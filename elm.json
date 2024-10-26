@@ -12,7 +12,8 @@
             "elm/svg": "1.0.1",
             "elm/url": "1.0.0",
             "icidasset/elm-binary": "2.1.0",
-            "mdgriffith/elm-ui": "1.1.8"
+            "mdgriffith/elm-ui": "1.1.8",
+            "nunntom/elm-ui-select": "4.0.0"
         },
         "indirect": {
             "elm/json": "1.1.3",

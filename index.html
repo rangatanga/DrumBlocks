@@ -5216,14 +5216,6 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$Main$Block = F3(
-	function (imageName, notePlacement, subdivision) {
-		return {imageName: imageName, notePlacement: notePlacement, subdivision: subdivision};
-	});
-var $author$project$Main$Instrument = F3(
-	function (name, staveLocation, stavePosition) {
-		return {name: name, staveLocation: staveLocation, stavePosition: stavePosition};
-	});
 var $author$project$Main$InstrumentBlocks = F2(
 	function (instrumentName, blockNames) {
 		return {blockNames: blockNames, instrumentName: instrumentName};
@@ -5232,148 +5224,6 @@ var $author$project$Main$Subdivision = F3(
 	function (name, description, subBeats) {
 		return {description: description, name: name, subBeats: subBeats};
 	});
-var $icidasset$elm_binary$Binary$Bits = function (a) {
-	return {$: 'Bits', a: a};
-};
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $icidasset$elm_binary$Binary$ifThenElse = F3(
-	function (bool, a, b) {
-		return bool ? a : b;
-	});
-var $icidasset$elm_binary$Binary$fromIntegers = A2(
-	$elm$core$Basics$composeR,
-	$elm$core$List$map(
-		function (i) {
-			return A3($icidasset$elm_binary$Binary$ifThenElse, i <= 0, false, true);
-		}),
-	$icidasset$elm_binary$Binary$Bits);
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$Dict$Black = {$: 'Black'};
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = {$: 'Red'};
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1.$) {
-				case 'LT':
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 'EQ':
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
-var $elm$core$Dict$fromList = function (assocs) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (_v0, dict) {
-				var key = _v0.a;
-				var value = _v0.b;
-				return A3($elm$core$Dict$insert, key, value, dict);
-			}),
-		$elm$core$Dict$empty,
-		assocs);
-};
 var $nunntom$elm_ui_select$Internal$Model$Model = function (a) {
 	return {$: 'Model', a: a};
 };
@@ -5413,240 +5263,8 @@ var $author$project$Main$initialModel = {
 			_List_fromArray(
 				['A', 'P', 'A', 'P']))
 		]),
-	availableInstruments: _List_fromArray(
-		[
-			A3($author$project$Main$Instrument, 'Ride Cymbal', 'F5', 9),
-			A3($author$project$Main$Instrument, 'High Tom', 'E5', 8),
-			A3($author$project$Main$Instrument, 'Mid Tom', 'D5', 7),
-			A3($author$project$Main$Instrument, 'Floor Tom', 'A4', 4),
-			A3($author$project$Main$Instrument, 'Hi-hat Foot', 'D4', 0)
-		]),
-	blockDict: $elm$core$Dict$fromList(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'A',
-				A3(
-					$author$project$Main$Block,
-					'A.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 0, 0, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'B',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 1, 0, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'C',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 0, 1, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'D',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 0, 0, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'E',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 1, 0, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'F',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 1, 1, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'G',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 0, 1, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'H',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 0, 0, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'I',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 0, 1, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'J',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 1, 0, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'K',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 1, 1, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'L',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 1, 1, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'M',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 0, 1, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'N',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 1, 0, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'O',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 1, 1, 1])),
-					'4-16')),
-				_Utils_Tuple2(
-				'P',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 0, 0, 0])),
-					'4-16')),
-				_Utils_Tuple2(
-				'Q',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 0, 0])),
-					'3-8')),
-				_Utils_Tuple2(
-				'R',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 1, 0])),
-					'3-8')),
-				_Utils_Tuple2(
-				'S',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 0, 1])),
-					'3-8')),
-				_Utils_Tuple2(
-				'T',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 1, 0])),
-					'3-8')),
-				_Utils_Tuple2(
-				'U',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 1, 1])),
-					'3-8')),
-				_Utils_Tuple2(
-				'V',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 0, 1])),
-					'3-8')),
-				_Utils_Tuple2(
-				'W',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[1, 1, 1])),
-					'3-8')),
-				_Utils_Tuple2(
-				'X',
-				A3(
-					$author$project$Main$Block,
-					'B.png',
-					$icidasset$elm_binary$Binary$fromIntegers(
-						_List_fromArray(
-							[0, 0, 0])),
-					'3-8'))
-			])),
 	instruments: _List_fromArray(
-		[
-			A3($author$project$Main$Instrument, 'Hi-Hat', 'G5', 10),
-			A3($author$project$Main$Instrument, 'Snare', 'C5', 6),
-			A3($author$project$Main$Instrument, 'Bass Drum', 'F4', 2)
-		]),
+		['Hi-Hat', 'Snare', 'Bass Drum']),
 	subdivisionSelect: A2(
 		$nunntom$elm_ui_select$Select$setItems,
 		_List_fromArray(
@@ -6105,6 +5723,11 @@ var $nunntom$elm_ui_select$Internal$Model$clear = function (_v0) {
 			model,
 			{applyFilter: false, highlighted: $elm$core$Maybe$Nothing, inputValue: '', menuOpen: false, selected: $elm$core$Maybe$Nothing}));
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $elm$core$Basics$ge = _Utils_ge;
 var $nunntom$elm_ui_select$Internal$Effect$GetContainerAndMenuElements = F2(
 	function (a, b) {
@@ -6987,6 +6610,8 @@ var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Set$Set_elm_builtin = function (a) {
 	return {$: 'Set_elm_builtin', a: a};
 };
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
 var $mdgriffith$elm_ui$Internal$Model$lengthClassName = function (x) {
 	switch (x.$) {
@@ -7137,6 +6762,115 @@ var $mdgriffith$elm_ui$Internal$Model$getStyleName = function (style) {
 				$mdgriffith$elm_ui$Internal$Model$transformClass(x));
 	}
 };
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
 var $elm$core$Set$insert = F2(
 	function (key, _v0) {
 		var dict = _v0.a;
@@ -13175,7 +12909,7 @@ var $author$project$Main$percussionClef = _List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
 				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$d('M 10 3 L 10 9')
+				$elm$svg$Svg$Attributes$d('M 10 6 L 10 12')
 			]),
 		_List_Nil),
 		A2(
@@ -13184,12 +12918,178 @@ var $author$project$Main$percussionClef = _List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
 				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$d('M 13 3 L 13 9')
+				$elm$svg$Svg$Attributes$d('M 13 6 L 13 12')
 			]),
 		_List_Nil)
 	]);
+var $author$project$Main$Ovoid = {$: 'Ovoid'};
+var $author$project$Main$Cross = {$: 'Cross'};
+var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
+var $author$project$Main$Instrument = F3(
+	function (staveLocation, stavePosition, noteShape) {
+		return {noteShape: noteShape, staveLocation: staveLocation, stavePosition: stavePosition};
+	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $author$project$Main$instrumentDict = $elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(
+			'Hi-Hat',
+			A3($author$project$Main$Instrument, 'G5', 2, $author$project$Main$Cross)),
+			_Utils_Tuple2(
+			'Ride Cymbal',
+			A3($author$project$Main$Instrument, 'F5', 3, $author$project$Main$CrossLedger)),
+			_Utils_Tuple2(
+			'High Tom',
+			A3($author$project$Main$Instrument, 'E5', 4.5, $author$project$Main$Ovoid)),
+			_Utils_Tuple2(
+			'Mid Tom',
+			A3($author$project$Main$Instrument, 'D5', 6, $author$project$Main$Ovoid)),
+			_Utils_Tuple2(
+			'Snare',
+			A3($author$project$Main$Instrument, 'C5', 7.5, $author$project$Main$Ovoid)),
+			_Utils_Tuple2(
+			'Floor Tom',
+			A3($author$project$Main$Instrument, 'A4', 10.5, $author$project$Main$Ovoid)),
+			_Utils_Tuple2(
+			'Bass Drum',
+			A3($author$project$Main$Instrument, 'F4', 13.5, $author$project$Main$Ovoid)),
+			_Utils_Tuple2(
+			'Hi-hat Foot',
+			A3($author$project$Main$Instrument, 'D4', 16, $author$project$Main$Cross))
+		]));
+var $author$project$Main$getNoteShape = function (instrumentName) {
+	var instr = A2($elm$core$Dict$get, instrumentName, $author$project$Main$instrumentDict);
+	if (instr.$ === 'Just') {
+		var instrument = instr.a;
+		return instrument.noteShape;
+	} else {
+		return $author$project$Main$Ovoid;
+	}
+};
+var $author$project$Main$getStavePosition = function (instrumentName) {
+	var instr = A2($elm$core$Dict$get, instrumentName, $author$project$Main$instrumentDict);
+	if (instr.$ === 'Just') {
+		var instrument = instr.a;
+		return instrument.stavePosition;
+	} else {
+		return 0;
+	}
+};
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
+var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $author$project$Main$renderNote = function (noteBlock) {
+	var stavePos = noteBlock.stavePos;
+	var noteIndex = noteBlock.index;
+	var _v0 = noteBlock.noteShape;
+	switch (_v0.$) {
+		case 'Ovoid':
+			return _List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$ellipse,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$cx(
+							$elm$core$String$fromFloat(20 + (noteIndex * 12.0))),
+							$elm$svg$Svg$Attributes$cy(
+							$elm$core$String$fromFloat(stavePos)),
+							$elm$svg$Svg$Attributes$rx('1.6'),
+							$elm$svg$Svg$Attributes$ry('1.4')
+						]),
+					_List_Nil)
+				]);
+		case 'Cross':
+			return _List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$strokeWidth('0.5'),
+							$elm$svg$Svg$Attributes$stroke('black'),
+							$elm$svg$Svg$Attributes$d(
+							'M 18 ' + ($elm$core$String$fromFloat(stavePos - 1) + (' L 22 ' + $elm$core$String$fromFloat(stavePos + 1))))
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$strokeWidth('0.5'),
+							$elm$svg$Svg$Attributes$stroke('black'),
+							$elm$svg$Svg$Attributes$d(
+							'M 22 ' + ($elm$core$String$fromFloat(stavePos - 1) + (' L 18 ' + $elm$core$String$fromFloat(stavePos + 1))))
+						]),
+					_List_Nil)
+				]);
+		case 'CrossLedger':
+			return _List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$circle,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$cx('20'),
+							$elm$svg$Svg$Attributes$cy(
+							$elm$core$String$fromFloat(stavePos)),
+							$elm$svg$Svg$Attributes$r('1.5')
+						]),
+					_List_Nil)
+				]);
+		default:
+			return _List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$circle,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$cx('20'),
+							$elm$svg$Svg$Attributes$cy(
+							$elm$core$String$fromFloat(stavePos)),
+							$elm$svg$Svg$Attributes$r('1.5')
+						]),
+					_List_Nil)
+				]);
+	}
+};
+var $author$project$Main$createInstrumentBlocks = function (instrBlocks) {
+	var sp = $author$project$Main$getStavePosition(instrBlocks.instrumentName);
+	var ns = $author$project$Main$getNoteShape(instrBlocks.instrumentName);
+	return $elm$core$List$concat(
+		A2(
+			$elm$core$List$map,
+			$author$project$Main$renderNote,
+			A2(
+				$elm$core$List$indexedMap,
+				F2(
+					function (i, b) {
+						return {blockName: b, index: i, noteShape: ns, stavePos: sp};
+					}),
+				instrBlocks.blockNames)));
+};
+var $author$project$Main$renderNotes = function (instrumentBlocks) {
+	return $elm$core$List$concat(
+		A2($elm$core$List$map, $author$project$Main$createInstrumentBlocks, instrumentBlocks));
+};
 var $author$project$Main$staveLines = _List_fromArray(
-	[0, 3, 6, 9, 12]);
+	[3, 6, 9, 12, 15]);
 var $author$project$Main$stave = A2(
 	$elm$core$List$map,
 	function (n) {
@@ -15122,7 +15022,7 @@ var $author$project$Main$view = function (model) {
 												$mdgriffith$elm_ui$Element$height(
 												$mdgriffith$elm_ui$Element$px(40)),
 												$mdgriffith$elm_ui$Element$Font$size(22),
-												$mdgriffith$elm_ui$Element$spacing(15)
+												$mdgriffith$elm_ui$Element$padding(5)
 											]),
 										$mdgriffith$elm_ui$Element$text('+ Add Instrument'))
 									]),
@@ -15161,7 +15061,11 @@ var $author$project$Main$view = function (model) {
 															$elm$svg$Svg$Attributes$height('100%'),
 															$elm$svg$Svg$Attributes$viewBox('0 0 110 105')
 														]),
-													_Utils_ap($author$project$Main$stave, $author$project$Main$percussionClef))))
+													_Utils_ap(
+														$author$project$Main$stave,
+														_Utils_ap(
+															$author$project$Main$percussionClef,
+															$author$project$Main$renderNotes(model.arrangement))))))
 										])))))))
 			]),
 		title: 'Drum Blocks'

@@ -5251,7 +5251,7 @@ var $author$project$Main$initialModel = {
 			$author$project$Main$InstrumentBlocks,
 			'Hi-Hat',
 			_List_fromArray(
-				['A', 'A', 'A', 'A'])),
+				['W', 'B', 'C', 'D'])),
 			A2(
 			$author$project$Main$InstrumentBlocks,
 			'Snare',
@@ -6464,6 +6464,9 @@ var $author$project$Main$update = F2(
 			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$InputChanged = function (a) {
+	return {$: 'InputChanged', a: a};
+};
 var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
 };
@@ -12519,7 +12522,7 @@ var $mdgriffith$elm_ui$Element$Border$width = function (v) {
 			v,
 			v));
 };
-var $author$project$Main$blockButton = function (block) {
+var $author$project$Main$blockButton = function (blockName) {
 	return A2(
 		$mdgriffith$elm_ui$Element$Input$button,
 		_List_fromArray(
@@ -12552,7 +12555,7 @@ var $author$project$Main$blockButton = function (block) {
 				$mdgriffith$elm_ui$Element$Font$size(22)
 			]),
 		{
-			label: $mdgriffith$elm_ui$Element$text(block),
+			label: $mdgriffith$elm_ui$Element$text(blockName),
 			onPress: $elm$core$Maybe$Just($author$project$Main$BlockClickMsg)
 		});
 };
@@ -12625,6 +12628,10 @@ var $author$project$Main$instrumentRow = function (instrumentBlock) {
 var $author$project$Main$instrumentView = function (instrumentBlocks) {
 	return A2($elm$core$List$map, $author$project$Main$instrumentRow, instrumentBlocks);
 };
+var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
+	return {$: 'HiddenLabel', a: a};
+};
+var $mdgriffith$elm_ui$Element$Input$labelHidden = $mdgriffith$elm_ui$Element$Input$HiddenLabel;
 var $mdgriffith$elm_ui$Internal$Model$OnlyDynamic = F2(
 	function (a, b) {
 		return {$: 'OnlyDynamic', a: a, b: b};
@@ -12922,13 +12929,86 @@ var $author$project$Main$percussionClef = _List_fromArray(
 			]),
 		_List_Nil)
 	]);
-var $author$project$Main$Ovoid = {$: 'Ovoid'};
-var $author$project$Main$Cross = {$: 'Cross'};
-var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
-var $author$project$Main$Instrument = F3(
-	function (staveLocation, stavePosition, noteShape) {
-		return {noteShape: noteShape, staveLocation: staveLocation, stavePosition: stavePosition};
+var $icidasset$elm_binary$Binary$Bits = function (a) {
+	return {$: 'Bits', a: a};
+};
+var $icidasset$elm_binary$Binary$condense = F2(
+	function (fn, _v0) {
+		var a = _v0.a.a;
+		var b = _v0.b.a;
+		return $icidasset$elm_binary$Binary$Bits(
+			A3($elm$core$List$map2, fn, a, b));
 	});
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var $icidasset$elm_binary$Binary$ensureSize = F2(
+	function (size, _v0) {
+		var bits = _v0.a;
+		var currentLength = $elm$core$List$length(bits);
+		return _Utils_eq(currentLength, size) ? $icidasset$elm_binary$Binary$Bits(bits) : ((_Utils_cmp(currentLength, size) > 0) ? $icidasset$elm_binary$Binary$Bits(
+			A2($elm$core$List$drop, currentLength - size, bits)) : $icidasset$elm_binary$Binary$Bits(
+			_Utils_ap(
+				A2($elm$core$List$repeat, size - currentLength, false),
+				bits)));
+	});
+var $icidasset$elm_binary$Binary$width = function (_v0) {
+	var bits = _v0.a;
+	return $elm$core$List$length(bits);
+};
+var $icidasset$elm_binary$Binary$makeIsometric = F2(
+	function (a, b) {
+		var _v0 = _Utils_Tuple2(
+			$icidasset$elm_binary$Binary$width(a),
+			$icidasset$elm_binary$Binary$width(b));
+		var widthA = _v0.a;
+		var widthB = _v0.b;
+		return _Utils_eq(widthA, widthB) ? _Utils_Tuple2(a, b) : ((_Utils_cmp(widthA, widthB) > 0) ? _Utils_Tuple2(
+			a,
+			A2($icidasset$elm_binary$Binary$ensureSize, widthA, b)) : _Utils_Tuple2(
+			A2($icidasset$elm_binary$Binary$ensureSize, widthB, a),
+			b));
+	});
+var $icidasset$elm_binary$Binary$and = F2(
+	function (a, b) {
+		return A2(
+			$icidasset$elm_binary$Binary$condense,
+			$elm$core$Basics$and,
+			A2($icidasset$elm_binary$Binary$makeIsometric, a, b));
+	});
+var $author$project$Main$Block = F3(
+	function (imageName, notePlacement, subdivision) {
+		return {imageName: imageName, notePlacement: notePlacement, subdivision: subdivision};
+	});
+var $icidasset$elm_binary$Binary$ifThenElse = F3(
+	function (bool, a, b) {
+		return bool ? a : b;
+	});
+var $icidasset$elm_binary$Binary$fromIntegers = A2(
+	$elm$core$Basics$composeR,
+	$elm$core$List$map(
+		function (i) {
+			return A3($icidasset$elm_binary$Binary$ifThenElse, i <= 0, false, true);
+		}),
+	$icidasset$elm_binary$Binary$Bits);
 var $elm$core$Dict$fromList = function (assocs) {
 	return A3(
 		$elm$core$List$foldl,
@@ -12941,12 +13021,439 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
+var $author$project$Main$blockDict = $elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(
+			'A',
+			A3(
+				$author$project$Main$Block,
+				'A.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 0, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'B',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 0, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'C',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 1, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'D',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 0, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'E',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 1, 0, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'F',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 1, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'G',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 1, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'H',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 0, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'I',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 1, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'J',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 0, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'K',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 1, 1, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'L',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 1, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'M',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 1, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'N',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 1, 0, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'O',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 1, 1, 1])),
+				'4-16')),
+			_Utils_Tuple2(
+			'P',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 0, 0])),
+				'4-16')),
+			_Utils_Tuple2(
+			'Q',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 0])),
+				'3-8')),
+			_Utils_Tuple2(
+			'R',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 0])),
+				'3-8')),
+			_Utils_Tuple2(
+			'S',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 1])),
+				'3-8')),
+			_Utils_Tuple2(
+			'T',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 1, 0])),
+				'3-8')),
+			_Utils_Tuple2(
+			'U',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 1])),
+				'3-8')),
+			_Utils_Tuple2(
+			'V',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 1])),
+				'3-8')),
+			_Utils_Tuple2(
+			'W',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 1, 1])),
+				'3-8')),
+			_Utils_Tuple2(
+			'X',
+			A3(
+				$author$project$Main$Block,
+				'B.png',
+				$icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 0])),
+				'3-8'))
+		]));
+var $elm$core$Basics$pow = _Basics_pow;
+var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
+	var bits = _v0.a;
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (bit, _v1) {
+				var x = _v1.a;
+				var exponent = _v1.b;
+				return _Utils_Tuple2(
+					(A2($elm$core$Basics$pow, 2, exponent) * A3($icidasset$elm_binary$Binary$ifThenElse, bit, 1, 0)) + x,
+					exponent - 1);
+			}),
+		_Utils_Tuple2(
+			0,
+			$elm$core$List$length(bits) - 1),
+		bits).a;
+};
+var $author$project$Main$isSubBeatMatch = F2(
+	function (subBeat, noteBlock) {
+		var blockQuery = A2($elm$core$Dict$get, noteBlock.blockName, $author$project$Main$blockDict);
+		if (blockQuery.$ === 'Just') {
+			var block = blockQuery.a;
+			var _v1 = block.subdivision;
+			switch (_v1) {
+				case '4-16':
+					return (((subBeat === 1) && ($icidasset$elm_binary$Binary$toDecimal(
+						A2(
+							$icidasset$elm_binary$Binary$and,
+							block.notePlacement,
+							$icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[1, 0, 0, 0])))) > 0)) || (((subBeat === 4) && ($icidasset$elm_binary$Binary$toDecimal(
+						A2(
+							$icidasset$elm_binary$Binary$and,
+							block.notePlacement,
+							$icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[0, 1, 0, 0])))) > 0)) || (((subBeat === 7) && ($icidasset$elm_binary$Binary$toDecimal(
+						A2(
+							$icidasset$elm_binary$Binary$and,
+							block.notePlacement,
+							$icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[0, 0, 1, 0])))) > 0)) || ((subBeat === 10) && ($icidasset$elm_binary$Binary$toDecimal(
+						A2(
+							$icidasset$elm_binary$Binary$and,
+							block.notePlacement,
+							$icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[0, 0, 0, 1])))) > 0))))) ? true : false;
+				case '3-8':
+					return (((subBeat === 1) && ($icidasset$elm_binary$Binary$toDecimal(
+						A2(
+							$icidasset$elm_binary$Binary$and,
+							block.notePlacement,
+							$icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[1, 0, 0])))) > 0)) || (((subBeat === 5) && ($icidasset$elm_binary$Binary$toDecimal(
+						A2(
+							$icidasset$elm_binary$Binary$and,
+							block.notePlacement,
+							$icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[0, 1, 0])))) > 0)) || ((subBeat === 9) && ($icidasset$elm_binary$Binary$toDecimal(
+						A2(
+							$icidasset$elm_binary$Binary$and,
+							block.notePlacement,
+							$icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[0, 0, 1])))) > 0)))) ? true : false;
+				default:
+					return false;
+			}
+		} else {
+			return false;
+		}
+	});
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
+var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
+var $author$project$Main$renderNote = F3(
+	function (beat, subBeat, noteBlock) {
+		var noteCenterY = noteBlock.stavePos;
+		var noteCenterX = 20.0 + ((((beat - 1) * 12) + (subBeat - 1)) * 4.0);
+		var _v0 = noteBlock.noteShape;
+		switch (_v0.$) {
+			case 'Ovoid':
+				return _List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$ellipse,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$cx(
+								$elm$core$String$fromFloat(noteCenterX)),
+								$elm$svg$Svg$Attributes$cy(
+								$elm$core$String$fromFloat(noteCenterY)),
+								$elm$svg$Svg$Attributes$rx('1.6'),
+								$elm$svg$Svg$Attributes$ry('1.4'),
+								$elm$svg$Svg$Attributes$transform(
+								'rotate(-15, ' + ($elm$core$String$fromFloat(noteCenterX) + (', ' + ($elm$core$String$fromFloat(noteCenterY) + ')'))))
+							]),
+						_List_Nil)
+					]);
+			case 'Cross':
+				return _List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$path,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$strokeWidth('0.4'),
+								$elm$svg$Svg$Attributes$stroke('black'),
+								$elm$svg$Svg$Attributes$d(
+								'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))
+							]),
+						_List_Nil),
+						A2(
+						$elm$svg$Svg$path,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$strokeWidth('0.4'),
+								$elm$svg$Svg$Attributes$stroke('black'),
+								$elm$svg$Svg$Attributes$d(
+								'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.5) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + $elm$core$String$fromFloat(noteCenterY - 1.5))))))))
+							]),
+						_List_Nil)
+					]);
+			case 'CrossLedger':
+				return _List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$path,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$strokeWidth('0.5'),
+								$elm$svg$Svg$Attributes$stroke('black'),
+								$elm$svg$Svg$Attributes$d(
+								'M ' + ($elm$core$String$fromFloat(noteCenterX - 2) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 2) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 2) + (' ' + $elm$core$String$fromFloat(noteCenterY + 2))))))))
+							]),
+						_List_Nil),
+						A2(
+						$elm$svg$Svg$path,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$strokeWidth('0.5'),
+								$elm$svg$Svg$Attributes$stroke('black'),
+								$elm$svg$Svg$Attributes$d(
+								'M ' + ($elm$core$String$fromFloat(noteCenterX - 2) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 2) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 2) + (' ' + $elm$core$String$fromFloat(noteCenterY - 2))))))))
+							]),
+						_List_Nil),
+						A2(
+						$elm$svg$Svg$path,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+								$elm$svg$Svg$Attributes$stroke('black'),
+								$elm$svg$Svg$Attributes$d(
+								'M ' + ($elm$core$String$fromFloat(noteCenterX - 2.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 2.5) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
+							]),
+						_List_Nil)
+					]);
+			default:
+				return _List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$circle,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$cx(
+								$elm$core$String$fromFloat(noteCenterX)),
+								$elm$svg$Svg$Attributes$cy(
+								$elm$core$String$fromFloat(noteCenterY)),
+								$elm$svg$Svg$Attributes$r('1.5')
+							]),
+						_List_Nil)
+					]);
+		}
+	});
+var $author$project$Main$blockLoop = function (params) {
+	return (_Utils_eq(params.beat, params.noteBlock.blockBeat) && A2($author$project$Main$isSubBeatMatch, params.subBeat, params.noteBlock)) ? A3($author$project$Main$renderNote, params.beat, params.subBeat, params.noteBlock) : _List_Nil;
+};
+var $author$project$Main$beatLoop = function (params) {
+	return $elm$core$List$concat(
+		A2(
+			$elm$core$List$map,
+			$author$project$Main$blockLoop,
+			A2(
+				$elm$core$List$map,
+				function (n) {
+					return {beat: params.beat, noteBlock: n, subBeat: params.subBeat};
+				},
+				params.noteBlocks)));
+};
+var $author$project$Main$Ovoid = {$: 'Ovoid'};
+var $author$project$Main$Cross = {$: 'Cross'};
+var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
+var $author$project$Main$Instrument = F3(
+	function (staveLocation, stavePosition, noteShape) {
+		return {noteShape: noteShape, staveLocation: staveLocation, stavePosition: stavePosition};
+	});
 var $author$project$Main$instrumentDict = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
 			_Utils_Tuple2(
 			'Hi-Hat',
-			A3($author$project$Main$Instrument, 'G5', 2, $author$project$Main$Cross)),
+			A3($author$project$Main$Instrument, 'G5', 1.5, $author$project$Main$Cross)),
 			_Utils_Tuple2(
 			'Ride Cymbal',
 			A3($author$project$Main$Instrument, 'F5', 3, $author$project$Main$CrossLedger)),
@@ -12987,106 +13494,42 @@ var $author$project$Main$getStavePosition = function (instrumentName) {
 		return 0;
 	}
 };
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
-var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
-var $author$project$Main$renderNote = function (noteBlock) {
-	var stavePos = noteBlock.stavePos;
-	var noteIndex = noteBlock.index;
-	var _v0 = noteBlock.noteShape;
-	switch (_v0.$) {
-		case 'Ovoid':
-			return _List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$ellipse,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$cx(
-							$elm$core$String$fromFloat(20 + (noteIndex * 12.0))),
-							$elm$svg$Svg$Attributes$cy(
-							$elm$core$String$fromFloat(stavePos)),
-							$elm$svg$Svg$Attributes$rx('1.6'),
-							$elm$svg$Svg$Attributes$ry('1.4')
-						]),
-					_List_Nil)
-				]);
-		case 'Cross':
-			return _List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$path,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$strokeWidth('0.5'),
-							$elm$svg$Svg$Attributes$stroke('black'),
-							$elm$svg$Svg$Attributes$d(
-							'M 18 ' + ($elm$core$String$fromFloat(stavePos - 1) + (' L 22 ' + $elm$core$String$fromFloat(stavePos + 1))))
-						]),
-					_List_Nil),
-					A2(
-					$elm$svg$Svg$path,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$strokeWidth('0.5'),
-							$elm$svg$Svg$Attributes$stroke('black'),
-							$elm$svg$Svg$Attributes$d(
-							'M 22 ' + ($elm$core$String$fromFloat(stavePos - 1) + (' L 18 ' + $elm$core$String$fromFloat(stavePos + 1))))
-						]),
-					_List_Nil)
-				]);
-		case 'CrossLedger':
-			return _List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$circle,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$cx('20'),
-							$elm$svg$Svg$Attributes$cy(
-							$elm$core$String$fromFloat(stavePos)),
-							$elm$svg$Svg$Attributes$r('1.5')
-						]),
-					_List_Nil)
-				]);
-		default:
-			return _List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$circle,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$cx('20'),
-							$elm$svg$Svg$Attributes$cy(
-							$elm$core$String$fromFloat(stavePos)),
-							$elm$svg$Svg$Attributes$r('1.5')
-						]),
-					_List_Nil)
-				]);
-	}
-};
 var $author$project$Main$createInstrumentBlocks = function (instrBlocks) {
 	var sp = $author$project$Main$getStavePosition(instrBlocks.instrumentName);
 	var ns = $author$project$Main$getNoteShape(instrBlocks.instrumentName);
+	return A2(
+		$elm$core$List$indexedMap,
+		F2(
+			function (i, b) {
+				return {blockBeat: i + 1, blockName: b, noteShape: ns, stavePos: sp};
+			}),
+		instrBlocks.blockNames);
+};
+var $author$project$Main$renderBar = function (instrumentBlocks) {
+	var subBeats = A2($elm$core$List$range, 1, 12);
+	var noteBlocks = $elm$core$List$concat(
+		A2($elm$core$List$map, $author$project$Main$createInstrumentBlocks, instrumentBlocks));
+	var beatCount = A2($elm$core$List$range, 1, 4);
 	return $elm$core$List$concat(
 		A2(
 			$elm$core$List$map,
-			$author$project$Main$renderNote,
+			$author$project$Main$beatLoop,
 			A2(
-				$elm$core$List$indexedMap,
-				F2(
-					function (i, b) {
-						return {blockName: b, index: i, noteShape: ns, stavePos: sp};
-					}),
-				instrBlocks.blockNames)));
-};
-var $author$project$Main$renderNotes = function (instrumentBlocks) {
-	return $elm$core$List$concat(
-		A2($elm$core$List$map, $author$project$Main$createInstrumentBlocks, instrumentBlocks));
+				$elm$core$List$map,
+				function (i) {
+					return {beat: i.a, noteBlocks: noteBlocks, subBeat: i.b};
+				},
+				A2(
+					$elm$core$List$concatMap,
+					function (i) {
+						return A2(
+							$elm$core$List$map,
+							function (j) {
+								return _Utils_Tuple2(i, j);
+							},
+							subBeats);
+					},
+					beatCount))));
 };
 var $author$project$Main$staveLines = _List_fromArray(
 	[3, 6, 9, 12, 15]);
@@ -13099,15 +13542,11 @@ var $author$project$Main$stave = A2(
 				[
 					$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$d('M 5 ' + (n + (' L 95 ' + n)))
+					$elm$svg$Svg$Attributes$d('M 5 ' + (n + (' L 395 ' + n)))
 				]),
 			_List_Nil);
 	},
 	A2($elm$core$List$map, $elm$core$String$fromInt, $author$project$Main$staveLines));
-var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
-	return {$: 'HiddenLabel', a: a};
-};
-var $mdgriffith$elm_ui$Element$Input$labelHidden = $mdgriffith$elm_ui$Element$Input$HiddenLabel;
 var $mdgriffith$elm_ui$Element$Input$Placeholder = F2(
 	function (a, b) {
 		return {$: 'Placeholder', a: a, b: b};
@@ -15038,35 +15477,48 @@ var $author$project$Main$view = function (model) {
 												]),
 											$mdgriffith$elm_ui$Element$none)
 										]),
-									_List_fromArray(
-										[
-											A2(
-											$mdgriffith$elm_ui$Element$el,
-											_List_fromArray(
-												[
-													$mdgriffith$elm_ui$Element$alignLeft,
-													$mdgriffith$elm_ui$Element$alignTop,
-													$mdgriffith$elm_ui$Element$height(
-													$mdgriffith$elm_ui$Element$px(350)),
-													$mdgriffith$elm_ui$Element$width(
-													$mdgriffith$elm_ui$Element$px(1000)),
-													$mdgriffith$elm_ui$Element$padding(5)
-												]),
-											$mdgriffith$elm_ui$Element$html(
+									_Utils_ap(
+										_List_fromArray(
+											[
 												A2(
-													$elm$svg$Svg$svg,
-													_List_fromArray(
-														[
-															$elm$svg$Svg$Attributes$width('100%'),
-															$elm$svg$Svg$Attributes$height('100%'),
-															$elm$svg$Svg$Attributes$viewBox('0 0 110 105')
-														]),
-													_Utils_ap(
-														$author$project$Main$stave,
+												$mdgriffith$elm_ui$Element$el,
+												_List_fromArray(
+													[
+														$mdgriffith$elm_ui$Element$alignLeft,
+														$mdgriffith$elm_ui$Element$alignTop,
+														$mdgriffith$elm_ui$Element$height(
+														$mdgriffith$elm_ui$Element$px(350)),
+														$mdgriffith$elm_ui$Element$width(
+														$mdgriffith$elm_ui$Element$px(2000)),
+														$mdgriffith$elm_ui$Element$padding(5)
+													]),
+												$mdgriffith$elm_ui$Element$html(
+													A2(
+														$elm$svg$Svg$svg,
+														_List_fromArray(
+															[
+																$elm$svg$Svg$Attributes$width('100%'),
+																$elm$svg$Svg$Attributes$height('100%'),
+																$elm$svg$Svg$Attributes$viewBox('0 0 210 105')
+															]),
 														_Utils_ap(
-															$author$project$Main$percussionClef,
-															$author$project$Main$renderNotes(model.arrangement))))))
-										])))))))
+															$author$project$Main$stave,
+															_Utils_ap(
+																$author$project$Main$percussionClef,
+																$author$project$Main$renderBar(model.arrangement))))))
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$mdgriffith$elm_ui$Element$Input$text,
+												_List_Nil,
+												{
+													label: $mdgriffith$elm_ui$Element$Input$labelHidden('Label '),
+													onChange: $author$project$Main$InputChanged,
+													placeholder: $elm$core$Maybe$Nothing,
+													text: 'StrAing'
+												})
+											]))))))))
 			]),
 		title: 'Drum Blocks'
 	};

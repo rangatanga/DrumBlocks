@@ -4,23 +4,19 @@ import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onInput, on)
 import Url
 import Element exposing (Element, el, text, row, alignRight, fill, width, rgb255, spacing, centerY, padding, rgb, Color)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Element.Input as Input
 import Platform exposing (Router)
 import Binary exposing (..)
-import Element.Input
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Select exposing (..)
 import Dict exposing (..)
 import Array exposing (Array)
-import Widget exposing (..)
-import Widget.Material as Material
---import Html.Events exposing (..)
+import Json.Decode as Json
 
 
 -- MAIN
@@ -46,7 +42,8 @@ type alias Model =
   { subdivisions : List Subdivision
   , instruments : List String
   , arrangement : List InstrumentBlocks
-  , subdivisionSelect : Select.Select Subdivision
+  --, subdivisionSelect : Select.Select Subdivision
+  , debugText : String
   }
 
 type alias Subdivision =
@@ -164,8 +161,9 @@ initialModel =
                     , InstrumentBlocks "Snare" ["P", "A", "P", "A"]
                     , InstrumentBlocks "Bass Drum" ["A", "P", "A", "P"]
                     ]     
-    , subdivisionSelect = Select.init "select-subdivision" |> Select.setItems [Subdivision "4-16" "Four 16ths" 4
-                                                                              ,Subdivision "3-8" "Three 8ths" 3]
+    --, subdivisionSelect = Select.init "select-subdivision" |> Select.setItems [Subdivision "4-16" "Four 16ths" 4
+    --                                                                          ,Subdivision "3-8" "Three 8ths" 3]
+    , debugText = ""
     }   
 
 
@@ -175,21 +173,35 @@ initialModel =
 type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
-  | BlockClickMsg 
-  | SubdivisionSelectMsg (Select.Msg Subdivision)
+  | BlockSelectedChange SelectIdValue
+  --| SubdivisionSelectMsg (Select.Msg Subdivision)
   | ChangedSelected Int
   | InputChanged String
-
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = 
     case msg of
-        SubdivisionSelectMsg subMsg ->
-            Select.update SubdivisionSelectMsg subMsg model.subdivisionSelect
-                |> Tuple.mapFirst (\select -> { model | subdivisionSelect = select })
+        BlockSelectedChange param ->  let
+                                        idList = String.split "~" param.id
+                                        instrName = List.head idList
+                                        blockIndex = List.head (List.reverse idList)
+                                        arr = model.arrangement
+                                      in
+                                      case instrName of
+                                          Just iName -> case blockIndex of
+                                                          Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value arr)}, Cmd.none)
+                                                          _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+                                          _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
         _ -> (model, Cmd.none)
 
 
+updateArrangement : String -> String -> String -> List InstrumentBlocks -> List InstrumentBlocks
+updateArrangement instrName blockIndex newVal currArrangement =
+  case String.toInt blockIndex of
+      Just bIndex -> (currArrangement) |> List.map (\a -> if a.instrumentName == instrName then 
+                                                             InstrumentBlocks instrName (a.blockNames |> List.indexedMap (\i b -> if i == bIndex then newVal else b))
+                                                          else a)
+      _ -> currArrangement
 
 -- SUBSCRIPTIONS
 
@@ -211,15 +223,7 @@ view model =
           (Element.column 
             [Element.width Element.fill
             ]
-            (Element.row []
-              [
-              Element.el 
-                [Element.width (Element.px 180)
-                ,Font.size 22] 
-                (Element.text "Subdivision:")
-              , subdivisionDropdown model
-              ]
-           :: (instrumentView model.arrangement)
+            ((instrumentView model.arrangement)
            ++ [Element.el 
                 [Element.width (Element.px 180)
                 , Element.height (Element.px 40)
@@ -243,40 +247,27 @@ view model =
                 (Element.html (svg
                                   [ Svg.Attributes.width "100%"
                                   , Svg.Attributes.height "100%"
-                                  , viewBox "0 0 210 105"
+                                  , viewBox "0 0 200 100"
                                   ]
                                   (stave ++ percussionClef ++ (renderBar model.arrangement)))
                                   --(stave ++ percussionClef))
                 ) --Element.html
               ] --Element.el 
-            ++ [(Input.text [] {onChange = InputChanged
-                            , text = "StrAing"
-                            , placeholder = Nothing-- Just (Input.placeholder [] (Element.text ""))
-                            , label = (Input.labelHidden "Label ")
-                           })
-              ]
             )
           ) --Element.column
+      , Html.text model.debugText
       ]
   }
 
 
 subdivisionDropdown : Model -> Element Msg
 subdivisionDropdown model = 
-    Select.view
-        |> Select.toElement []
-            { select = model.subdivisionSelect
-            , onChange = SubdivisionSelectMsg
-            , itemToString = \c -> c.description
-            , label = Element.Input.labelHidden ""
-            , placeholder = Just (Element.Input.placeholder [] (Element.text "Type to search"))
-            }
-    {- Element.el  [Font.size 22] 
+     Element.el  [Font.size 22] 
         (Element.row [] 
             [ Element.el [Element.width (Element.px 150)] (Element.text "Subdivision:")
             , Element.el [Font.size 22] (Element.html (select [] (List.map subdivisionOption model.subdivisions)))
             ]
-        ) -}
+        ) 
 
 
 subdivisionOption : Subdivision -> Html Msg
@@ -293,42 +284,49 @@ instrumentRow instrumentBlock = Element.row
                                   ] ([Element.el 
                                       [Element.width (Element.px 180)
                                       , Font.size 22
-                                      ] (Element.text instrumentBlock.instrumentName)] ++ blockView instrumentBlock.blockNames)
+                                      ] (Element.text instrumentBlock.instrumentName)] ++ blockView instrumentBlock)
 
-blockView : List String -> List (Element Msg)
-blockView blocks = List.map blockButton blocks
+blockView : InstrumentBlocks -> List (Element Msg)
+blockView instrblocks = 
+  let
+    instrName = instrblocks.instrumentName
+    blocks = instrblocks.blockNames
+  in
+  (blocks) |> List.indexedMap (\i b -> blockButton instrName i b)
 
-blockButton : String -> Element Msg
-blockButton blockName = 
-  Element.Input.button 
-                  [ Background.color (Element.rgb255 238 238 238)
-                  , Element.focused [Background.color (Element.rgb255 238 238 238)]
-                  , Element.width (Element.px 80)
-                  , Element.height (Element.px 25)
-                  , Border.solid
-                  , Border.color (rgb 0 0 0)
-                  , Border.width 2
-                  , Border.shadow {offset = (12.0,12.0), size = 5, blur = 5, color = (rgb 10 10 10)}
-                  , Border.rounded 5
-                  , Font.center
-                  , Font.size 22
-                  ]
-                  { onPress = Just BlockClickMsg
-                  , label = Element.text blockName
-                  }
+blockButton : String -> Int -> String -> Element Msg
+blockButton instrName index blockName = 
+  Element.html <| Html.select [onChange BlockSelectedChange
+                              , Html.Attributes.id (instrName ++ "~" ++ String.fromInt index)
+                              ]
+                              (getBlockOptions blockName)
+
+getBlockOptions : String -> List (Html Msg)
+getBlockOptions blockName = 
+  (Dict.keys blockDict) |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k]))
 
 
-{-
-myElement : String -> Element msg
-myElement txt =
-    el
-        [ Background.color (rgb255 140 0 245)
-        , Font.color (rgb255 255 255 255)
-        , Border.rounded 3
-        , padding 30
-        ]
-        (Element.text txt)
--}
+onChange : (SelectIdValue -> msg) -> Html.Attribute msg
+onChange tagger =
+  on "change" (Json.map tagger selectDecoder)
+
+targetIdDecoder : Json.Decoder String
+targetIdDecoder =
+  Json.at ["target", "id"] Json.string
+
+targetValueDecoder : Json.Decoder String
+targetValueDecoder =
+  Json.at ["target", "value"] Json.string
+
+type alias SelectIdValue = 
+  {
+    id : String
+    ,value : String
+  }
+
+selectDecoder : Json.Decoder SelectIdValue
+selectDecoder =
+  Json.map2 SelectIdValue targetIdDecoder targetValueDecoder
 
 stave : List (Svg Msg)
 stave =
@@ -339,7 +337,7 @@ stave =
                 Svg.path
                     [ strokeWidth "0.3"
                     , stroke "black"
-                    , d ("M 5 " ++ n ++ " L 395 " ++ n)
+                    , d ("M 5 " ++ n ++ " L 355 " ++ n)
                     ]
                     []
             )
@@ -431,7 +429,7 @@ blockLoop params =
 renderNote : Int -> Int -> NoteBlock -> List (Svg Msg)
 renderNote beat subBeat noteBlock = 
   let
-      noteCenterX = 20.0 + ((toFloat (((beat - 1) * 12) + (subBeat - 1))) * 4.0)
+      noteCenterX = 20.0 + ((toFloat (((beat - 1) * 12) + (subBeat - 1))) * 3.6)
       noteCenterY = noteBlock.stavePos
   in
   case noteBlock.noteShape of

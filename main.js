@@ -6107,14 +6107,16 @@ var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
+var $author$project$Main$Cross = {$: 'Cross'};
+var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
 var $author$project$Main$Ovoid = {$: 'Ovoid'};
 var $author$project$Main$Rest = {$: 'Rest'};
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
-var $author$project$Main$Cross = {$: 'Cross'};
-var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
 var $author$project$Main$Instrument = F3(
 	function (staveLocation, stavePosition, noteShape) {
 		return {noteShape: noteShape, staveLocation: staveLocation, stavePosition: stavePosition};
@@ -6157,6 +6159,16 @@ var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
 var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
+	return A3(
+		_VirtualDom_attributeNS,
+		'http://www.w3.org/1999/xlink',
+		'xlink:href',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Main$renderNote = F2(
 	function (beat, noteSubBeat) {
 		var noteCenterX = 20.0 + ((((beat - 1) * 12) + (noteSubBeat.subBeat - 1)) * 3.6);
@@ -6177,7 +6189,19 @@ var $author$project$Main$renderNote = F2(
 				return $author$project$Main$Ovoid;
 			}
 		}();
-		var stalk = _Utils_eq(noteShape, $author$project$Main$Rest) ? _List_Nil : _List_fromArray(
+		var stalk = _Utils_eq(noteShape, $author$project$Main$Rest) ? _List_Nil : ((_Utils_eq(noteShape, $author$project$Main$Cross) || _Utils_eq(noteShape, $author$project$Main$CrossLedger)) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.5'),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.2))))))))
+					]),
+				_List_Nil)
+			]) : _List_fromArray(
 			[
 				A2(
 				$elm$svg$Svg$path,
@@ -6189,7 +6213,7 @@ var $author$project$Main$renderNote = F2(
 						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
 					]),
 				_List_Nil)
-			]);
+			]));
 		return A2(
 			$elm$core$List$append,
 			function () {
@@ -6289,14 +6313,16 @@ var $author$project$Main$renderNote = F2(
 						return _List_fromArray(
 							[
 								A2(
-								$elm$svg$Svg$circle,
+								$elm$svg$Svg$image,
 								_List_fromArray(
 									[
-										$elm$svg$Svg$Attributes$cx(
-										$elm$core$String$fromFloat(noteCenterX)),
-										$elm$svg$Svg$Attributes$cy(
-										$elm$core$String$fromFloat(noteCenterY)),
-										$elm$svg$Svg$Attributes$r('1.0')
+										$elm$svg$Svg$Attributes$xlinkHref('assets/images/quarter-rest.svg'),
+										$elm$svg$Svg$Attributes$width('8'),
+										$elm$svg$Svg$Attributes$height('8'),
+										$elm$svg$Svg$Attributes$x(
+										$elm$core$String$fromFloat(noteCenterX - 4)),
+										$elm$svg$Svg$Attributes$y(
+										$elm$core$String$fromFloat(noteCenterY - 6))
 									]),
 								_List_Nil)
 							]);
@@ -6369,7 +6395,7 @@ var $author$project$Main$updateStalkHeights = function (noteSubBeats) {
 		} else {
 			return 20;
 		}
-	}() - 20;
+	}() - 8;
 	return A2(
 		$elm$core$List$map,
 		function (nsb) {
@@ -6386,11 +6412,11 @@ var $author$project$Main$updateNoteSubBeats = function (noteSubBeats) {
 			function (a) {
 				return a.subBeat === 1;
 			},
-			noteSubBeats) ? _List_Nil : _List_fromArray(
+			updateStalks) ? _List_Nil : _List_fromArray(
 			[
 				A7($author$project$Main$NoteSubBeat, 1, 'Rest', $author$project$Main$Crotchet, false, true, '4-16', 0)
 			]),
-		noteSubBeats);
+		updateStalks);
 	return noteSubBeatsWithRests;
 };
 var $author$project$Main$buildNoteSubBeats = F2(

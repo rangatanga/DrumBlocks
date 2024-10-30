@@ -458,10 +458,10 @@ updateNoteSubBeats : List NoteSubBeat -> List NoteSubBeat
 updateNoteSubBeats noteSubBeats = 
   let
     updateStalks = updateStalkHeights noteSubBeats
-    noteSubBeatsWithRests = List.append (if List.any (\a -> a.subBeat == 1) noteSubBeats then 
+    noteSubBeatsWithRests = List.append (if List.any (\a -> a.subBeat == 1) updateStalks then 
                                             []
                                          else
-                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0]) noteSubBeats
+                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0]) updateStalks
   in
   noteSubBeatsWithRests
 
@@ -476,7 +476,7 @@ updateStalkHeights noteSubBeats =
                          
     justStalkHeight = (case stalkHeight of
                         Just sHeight -> sHeight
-                        _ -> 20) - 20
+                        _ -> 20) - 8
   in
   (noteSubBeats) |> List.map (\nsb -> NoteSubBeat nsb.subBeat nsb.instrumentName nsb.noteDuration nsb.isDotted nsb.isRest nsb.subdivision justStalkHeight)
 
@@ -493,12 +493,20 @@ renderNote beat noteSubBeat =
                     _ -> Ovoid  
     stalk = if noteShape == Rest then []
             else
-              [Svg.path
-                [ strokeWidth "0.5"
-                , stroke "black"
-                , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat (noteCenterY))
-                ]
-                []]
+              if noteShape == Cross || noteShape == CrossLedger then
+                [Svg.path
+                  [ strokeWidth "0.5"
+                  , stroke "black"
+                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat (noteCenterY + 1.2))
+                  ]
+                  []]
+              else
+                [Svg.path
+                  [ strokeWidth "0.5"
+                  , stroke "black"
+                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat noteCenterY)
+                  ]
+                  []]
   in
   List.append 
     (case noteShape of
@@ -543,7 +551,11 @@ renderNote beat noteSubBeat =
         Triangle ->
             [Svg.circle [cx (String.fromFloat noteCenterX), cy (String.fromFloat noteCenterY), r "1.5"] []]
         Rest ->
-            [Svg.circle [cx (String.fromFloat noteCenterX), cy (String.fromFloat noteCenterY), r "1.0"] []])
+            [Svg.image [xlinkHref "assets/images/quarter-rest.svg"
+                        , Svg.Attributes.width "8"
+                        , Svg.Attributes.height "8"
+                        , Svg.Attributes.x (String.fromFloat (noteCenterX - 4))
+                        , Svg.Attributes.y (String.fromFloat (noteCenterY - 6))] [] ])
       stalk     
 
 

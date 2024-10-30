@@ -1,0 +1,28 @@
+.instrumentTableHeaderRow {
+}
+
+.instrumentTableHeaderCell {
+    min-height: 50;
+    font-size: 24;
+}
+
+.instrumentTableRow {
+
+}
+
+.instrumentTableCell {
+    min-height: 50;
+    font-size: 22;
+}
+
+.instrumentBlockSelect {
+    min-width: 70;
+    min-height: 30;
+    font-size: 30;
+
+}
+
+.stave {
+    width: 90%;
+    height: 100%;
+}

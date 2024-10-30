@@ -4,18 +4,14 @@ import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, on)
+import Html.Attributes as HA
+import Html.Events exposing (on)
 import Url
-import Element exposing (Element, el, text, row, alignRight, fill, width, rgb255, spacing, centerY, padding, rgb, Color)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Font as Font
-import Platform exposing (Router)
+--import Platform exposing (Router)
 import Binary exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Dict exposing (..)
-import Array exposing (Array)
 import Json.Decode as Json
 
 
@@ -98,20 +94,23 @@ type alias NoteBlock =
   ,blockName : String
   }
 
-staveLines : List Int
+staveLines : List Float
 staveLines =
-    [ 3, 6, 9, 12, 15]
+    [ 0, 3, 6, 9, 12]
+
+staveShiftY : Float
+staveShiftY = 20
 
 instrumentDict : Dict String Instrument
 instrumentDict = Dict.fromList 
-    [("Hi-Hat", Instrument "G5" 1.5 Cross)
-    , ("Ride Cymbal", Instrument "F5" 3 CrossLedger)
-    , ("High Tom", Instrument "E5" 4.5 Ovoid)
-    , ("Mid Tom", Instrument "D5" 6 Ovoid)
-    , ("Snare", Instrument "C5" 7.5 Ovoid)
-    , ("Floor Tom", Instrument "A4" 10.5 Ovoid)
-    , ("Bass Drum", Instrument "F4" 13.5 Ovoid)      
-    , ("Hi-hat Foot", Instrument "D4" 16 Cross)
+    [("Hi-Hat", Instrument "G5" -1.5 Cross)
+    , ("Ride Cymbal", Instrument "F5" 0 CrossLedger)
+    , ("High Tom", Instrument "E5" 1.5 Ovoid)
+    , ("Mid Tom", Instrument "D5" 3 Ovoid)
+    , ("Snare", Instrument "C5" 4.5 Ovoid)
+    , ("Floor Tom", Instrument "A4" 7.5 Ovoid)
+    , ("Bass Drum", Instrument "F4" 10.5 Ovoid)      
+    , ("Hi-hat Foot", Instrument "D4" 13 Cross)
     ]
 
 blockDict : Dict String Block
@@ -175,8 +174,6 @@ type Msg
   | UrlChanged Url.Url
   | BlockSelectedChange SelectIdValue
   --| SubdivisionSelectMsg (Select.Msg Subdivision)
-  | ChangedSelected Int
-  | InputChanged String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = 
@@ -219,74 +216,70 @@ view : Model -> Browser.Document Msg
 view model =
   { title = "Drum Blocks"
   , body =
-      [ Element.layout [] <| 
-          (Element.column 
-            [Element.width Element.fill
-            ]
-            ((instrumentView model.arrangement)
-           ++ [Element.el 
-                [Element.width (Element.px 180)
-                , Element.height (Element.px 40)
-                , Font.size 22
-                --, Element.spacing 15
-                , Element.padding 5
-                ] 
-                (Element.text "+ Add Instrument")]
-           ++ [Element.el 
-                [Element.height (Element.px 50) 
+      [
+        Html.table
+              [] 
+              ([Html.tr 
+                        [HA.class "instrumentTableHeaderRow"] 
+                        [th [HA.class "instrumentTableHeaderCell"] 
+                            [Html.text "Instrument"]
+                        ,th [HA.class "instrumentTableHeaderCell"] 
+                            [Html.text "Rhythm Blocks"]
+                        ]]
+               ++ (instrumentView model.arrangement)
+               ++ [Html.tr 
+                        [HA.class "instrumentTableRow"] 
+                        [td [] [Html.text "+ Add Instrument"]
+                        ,td [] []
+                        ]
+                  ])
+      , div []
+            [svg
+                [ viewBox "0 0 200 100"
+                , Svg.Attributes.class "stave"
                 ]
-                Element.none
-              ]
-           ++ [Element.el 
-                [Element.alignLeft
-                , Element.alignTop
-                , Element.height (Element.px 350) 
-                , Element.width (Element.px 2000) 
-                , Element.padding 5
-                ] 
-                (Element.html (svg
-                                  [ Svg.Attributes.width "100%"
-                                  , Svg.Attributes.height "100%"
-                                  , viewBox "0 0 200 100"
-                                  ]
-                                  (stave ++ percussionClef ++ (renderBar model.arrangement)))
-                                  --(stave ++ percussionClef))
-                ) --Element.html
-              ] --Element.el 
-            )
-          ) --Element.column
+                (stave ++ percussionClef ++ (renderBar model.arrangement))
+            ]
+
       , Html.text model.debugText
       ]
   }
 
 
-subdivisionDropdown : Model -> Element Msg
+subdivisionDropdown : Model -> Html Msg
 subdivisionDropdown model = 
-     Element.el  [Font.size 22] 
-        (Element.row [] 
-            [ Element.el [Element.width (Element.px 150)] (Element.text "Subdivision:")
-            , Element.el [Font.size 22] (Element.html (select [] (List.map subdivisionOption model.subdivisions)))
-            ]
+     div
+      [] 
+      [
+        (div 
+          [] 
+          [ Html.text "Subdivision:"
+          , select [] (List.map subdivisionOption model.subdivisions)
+          ]
         ) 
+      ]
 
 
 subdivisionOption : Subdivision -> Html Msg
 subdivisionOption subdiv = 
     Html.option [] [Html.text subdiv.description]
 
-instrumentView : List InstrumentBlocks -> List (Element Msg)
-instrumentView instrumentBlocks = List.map instrumentRow instrumentBlocks
+instrumentView : List InstrumentBlocks -> List (Html Msg)
+instrumentView instrumentBlocks = 
+  (instrumentBlocks) |> List.map (\ib -> tr [Html.Attributes.class "instrumentTableRow"]
+                                            [td [Html.Attributes.class "instrumentTableCell"]
+                                                [Html.text ib.instrumentName]
+                                            , td []
+                                                 [instrumentRow ib]
+                                            ])
 
-instrumentRow : InstrumentBlocks -> Element Msg
-instrumentRow instrumentBlock = Element.row 
-                                  [Element.height (Element.px 40)
-                                  , Element.spacing 5
-                                  ] ([Element.el 
-                                      [Element.width (Element.px 180)
-                                      , Font.size 22
-                                      ] (Element.text instrumentBlock.instrumentName)] ++ blockView instrumentBlock)
+instrumentRow : InstrumentBlocks -> Html Msg
+instrumentRow instrumentBlock = 
+  div 
+    [] 
+    (blockView instrumentBlock)
 
-blockView : InstrumentBlocks -> List (Element Msg)
+blockView : InstrumentBlocks -> List (Html Msg)
 blockView instrblocks = 
   let
     instrName = instrblocks.instrumentName
@@ -294,17 +287,24 @@ blockView instrblocks =
   in
   (blocks) |> List.indexedMap (\i b -> blockButton instrName i b)
 
-blockButton : String -> Int -> String -> Element Msg
+blockButton : String -> Int -> String -> Html Msg
 blockButton instrName index blockName = 
-  Element.html <| Html.select [onChange BlockSelectedChange
-                              , Html.Attributes.id (instrName ++ "~" ++ String.fromInt index)
-                              ]
-                              (getBlockOptions blockName)
+  Html.select [onChange BlockSelectedChange
+              , HA.id (instrName ++ "~" ++ String.fromInt index)
+              , HA.class "instrumentBlockSelect"
+              ]
+              (getBlockOptions blockName)
 
 getBlockOptions : String -> List (Html Msg)
 getBlockOptions blockName = 
   (Dict.keys blockDict) |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k]))
 
+
+type alias SelectIdValue = 
+  {
+    id : String
+    ,value : String
+  }
 
 onChange : (SelectIdValue -> msg) -> Html.Attribute msg
 onChange tagger =
@@ -318,11 +318,6 @@ targetValueDecoder : Json.Decoder String
 targetValueDecoder =
   Json.at ["target", "value"] Json.string
 
-type alias SelectIdValue = 
-  {
-    id : String
-    ,value : String
-  }
 
 selectDecoder : Json.Decoder SelectIdValue
 selectDecoder =
@@ -331,16 +326,16 @@ selectDecoder =
 stave : List (Svg Msg)
 stave =
     (staveLines)
-        |> List.map String.fromInt
         |> List.map
             (\n ->
                 Svg.path
                     [ strokeWidth "0.3"
                     , stroke "black"
-                    , d ("M 5 " ++ n ++ " L 355 " ++ n)
+                    , d ("M 0 " ++ String.fromFloat (n + staveShiftY) ++ " L 355 " ++ String.fromFloat (n + staveShiftY))
                     ]
                     []
             )
+
 
   
 percussionClef : List(Svg Msg)
@@ -348,13 +343,13 @@ percussionClef =
   [Svg.path
       [ strokeWidth "1.8"
       , stroke "black"
-      , d ("M 10 6 L 10 12")
+      , d ("M 5 " ++ String.fromFloat (3 + staveShiftY) ++ " L 5 " ++ String.fromFloat (9 + staveShiftY))
       ]
       []
   ,Svg.path
       [ strokeWidth "1.8"
       , stroke "black"
-      , d ("M 13 6 L 13 12")
+      , d ("M 8 " ++ String.fromFloat (3 + staveShiftY) ++ " L 8 " ++ String.fromFloat (9 + staveShiftY))
       ]
       []
   ]
@@ -380,19 +375,11 @@ renderBar instrumentBlocks =
     noteBlocks = List.map createInstrumentBlocks instrumentBlocks |> List.concat
   in
   (beatCount) |> List.concatMap (\i -> List.map (\j -> (i,j)) subBeats)
-              |> List.map (\i -> {beat = Tuple.first i
-                                 , subBeat = Tuple.second i
-                                 , noteBlocks = noteBlocks})
-              |> List.map beatLoop
+              |> List.map (\i -> beatLoop (Tuple.first i) (Tuple.second i) noteBlocks)
               |> List.concat
               --|> Debug.toString
 
 
-type alias BeatLoopParams =
- { beat : Int
-  , subBeat : Int
-  , noteBlocks : List(NoteBlock)
- }
 {-
 Variable beat is looping from 1 to 4, within this subBeat is looping from 1 to 12.
 
@@ -401,26 +388,16 @@ noteBlock has value blockBeat in range 1 to 4, it also has the block name.
 If beat == blockBeat && the block has a note on the subBeat then draw note
 else do nothing
 -}
-beatLoop : BeatLoopParams -> List(Svg Msg)
-beatLoop params  = 
-  (params.noteBlocks) |> List.map (\n -> {beat = params.beat
-                                         , subBeat = params.subBeat
-                                         , noteBlock = n})
-                      |> List.map blockLoop
+beatLoop : Int -> Int -> List(NoteBlock) -> List(Svg Msg)
+beatLoop beat subBeat noteBlocks  = 
+  (noteBlocks) |> List.map (\n -> blockLoop beat subBeat n)
                       |> List.concat
-                      --|> Debug.toString (Binary.toDecimal (Binary.and (Binary.fromIntegers [1,1,0]) (Binary.fromIntegers [1,0,0])))
 
-type alias BlockLoopParams =
- { beat : Int
-  , subBeat : Int
-  , noteBlock : NoteBlock
- }
-
-blockLoop :BlockLoopParams -> List(Svg Msg)
-blockLoop params = 
-  (if (params.beat == params.noteBlock.blockBeat
-     && isSubBeatMatch params.subBeat params.noteBlock) then
-    renderNote params.beat params.subBeat params.noteBlock
+blockLoop : Int -> Int -> NoteBlock -> List(Svg Msg)
+blockLoop beat subBeat noteBlock = 
+  (if (beat == noteBlock.blockBeat
+     && isSubBeatMatch subBeat noteBlock) then
+    renderNote beat subBeat noteBlock
   else
     []
   ) 
@@ -430,7 +407,7 @@ renderNote : Int -> Int -> NoteBlock -> List (Svg Msg)
 renderNote beat subBeat noteBlock = 
   let
       noteCenterX = 20.0 + ((toFloat (((beat - 1) * 12) + (subBeat - 1))) * 3.6)
-      noteCenterY = noteBlock.stavePos
+      noteCenterY = noteBlock.stavePos + staveShiftY
   in
   case noteBlock.noteShape of
       Ovoid ->

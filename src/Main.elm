@@ -13,6 +13,7 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Dict exposing (..)
 import Json.Decode as Json
+import List exposing (sortBy)
 
 
 -- MAIN
@@ -35,10 +36,7 @@ main =
 
 
 type alias Model =
-  { subdivisions : List Subdivision
-  , instruments : List String
-  , arrangement : List InstrumentBlocks
-  --, subdivisionSelect : Select.Select Subdivision
+  { arrangement : List InstrumentBlocks
   , debugText : String
   }
 
@@ -53,6 +51,7 @@ type NoteShape =
   | Cross
   | CrossLedger
   | Ovoid
+  | Rest
 
 type alias Instrument = 
   { staveLocation : String
@@ -60,6 +59,23 @@ type alias Instrument =
   , noteShape : NoteShape
   }
 
+type NoteDuration =
+  Crotchet
+  | Quaver
+  | SemiQuaver
+  | Minim
+  | Breve
+
+
+type alias NoteSubBeat = 
+  {subBeat : Int
+  , instrumentName : String --this gives me stave position and note shape
+  , noteDuration : NoteDuration
+  , isDotted : Bool
+  , isRest : Bool
+  , subdivision : String
+  , stalkHeight : Float
+  }
 
 {- 
 Stave Locations are defined per piano treble clef and given an associated numeric position:
@@ -77,14 +93,15 @@ D4  0       (hi-hat foot)
 -}
 
 type alias Block = 
-  { imageName : String
+  {blockName : String
+  , imageName : String
   , notePlacement : Bits
   , subdivision : String
   }
 
 type alias InstrumentBlocks = 
   { instrumentName : String
-  , blockNames : List String
+  , blocks : BeatBlockDict
   }
 
 type alias NoteBlock =
@@ -93,6 +110,12 @@ type alias NoteBlock =
   ,noteShape : NoteShape
   ,blockName : String
   }
+
+subdivisions : List Subdivision
+subdivisions =
+  [Subdivision "4-16" "Four 16ths" 4
+  , Subdivision "3-8" "Three 8ths" 3]
+     
 
 staveLines : List Float
 staveLines =
@@ -111,34 +134,45 @@ instrumentDict = Dict.fromList
     , ("Floor Tom", Instrument "A4" 7.5 Ovoid)
     , ("Bass Drum", Instrument "F4" 10.5 Ovoid)      
     , ("Hi-hat Foot", Instrument "D4" 13 Cross)
+    , ("Rest", Instrument "" 7 Rest)
     ]
+type alias BeatBlockDict = Dict Int Block
+
+{-
+  A and P blocks are needed in the initial setup
+-}
+aBlock : Block
+aBlock = Block "A" "A.png" (Binary.fromIntegers [1,0,0,0]) "4-16"
+
+pBlock : Block
+pBlock = Block "P" "P.png" (Binary.fromIntegers [0,0,0,0]) "4-16"
 
 blockDict : Dict String Block
 blockDict = Dict.fromList 
-              [ ("A", Block "A.png" (Binary.fromIntegers [1,0,0,0]) "4-16")
-              , ("B", Block "B.png" (Binary.fromIntegers [0,1,0,0]) "4-16")
-              , ("C", Block "B.png" (Binary.fromIntegers [0,0,1,0]) "4-16")
-              , ("D", Block "B.png" (Binary.fromIntegers [0,0,0,1]) "4-16")
-              , ("E", Block "B.png" (Binary.fromIntegers [1,1,0,0]) "4-16")
-              , ("F", Block "B.png" (Binary.fromIntegers [0,1,1,0]) "4-16")
-              , ("G", Block "B.png" (Binary.fromIntegers [0,0,1,1]) "4-16")
-              , ("H", Block "B.png" (Binary.fromIntegers [1,0,0,1]) "4-16")
-              , ("I", Block "B.png" (Binary.fromIntegers [1,0,1,0]) "4-16")
-              , ("J", Block "B.png" (Binary.fromIntegers [0,1,0,1]) "4-16")
-              , ("K", Block "B.png" (Binary.fromIntegers [1,1,1,0]) "4-16")
-              , ("L", Block "B.png" (Binary.fromIntegers [0,1,1,1]) "4-16")
-              , ("M", Block "B.png" (Binary.fromIntegers [1,0,1,1]) "4-16")
-              , ("N", Block "B.png" (Binary.fromIntegers [1,1,0,1]) "4-16")
-              , ("O", Block "B.png" (Binary.fromIntegers [1,1,1,1]) "4-16")
-              , ("P", Block "B.png" (Binary.fromIntegers [0,0,0,0]) "4-16")
-              , ("Q", Block "B.png" (Binary.fromIntegers [1,0,0]) "3-8")
-              , ("R", Block "B.png" (Binary.fromIntegers [0,1,0]) "3-8")
-              , ("S", Block "B.png" (Binary.fromIntegers [0,0,1]) "3-8")
-              , ("T", Block "B.png" (Binary.fromIntegers [1,1,0]) "3-8")
-              , ("U", Block "B.png" (Binary.fromIntegers [0,1,1]) "3-8")
-              , ("V", Block "B.png" (Binary.fromIntegers [1,0,1]) "3-8")
-              , ("W", Block "B.png" (Binary.fromIntegers [1,1,1]) "3-8")
-              , ("X", Block "B.png" (Binary.fromIntegers [0,0,0]) "3-8")
+              [ ("A", aBlock)
+              , ("B", Block "B" "B.png" (Binary.fromIntegers [0,1,0,0]) "4-16")
+              , ("C", Block "C" "C.png" (Binary.fromIntegers [0,0,1,0]) "4-16")
+              , ("D", Block "D" "D.png" (Binary.fromIntegers [0,0,0,1]) "4-16")
+              , ("E", Block "E" "E.png" (Binary.fromIntegers [1,1,0,0]) "4-16")
+              , ("F", Block "F" "F.png" (Binary.fromIntegers [0,1,1,0]) "4-16")
+              , ("G", Block "G" "G.png" (Binary.fromIntegers [0,0,1,1]) "4-16")
+              , ("H", Block "H" "H.png" (Binary.fromIntegers [1,0,0,1]) "4-16")
+              , ("I", Block "I" "I.png" (Binary.fromIntegers [1,0,1,0]) "4-16")
+              , ("J", Block "J" "J.png" (Binary.fromIntegers [0,1,0,1]) "4-16")
+              , ("K", Block "K" "K.png" (Binary.fromIntegers [1,1,1,0]) "4-16")
+              , ("L", Block "L" "L.png" (Binary.fromIntegers [0,1,1,1]) "4-16")
+              , ("M", Block "M" "M.png" (Binary.fromIntegers [1,0,1,1]) "4-16")
+              , ("N", Block "N" "N.png" (Binary.fromIntegers [1,1,0,1]) "4-16")
+              , ("O", Block "O" "O.png" (Binary.fromIntegers [1,1,1,1]) "4-16")
+              , ("P", pBlock)
+              , ("Q", Block "Q" "Q.png" (Binary.fromIntegers [1,0,0]) "3-8")
+              , ("R", Block "R" "R.png" (Binary.fromIntegers [0,1,0]) "3-8")
+              , ("S", Block "S" "S.png" (Binary.fromIntegers [0,0,1]) "3-8")
+              , ("T", Block "T" "T.png" (Binary.fromIntegers [1,1,0]) "3-8")
+              , ("U", Block "U" "U.png" (Binary.fromIntegers [0,1,1]) "3-8")
+              , ("V", Block "V" "V.png" (Binary.fromIntegers [1,0,1]) "3-8")
+              , ("W", Block "W" "W.png" (Binary.fromIntegers [1,1,1]) "3-8")
+              , ("X", Block "X" "X.png" (Binary.fromIntegers [0,0,0]) "3-8")
               ]
 
 -- INIT
@@ -153,12 +187,9 @@ init flags url key =
 
 initialModel : Model
 initialModel = 
-    { subdivisions = [Subdivision "4-16" "Four 16ths" 4
-                     ,Subdivision "3-8" "Three 8ths" 3]
-    , instruments = ["Hi-Hat", "Snare", "Bass Drum"]
-    , arrangement = [ InstrumentBlocks "Hi-Hat" ["W", "B", "C", "D"]
-                    , InstrumentBlocks "Snare" ["P", "A", "P", "A"]
-                    , InstrumentBlocks "Bass Drum" ["A", "P", "A", "P"]
+    { arrangement = [ InstrumentBlocks "Hi-Hat" (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)])
+                    , InstrumentBlocks "Snare" (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)])
+                    , InstrumentBlocks "Bass Drum" (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)])
                     ]     
     --, subdivisionSelect = Select.init "select-subdivision" |> Select.setItems [Subdivision "4-16" "Four 16ths" 4
     --                                                                          ,Subdivision "3-8" "Three 8ths" 3]
@@ -194,10 +225,15 @@ update msg model =
 
 updateArrangement : String -> String -> String -> List InstrumentBlocks -> List InstrumentBlocks
 updateArrangement instrName blockIndex newVal currArrangement =
+  let
+    newBlock = Dict.get newVal blockDict
+  in
   case String.toInt blockIndex of
-      Just bIndex -> (currArrangement) |> List.map (\a -> if a.instrumentName == instrName then 
-                                                             InstrumentBlocks instrName (a.blockNames |> List.indexedMap (\i b -> if i == bIndex then newVal else b))
+      Just bIndex -> case newBlock of
+                        Just nBlock -> (currArrangement) |> List.map (\a -> if a.instrumentName == instrName then 
+                                                             InstrumentBlocks instrName (Dict.insert bIndex nBlock a.blocks)
                                                           else a)
+                        _ -> currArrangement
       _ -> currArrangement
 
 -- SUBSCRIPTIONS
@@ -239,9 +275,11 @@ view model =
                 , Svg.Attributes.class "stave"
                 ]
                 (stave ++ percussionClef ++ (renderBar model.arrangement))
+                --(stave ++ percussionClef)
             ]
 
       , Html.text model.debugText
+      --, Html.text (renderBar model.arrangement)
       ]
   }
 
@@ -254,7 +292,7 @@ subdivisionDropdown model =
         (div 
           [] 
           [ Html.text "Subdivision:"
-          , select [] (List.map subdivisionOption model.subdivisions)
+          , select [] (List.map subdivisionOption subdivisions)
           ]
         ) 
       ]
@@ -283,9 +321,9 @@ blockView : InstrumentBlocks -> List (Html Msg)
 blockView instrblocks = 
   let
     instrName = instrblocks.instrumentName
-    blocks = instrblocks.blockNames
+    blocks = instrblocks.blocks
   in
-  (blocks) |> List.indexedMap (\i b -> blockButton instrName i b)
+  (Dict.toList blocks) |> List.map (\i -> blockButton instrName (Tuple.first i) (Tuple.second i).blockName)
 
 blockButton : String -> Int -> String -> Html Msg
 blockButton instrName index blockName = 
@@ -359,120 +397,178 @@ Each beat in a bar is divided into 12 equal spaces because 12 is divisible by 3 
 both triplets and 16ths, e.g.
 
 One             Trip            Let
-O               O               O    
+X               X               X    
 1   2   3   4   5   6   7   8   9   10    11    12
-O           O           O           O
+X           X           X           X
 One         E           And         A
 
-So we need to iterate through all 12 spaces and all items in the arrangement, and draw a note if required.
+Iterate through all 12 spaces and all items in the arrangement, and draw a note if required.
 -}
 
 renderBar : List InstrumentBlocks -> List(Svg Msg)
 renderBar instrumentBlocks = 
   let
     beatCount = List.range 1 4
-    subBeats = List.range 1 12
-    noteBlocks = List.map createInstrumentBlocks instrumentBlocks |> List.concat
   in
-  (beatCount) |> List.concatMap (\i -> List.map (\j -> (i,j)) subBeats)
-              |> List.map (\i -> beatLoop (Tuple.first i) (Tuple.second i) noteBlocks)
-              |> List.concat
+  --loop through each beat of the bar
+  (beatCount) |> List.concatMap (\beat -> buildNoteSubBeats beat instrumentBlocks)
               --|> Debug.toString
 
 
-{-
-Variable beat is looping from 1 to 4, within this subBeat is looping from 1 to 12.
-
-noteBlock has value blockBeat in range 1 to 4, it also has the block name.
-
-If beat == blockBeat && the block has a note on the subBeat then draw note
-else do nothing
--}
-beatLoop : Int -> Int -> List(NoteBlock) -> List(Svg Msg)
-beatLoop beat subBeat noteBlocks  = 
-  (noteBlocks) |> List.map (\n -> blockLoop beat subBeat n)
-                      |> List.concat
-
-blockLoop : Int -> Int -> NoteBlock -> List(Svg Msg)
-blockLoop beat subBeat noteBlock = 
-  (if (beat == noteBlock.blockBeat
-     && isSubBeatMatch subBeat noteBlock) then
-    renderNote beat subBeat noteBlock
-  else
-    []
-  ) 
-
-
-renderNote : Int -> Int -> NoteBlock -> List (Svg Msg)
-renderNote beat subBeat noteBlock = 
+buildNoteSubBeats : Int -> List InstrumentBlocks -> List(Svg Msg)
+buildNoteSubBeats beat instrumentBlocks = 
   let
-      noteCenterX = 20.0 + ((toFloat (((beat - 1) * 12) + (subBeat - 1))) * 3.6)
-      noteCenterY = noteBlock.stavePos + staveShiftY
+      subBeats = [1, 4, 5, 7, 9, 10]
+      --get alll instruments & blocks for the current beat
+      beatBlocks = (instrumentBlocks) |> List.map (\ib -> Tuple.pair ib.instrumentName (Dict.get beat ib.blocks))
+      noteSubBeats = updateNoteSubBeats (
+                        (subBeats) |> List.concatMap  (\sb -> getNoteSubBeats sb beatBlocks) )
   in
-  case noteBlock.noteShape of
-      Ovoid ->
-          [Svg.ellipse 
-            [cx (String.fromFloat noteCenterX)
-              , cy (String.fromFloat noteCenterY)
-              , rx "1.6"
-              , ry "1.4"
-              , transform ("rotate(-15, " ++ (String.fromFloat noteCenterX) ++ ", " ++ (String.fromFloat noteCenterY) ++ ")")
-            ] []]
-      Cross ->
-          [Svg.path
-            [ strokeWidth "0.4"
-              , stroke "black"
-              , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) )
-            ] []
-          ,Svg.path
-            [ strokeWidth "0.4"
-              , stroke "black"
-              , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) )
-            ] []
-          ]
-      CrossLedger ->
-          [Svg.path
-            [ strokeWidth "0.5"
-              , stroke "black"
-              , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) )
-            ] []
-          ,Svg.path
-            [ strokeWidth "0.5"
-              , stroke "black"
-              , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) )
-            ] []
-          ,Svg.path
-            [ strokeWidth "0.3"
-              , stroke "black"
-              , d ("M " ++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) ++ " L " ++ (String.fromFloat (noteCenterX + 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) )
-            ] []
-          ]
-      Triangle ->
-          [Svg.circle [cx (String.fromFloat noteCenterX), cy (String.fromFloat noteCenterY), r "1.5"] []]
+  (noteSubBeats) |> List.concatMap (\nsb -> renderNote beat nsb)
+  --(Debug.toString noteSubBeats) ++ " BEAT " ++ String.fromInt beat
 
+
+getNoteSubBeats : Int -> List (String, Maybe Block) -> List NoteSubBeat
+getNoteSubBeats subBeat beatBlocks = 
+  (beatBlocks) |> List.concatMap (\bb ->  let
+                                            isPlayed = case Tuple.second bb of
+                                                          Just block -> isSubBeatMatch subBeat block
+                                                          _ -> False
+                                            subDivision = case Tuple.second bb of
+                                                            Just block -> block.subdivision
+                                                            _ -> "4-16"
+                                          in
+                                          if isPlayed == True then 
+                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0]
+                                          else 
+                                            []
+                            )
+
+processNoteSubBeats : Int -> List NoteSubBeat ->List(Svg Msg)
+processNoteSubBeats beat noteSubBeats = 
+  List.append ((noteSubBeats) |> List.concatMap (\nsb -> renderNote beat nsb)) 
+              []
+
+
+{-
+For each note, update NoteDuration, isDotted, isRest, etc, - for each note we need to look forward (i.e. > subBeat) to the other
+notes within the beat. 
+-}
+updateNoteSubBeats : List NoteSubBeat -> List NoteSubBeat
+updateNoteSubBeats noteSubBeats = 
+  let
+    updateStalks = updateStalkHeights noteSubBeats
+    noteSubBeatsWithRests = List.append (if List.any (\a -> a.subBeat == 1) noteSubBeats then 
+                                            []
+                                         else
+                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0]) noteSubBeats
+  in
+  noteSubBeatsWithRests
+
+updateStalkHeights : List NoteSubBeat -> List NoteSubBeat
+updateStalkHeights noteSubBeats =
+  let
+    stalkHeight = List.minimum ((noteSubBeats)  |> List.map (\nsb -> nsb.instrumentName)
+                                                |> List.map (\i -> Dict.get i instrumentDict)
+                                                |> List.map (\i -> case i of
+                                                                      Just instrument -> instrument.stavePosition
+                                                                      _ -> 99.0) )
+                         
+    justStalkHeight = (case stalkHeight of
+                        Just sHeight -> sHeight
+                        _ -> 20) - 20
+  in
+  (noteSubBeats) |> List.map (\nsb -> NoteSubBeat nsb.subBeat nsb.instrumentName nsb.noteDuration nsb.isDotted nsb.isRest nsb.subdivision justStalkHeight)
+
+renderNote : Int -> NoteSubBeat -> List (Svg Msg)
+renderNote beat noteSubBeat = 
+  let
+    instrument = Dict.get noteSubBeat.instrumentName instrumentDict
+    noteCenterX = 20.0 + ((toFloat (((beat - 1) * 12) + (noteSubBeat.subBeat - 1))) * 3.6)
+    noteCenterY = case instrument of
+                    Just instr -> instr.stavePosition + staveShiftY
+                    _ -> 0
+    noteShape = case instrument of
+                    Just instr -> instr.noteShape
+                    _ -> Ovoid  
+    stalk = if noteShape == Rest then []
+            else
+              [Svg.path
+                [ strokeWidth "0.5"
+                , stroke "black"
+                , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat (noteCenterY))
+                ]
+                []]
+  in
+  List.append 
+    (case noteShape of
+        Ovoid ->
+            [Svg.ellipse 
+              [cx (String.fromFloat noteCenterX)
+                , cy (String.fromFloat noteCenterY)
+                , rx "1.85"
+                , ry "1.3"
+                , transform ("rotate(-20, " ++ (String.fromFloat noteCenterX) ++ ", " ++ (String.fromFloat noteCenterY) ++ ")")
+              ] []
+            ]
+        Cross ->
+            [Svg.path
+              [ strokeWidth "0.4"
+                , stroke "black"
+                , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) )
+              ] []
+            ,Svg.path
+              [ strokeWidth "0.4"
+                , stroke "black"
+                , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) )
+              ] []
+            ]
+        CrossLedger ->
+            [Svg.path
+              [ strokeWidth "0.5"
+                , stroke "black"
+                , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) )
+              ] []
+            ,Svg.path
+              [ strokeWidth "0.5"
+                , stroke "black"
+                , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) )
+              ] []
+            ,Svg.path
+              [ strokeWidth "0.3"
+                , stroke "black"
+                , d ("M " ++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) ++ " L " ++ (String.fromFloat (noteCenterX + 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) )
+              ] []
+            ]
+        Triangle ->
+            [Svg.circle [cx (String.fromFloat noteCenterX), cy (String.fromFloat noteCenterY), r "1.5"] []]
+        Rest ->
+            [Svg.circle [cx (String.fromFloat noteCenterX), cy (String.fromFloat noteCenterY), r "1.0"] []])
+      stalk     
+
+
+renderBeams : Int -> List NoteSubBeat -> List (Svg Msg)
+renderBeams beat noteSubBeats = 
+  []
 
 {-
 isSubBeatMatch returns True if the block has a note that corresponds with the sub beat
 -}  
-isSubBeatMatch :  Int -> NoteBlock -> Bool
-isSubBeatMatch subBeat noteBlock =
-  let
-    blockQuery = Dict.get noteBlock.blockName blockDict 
-  in
-  case blockQuery of
-    Just block -> case block.subdivision of 
-                    "4-16" -> if (subBeat == 1     && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [1,0,0,0])) > 0) 
-                                 || (subBeat == 4  && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,1,0,0])) > 0) 
-                                 || (subBeat == 7  && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,0,1,0])) > 0)
-                                 || (subBeat == 10 && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,0,0,1])) > 0) then True
-                              else False
-                    "3-8" -> if (subBeat == 1     && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [1,0,0])) > 0) 
-                                 || (subBeat == 5 && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,1,0])) > 0) 
-                                 || (subBeat == 9 && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,0,1])) > 0) then True
-                              else False
-                    _ -> False
-    Nothing -> False    
+isSubBeatMatch :  Int -> Block -> Bool
+isSubBeatMatch subBeat block =
+    case block.subdivision of 
+                  "4-16" -> if (subBeat == 1     && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [1,0,0,0])) > 0) 
+                                || (subBeat == 4  && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,1,0,0])) > 0) 
+                                || (subBeat == 7  && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,0,1,0])) > 0)
+                                || (subBeat == 10 && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,0,0,1])) > 0) then True
+                            else False
+                  "3-8" -> if (subBeat == 1     && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [1,0,0])) > 0) 
+                                || (subBeat == 5 && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,1,0])) > 0) 
+                                || (subBeat == 9 && Binary.toDecimal (Binary.and block.notePlacement (Binary.fromIntegers [0,0,1])) > 0) then True
+                            else False
+                  _ -> False
 
+{-
 createInstrumentBlocks : InstrumentBlocks -> List(NoteBlock)
 createInstrumentBlocks instrBlocks = 
   let
@@ -483,6 +579,7 @@ createInstrumentBlocks instrBlocks =
                                                           , stavePos = sp
                                                           , noteShape = ns
                                                           , blockName = b})
+-}
 
 getStavePosition : String -> Float
 getStavePosition  instrumentName =

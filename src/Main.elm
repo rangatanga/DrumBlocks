@@ -37,9 +37,15 @@ main =
 
 type alias Model =
   { arrangement : List InstrumentBlocks
+  , timeSignature : String
   , debugText : String
   }
 
+type alias Bar = 
+  {
+    arrangement : List InstrumentBlocks
+    ,timeSignature : String
+  }
 type alias Subdivision =
   { name : String
   , description : String 
@@ -75,6 +81,15 @@ type alias NoteSubBeat =
   , isRest : Bool
   , subdivision : String
   , stalkHeight : Float
+  , nextSubBeat : Int
+  , nextSubBeatNoteDuration : NoteDuration
+  }
+
+type alias NoteDurationParam = 
+  {
+    noteDuration : NoteDuration
+    ,isDotted : Bool
+    ,nextSubBeat : Int
   }
 
 {- 
@@ -191,6 +206,7 @@ initialModel =
                     , InstrumentBlocks "Snare" (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)])
                     , InstrumentBlocks "Bass Drum" (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)])
                     ]     
+    , timeSignature = "4/4"
     --, subdivisionSelect = Select.init "select-subdivision" |> Select.setItems [Subdivision "4-16" "Four 16ths" 4
     --                                                                          ,Subdivision "3-8" "Three 8ths" 3]
     , debugText = ""
@@ -255,14 +271,14 @@ view model =
       [
         Html.table
               [] 
-              ([Html.tr 
+              (Html.tr 
                         [HA.class "instrumentTableHeaderRow"] 
                         [th [HA.class "instrumentTableHeaderCell"] 
                             [Html.text "Instrument"]
                         ,th [HA.class "instrumentTableHeaderCell"] 
-                            [Html.text "Rhythm Blocks"]
-                        ]]
-               ++ (instrumentView model.arrangement)
+                            [Html.text "Bar 1"]
+                        ]
+               :: (instrumentView model.arrangement)
                ++ [Html.tr 
                         [HA.class "instrumentTableRow"] 
                         [td [] [Html.text "+ Add Instrument"]
@@ -274,7 +290,7 @@ view model =
                 [ viewBox "0 0 200 100"
                 , Svg.Attributes.class "stave"
                 ]
-                (stave ++ percussionClef ++ (renderBar model.arrangement))
+                (stave ++ percussionClef ++ (staveTimeSignature model) ++ (renderBar model.arrangement))
                 --(stave ++ percussionClef)
             ]
 
@@ -374,20 +390,28 @@ stave =
                     []
             )
 
-
+staveTimeSignature : Model -> List (Svg Msg)
+staveTimeSignature model = 
+  case model.timeSignature of
+      "4/4" ->  [Svg.image [xlinkHref "assets/images/Timesignature4-4.svg"
+                        , Svg.Attributes.width "18"
+                        , Svg.Attributes.height "18"
+                        , Svg.Attributes.x "3"
+                        , Svg.Attributes.y "17.4"] [] ]
+      _ -> []
   
 percussionClef : List(Svg Msg)
 percussionClef =
   [Svg.path
       [ strokeWidth "1.8"
       , stroke "black"
-      , d ("M 5 " ++ String.fromFloat (3 + staveShiftY) ++ " L 5 " ++ String.fromFloat (9 + staveShiftY))
+      , d ("M 3 " ++ String.fromFloat (3 + staveShiftY) ++ " L 3 " ++ String.fromFloat (9 + staveShiftY))
       ]
       []
   ,Svg.path
       [ strokeWidth "1.8"
       , stroke "black"
-      , d ("M 8 " ++ String.fromFloat (3 + staveShiftY) ++ " L 8 " ++ String.fromFloat (9 + staveShiftY))
+      , d ("M 6 " ++ String.fromFloat (3 + staveShiftY) ++ " L 6 " ++ String.fromFloat (9 + staveShiftY))
       ]
       []
   ]
@@ -439,7 +463,7 @@ getNoteSubBeats subBeat beatBlocks =
                                                             _ -> "4-16"
                                           in
                                           if isPlayed == True then 
-                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0]
+                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet]
                                           else 
                                             []
                             )
@@ -457,16 +481,17 @@ notes within the beat.
 updateNoteSubBeats : List NoteSubBeat -> List NoteSubBeat
 updateNoteSubBeats noteSubBeats = 
   let
-    updateStalks = updateStalkHeights noteSubBeats
+    updateStalks = updateStalkHeight noteSubBeats
     noteSubBeatsWithRests = List.append (if List.any (\a -> a.subBeat == 1) updateStalks then 
                                             []
                                          else
-                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0]) updateStalks
-  in
-  noteSubBeatsWithRests
+                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0 1 Crotchet]) updateStalks
 
-updateStalkHeights : List NoteSubBeat -> List NoteSubBeat
-updateStalkHeights noteSubBeats =
+  in
+  updateNoteDuration noteSubBeatsWithRests
+
+updateStalkHeight : List NoteSubBeat -> List NoteSubBeat
+updateStalkHeight noteSubBeats =
   let
     stalkHeight = List.minimum ((noteSubBeats)  |> List.map (\nsb -> nsb.instrumentName)
                                                 |> List.map (\i -> Dict.get i instrumentDict)
@@ -478,13 +503,71 @@ updateStalkHeights noteSubBeats =
                         Just sHeight -> sHeight
                         _ -> 20) - 8
   in
-  (noteSubBeats) |> List.map (\nsb -> NoteSubBeat nsb.subBeat nsb.instrumentName nsb.noteDuration nsb.isDotted nsb.isRest nsb.subdivision justStalkHeight)
+  (noteSubBeats) |> List.map (\nsb -> NoteSubBeat nsb.subBeat 
+                                                  nsb.instrumentName 
+                                                  nsb.noteDuration 
+                                                  nsb.isDotted 
+                                                  nsb.isRest 
+                                                  nsb.subdivision 
+                                                  justStalkHeight 
+                                                  nsb.nextSubBeat 
+                                                  nsb.nextSubBeatNoteDuration)
+
+updateNoteDuration : List NoteSubBeat -> List NoteSubBeat
+updateNoteDuration noteSubBeats = 
+  let
+    updNoteSubBeats = (noteSubBeats) |> List.map (\nsb -> Tuple.pair nsb (getNoteDuration nsb noteSubBeats))
+                                     |> List.map (\x -> NoteSubBeat (Tuple.first x).subBeat 
+                                                                    (Tuple.first x).instrumentName 
+                                                                    (Tuple.second x).noteDuration
+                                                                    (Tuple.second x).isDotted
+                                                                    (Tuple.first x).isRest 
+                                                                    (Tuple.first x).subdivision 
+                                                                    (Tuple.first x).stalkHeight
+                                                                    (Tuple.second x).nextSubBeat
+                                                                    (Tuple.first x).nextSubBeatNoteDuration)
+  in
+  (updNoteSubBeats) |> List.map (\nsb ->  let
+                                            nextNoteSubBeats = List.filter (\x -> x.subBeat == nsb.nextSubBeat) updNoteSubBeats
+                                            maxNoteDuration = List.foldl  (\n i -> if i == Crotchet || n.noteDuration == Crotchet then Crotchet
+                                                                                  else if i == Quaver || n.noteDuration == Quaver then Quaver
+                                                                                  else i
+                                                                          ) SemiQuaver nextNoteSubBeats    
+                                          in
+                                          NoteSubBeat nsb.subBeat 
+                                                      nsb.instrumentName 
+                                                      nsb.noteDuration
+                                                      nsb.isDotted
+                                                      nsb.isRest 
+                                                      nsb.subdivision 
+                                                      nsb.stalkHeight
+                                                      nsb.nextSubBeat
+                                                      maxNoteDuration)
+
+  
+getNoteDuration : NoteSubBeat -> List NoteSubBeat -> NoteDurationParam
+getNoteDuration currNoteSubBeat allNoteSubBeats =
+  let
+    nextSubBeat = List.filter (\nsb -> nsb.subBeat > currNoteSubBeat.subBeat) allNoteSubBeats
+                   |> List.map (\nsb -> nsb.subBeat)
+                   |> List.minimum
+  in
+  case nextSubBeat of
+      Just nxtSubBeat -> if nxtSubBeat - currNoteSubBeat.subBeat == 3 then NoteDurationParam SemiQuaver False nxtSubBeat
+                         else if nxtSubBeat - currNoteSubBeat.subBeat == 6 then NoteDurationParam Quaver False nxtSubBeat
+                         else if nxtSubBeat - currNoteSubBeat.subBeat == 9 then NoteDurationParam Quaver True nxtSubBeat
+                         else NoteDurationParam Crotchet False nxtSubBeat
+      _ -> if currNoteSubBeat.subBeat == 1 then NoteDurationParam Crotchet False currNoteSubBeat.nextSubBeat
+           else if currNoteSubBeat.subBeat == 4 then NoteDurationParam Quaver True currNoteSubBeat.nextSubBeat
+           else if currNoteSubBeat.subBeat == 7 then NoteDurationParam Quaver False currNoteSubBeat.nextSubBeat
+           else NoteDurationParam SemiQuaver False currNoteSubBeat.nextSubBeat
 
 renderNote : Int -> NoteSubBeat -> List (Svg Msg)
 renderNote beat noteSubBeat = 
   let
     instrument = Dict.get noteSubBeat.instrumentName instrumentDict
     noteCenterX = 20.0 + ((toFloat (((beat - 1) * 12) + (noteSubBeat.subBeat - 1))) * 3.6)
+    nextNoteCenterX = 20.0 + ((toFloat (((beat - 1) * 12) + (noteSubBeat.nextSubBeat - 1))) * 3.6)
     noteCenterY = case instrument of
                     Just instr -> instr.stavePosition + staveShiftY
                     _ -> 0
@@ -495,19 +578,68 @@ renderNote beat noteSubBeat =
             else
               if noteShape == Cross || noteShape == CrossLedger then
                 [Svg.path
-                  [ strokeWidth "0.5"
+                  [ strokeWidth "0.3"
                   , stroke "black"
                   , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat (noteCenterY + 1.2))
                   ]
                   []]
               else
                 [Svg.path
-                  [ strokeWidth "0.5"
+                  [ strokeWidth "0.3"
                   , stroke "black"
                   , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat noteCenterY)
                   ]
                   []]
+    dot = if noteSubBeat.isDotted then
+            [Svg.circle 
+              [cx (String.fromFloat (noteCenterX + 2.6))
+               , cy (String.fromFloat noteCenterY)
+               , r "0.4"
+              ] []]
+          else []  
+
+    topBeam = if noteSubBeat.subBeat == noteSubBeat.nextSubBeat 
+                 || noteSubBeat.isRest then []
+              else [Svg.path 
+                      [ strokeWidth "0.8"
+                      , stroke "black"
+                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
+                      ] []]
+    semiQuaverBeam =  if noteSubBeat.noteDuration == SemiQuaver 
+                         && Basics.not noteSubBeat.isRest then 
+                        if noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --last (or only) note in the beat
+                          if noteSubBeat.subBeat == 10 then --last subBeat position so the short semi quaver bar goes to the left
+                              [Svg.path 
+                                [ strokeWidth "0.8"
+                                , stroke "black"
+                                , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
+                                ] []]
+                          else --short semi quaver bar goes to the right
+                              [Svg.path 
+                                [ strokeWidth "0.8"
+                                , stroke "black"
+                                , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
+                                ] []]
+                        else if noteSubBeat.nextSubBeatNoteDuration == SemiQuaver then --full semi quaver bar goes to next note
+                                [Svg.path 
+                                  [ strokeWidth "0.8"
+                                  , stroke "black"
+                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                  ] []]
+                             else --short semi quaver bar goes to the right
+                                [Svg.path 
+                                  [ strokeWidth "0.8"
+                                  , stroke "black"
+                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
+                                  ] []]
+                      else []
   in
+  List.append
+    (
+  List.append
+    (
+  List.append
+    (
   List.append 
     (case noteShape of
         Ovoid ->
@@ -556,7 +688,10 @@ renderNote beat noteSubBeat =
                         , Svg.Attributes.height "8"
                         , Svg.Attributes.x (String.fromFloat (noteCenterX - 4))
                         , Svg.Attributes.y (String.fromFloat (noteCenterY - 6))] [] ])
-      stalk     
+      stalk)
+      dot)
+      topBeam)
+      semiQuaverBeam
 
 
 renderBeams : Int -> List NoteSubBeat -> List (Svg Msg)

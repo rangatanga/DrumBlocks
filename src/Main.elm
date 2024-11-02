@@ -360,7 +360,7 @@ getBlockOptions blockName =
   --Html.optgroup [HA.class "quarterBlocksOptGroup"] (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
   --:: [Html.optgroup [HA.class "tripletBlocksOptGroup"] ((tripletBlocks) |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))]
   (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False
-                                                  , HA.class ("blockSelect" ++ k)] [Html.text k])))
+                                                  , HA.class "blockSelect"] [Html.text k])))
   ++ (tripletBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
 
 type alias SelectIdValue = 

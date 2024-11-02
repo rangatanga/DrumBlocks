@@ -5776,7 +5776,7 @@ var $author$project$Main$getBlockOptions = function (blockName) {
 					_List_fromArray(
 						[
 							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false),
-							$elm$html$Html$Attributes$class('blockSelect' + k)
+							$elm$html$Html$Attributes$class('blockSelect')
 						]),
 					_List_fromArray(
 						[

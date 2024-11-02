@@ -19,11 +19,7 @@
             "elm/regex": "1.0.0",
             "elm/time": "1.0.0",
             "elm/virtual-dom": "1.0.3",
-            "elm-community/intdict": "3.1.0",
-            "elm-community/list-extra": "8.7.0",
-            "fredcy/elm-parseint": "2.0.1",
-            "noahzgordon/elm-color-extra": "1.0.2",
-            "turboMaCk/queue": "1.1.0"
+            "elm-community/list-extra": "8.7.0"
         }
     },
     "test-dependencies": {

@@ -5731,6 +5731,17 @@ var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Main$BlockSelectedChange = function (a) {
 	return {$: 'BlockSelectedChange', a: a};
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $elm$html$Html$option = _VirtualDom_node('option');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -5744,21 +5755,50 @@ var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty(
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$getBlockOptions = function (blockName) {
-	return A2(
-		$elm$core$List$map,
+	var tripletBlocks = A2(
+		$elm$core$List$filter,
 		function (k) {
-			return A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(k)
-					]));
+			return k > 'P';
 		},
 		$elm$core$Dict$keys($author$project$Main$blockDict));
+	var quarterBlocks = A2(
+		$elm$core$List$filter,
+		function (k) {
+			return k <= 'P';
+		},
+		$elm$core$Dict$keys($author$project$Main$blockDict));
+	return _Utils_ap(
+		A2(
+			$elm$core$List$map,
+			function (k) {
+				return A2(
+					$elm$html$Html$option,
+					_List_fromArray(
+						[
+							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false),
+							$elm$html$Html$Attributes$class('blockSelect' + k)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(k)
+						]));
+			},
+			quarterBlocks),
+		A2(
+			$elm$core$List$map,
+			function (k) {
+				return A2(
+					$elm$html$Html$option,
+					_List_fromArray(
+						[
+							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(k)
+						]));
+			},
+			tripletBlocks));
 };
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5915,10 +5955,27 @@ var $elm$core$List$concatMap = F2(
 			A2($elm$core$List$map, f, list));
 	});
 var $author$project$Main$Crotchet = {$: 'Crotchet'};
-var $author$project$Main$NoteSubBeat = F9(
-	function (subBeat, instrumentName, noteDuration, isDotted, isRest, subdivision, stalkHeight, nextSubBeat, nextSubBeatNoteDuration) {
-		return {instrumentName: instrumentName, isDotted: isDotted, isRest: isRest, nextSubBeat: nextSubBeat, nextSubBeatNoteDuration: nextSubBeatNoteDuration, noteDuration: noteDuration, stalkHeight: stalkHeight, subBeat: subBeat, subdivision: subdivision};
-	});
+var $author$project$Main$NoteSubBeat = function (subBeat) {
+	return function (instrumentName) {
+		return function (noteDuration) {
+			return function (isDotted) {
+				return function (isRest) {
+					return function (subdivision) {
+						return function (stalkHeight) {
+							return function (nextSubBeat) {
+								return function (nextSubBeatNoteDuration) {
+									return function (prevSubBeat) {
+										return {instrumentName: instrumentName, isDotted: isDotted, isRest: isRest, nextSubBeat: nextSubBeat, nextSubBeatNoteDuration: nextSubBeatNoteDuration, noteDuration: noteDuration, prevSubBeat: prevSubBeat, stalkHeight: stalkHeight, subBeat: subBeat, subdivision: subdivision};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var $icidasset$elm_binary$Binary$condense = F2(
 	function (fn, _v0) {
 		var a = _v0.a.a;
@@ -6099,7 +6156,7 @@ var $author$project$Main$getNoteSubBeats = F2(
 				}();
 				return isPlayed ? _List_fromArray(
 					[
-						A9($author$project$Main$NoteSubBeat, subBeat, bb.a, $author$project$Main$Crotchet, false, false, subDivision, 0, subBeat, $author$project$Main$Crotchet)
+						$author$project$Main$NoteSubBeat(subBeat)(bb.a)($author$project$Main$Crotchet)(false)(false)(subDivision)(0)(subBeat)($author$project$Main$Crotchet)(subBeat)
 					]) : _List_Nil;
 			},
 			beatBlocks);
@@ -6111,6 +6168,7 @@ var $elm$core$Tuple$pair = F2(
 var $author$project$Main$Cross = {$: 'Cross'};
 var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
 var $author$project$Main$Ovoid = {$: 'Ovoid'};
+var $author$project$Main$Quaver = {$: 'Quaver'};
 var $author$project$Main$Rest = {$: 'Rest'};
 var $author$project$Main$SemiQuaver = {$: 'SemiQuaver'};
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
@@ -6157,6 +6215,7 @@ var $author$project$Main$instrumentDict = $elm$core$Dict$fromList(
 			'Rest',
 			A3($author$project$Main$Instrument, '', 7, $author$project$Main$Rest))
 		]));
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Basics$not = _Basics_not;
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
@@ -6176,7 +6235,7 @@ var $author$project$Main$renderNote = F2(
 	function (beat, noteSubBeat) {
 		var noteCenterX = 20.0 + ((((beat - 1) * 12) + (noteSubBeat.subBeat - 1)) * 3.6);
 		var nextNoteCenterX = 20.0 + ((((beat - 1) * 12) + (noteSubBeat.nextSubBeat - 1)) * 3.6);
-		var semiQuaverBeam = (_Utils_eq(noteSubBeat.noteDuration, $author$project$Main$SemiQuaver) && (!noteSubBeat.isRest)) ? (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat) ? ((noteSubBeat.subBeat === 10) ? _List_fromArray(
+		var semiQuaverBeam = (_Utils_eq(noteSubBeat.noteDuration, $author$project$Main$SemiQuaver) && (!noteSubBeat.isRest)) ? (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat) ? ((noteSubBeat.subBeat === 10) ? ((!_Utils_eq(noteSubBeat.prevSubBeat, noteSubBeat.subBeat)) ? _List_fromArray(
 			[
 				A2(
 				$elm$svg$Svg$path,
@@ -6185,19 +6244,34 @@ var $author$project$Main$renderNote = F2(
 						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 2) + (' ' + $elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 0.4) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6))))))))
 					]),
 				_List_Nil)
 			]) : _List_fromArray(
 			[
 				A2(
+				$elm$svg$Svg$image,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver.svg'),
+						$elm$svg$Svg$Attributes$width('6'),
+						$elm$svg$Svg$Attributes$height('6'),
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(noteCenterX - 0.4)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) - 0.6))
+					]),
+				_List_Nil)
+			])) : _List_fromArray(
+			[
+				A2(
 				$elm$svg$Svg$path,
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.5) + (' ' + $elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.5) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6))))))))
 					]),
 				_List_Nil)
 			])) : (_Utils_eq(noteSubBeat.nextSubBeatNoteDuration, $author$project$Main$SemiQuaver) ? _List_fromArray(
@@ -6212,7 +6286,7 @@ var $author$project$Main$renderNote = F2(
 						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 1.8) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6))))))))
 					]),
 				_List_Nil)
-			]) : _List_fromArray(
+			]) : (((!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) && (!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat))) ? _List_Nil : _List_fromArray(
 			[
 				A2(
 				$elm$svg$Svg$path,
@@ -6221,10 +6295,25 @@ var $author$project$Main$renderNote = F2(
 						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.5) + (' ' + $elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Main$staveShiftY))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.5) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) + 1.6))))))))
 					]),
 				_List_Nil)
-			]))) : _List_Nil;
+			])))) : ((_Utils_eq(noteSubBeat.noteDuration, $author$project$Main$Quaver) && ((!noteSubBeat.isRest) && (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat) && _Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)))) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$image,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver.svg'),
+						$elm$svg$Svg$Attributes$width('6'),
+						$elm$svg$Svg$Attributes$height('6'),
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(noteCenterX - 0.4)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Main$staveShiftY) - 0.6))
+					]),
+				_List_Nil)
+			]) : _List_Nil);
 		var topBeam = (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat) || noteSubBeat.isRest) ? _List_Nil : _List_fromArray(
 			[
 				A2(
@@ -6396,22 +6485,62 @@ var $author$project$Main$renderNote = F2(
 											_List_Nil)
 										]);
 								default:
-									return _List_fromArray(
-										[
-											A2(
-											$elm$svg$Svg$image,
-											_List_fromArray(
+									var _v1 = noteSubBeat.noteDuration;
+									switch (_v1.$) {
+										case 'Crotchet':
+											return _List_fromArray(
 												[
-													$elm$svg$Svg$Attributes$xlinkHref('assets/images/quarter-rest.svg'),
-													$elm$svg$Svg$Attributes$width('8'),
-													$elm$svg$Svg$Attributes$height('8'),
-													$elm$svg$Svg$Attributes$x(
-													$elm$core$String$fromFloat(noteCenterX - 4)),
-													$elm$svg$Svg$Attributes$y(
-													$elm$core$String$fromFloat(noteCenterY - 6))
-												]),
-											_List_Nil)
-										]);
+													A2(
+													$elm$svg$Svg$image,
+													_List_fromArray(
+														[
+															$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
+															$elm$svg$Svg$Attributes$width('7'),
+															$elm$svg$Svg$Attributes$height('7'),
+															$elm$svg$Svg$Attributes$x(
+															$elm$core$String$fromFloat(noteCenterX - 4)),
+															$elm$svg$Svg$Attributes$y(
+															$elm$core$String$fromFloat(noteCenterY - 4))
+														]),
+													_List_Nil)
+												]);
+										case 'Quaver':
+											return _List_fromArray(
+												[
+													A2(
+													$elm$svg$Svg$image,
+													_List_fromArray(
+														[
+															$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
+															$elm$svg$Svg$Attributes$width('6'),
+															$elm$svg$Svg$Attributes$height('6'),
+															$elm$svg$Svg$Attributes$x(
+															$elm$core$String$fromFloat(noteCenterX - 3)),
+															$elm$svg$Svg$Attributes$y(
+															$elm$core$String$fromFloat(noteCenterY - 4))
+														]),
+													_List_Nil)
+												]);
+										case 'SemiQuaver':
+											return _List_fromArray(
+												[
+													A2(
+													$elm$svg$Svg$image,
+													_List_fromArray(
+														[
+															$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver-rest.svg'),
+															$elm$svg$Svg$Attributes$width('6'),
+															$elm$svg$Svg$Attributes$height('6'),
+															$elm$svg$Svg$Attributes$x(
+															$elm$core$String$fromFloat(noteCenterX - 3)),
+															$elm$svg$Svg$Attributes$y(
+															$elm$core$String$fromFloat(noteCenterY - 4))
+														]),
+													_List_Nil)
+												]);
+										default:
+											return _List_Nil;
+									}
 							}
 						}(),
 						stalk),
@@ -6440,22 +6569,20 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
-var $author$project$Main$Quaver = {$: 'Quaver'};
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
+var $author$project$Main$NoteDurationParam = F4(
+	function (noteDuration, isDotted, nextSubBeat, prevSubBeat) {
+		return {isDotted: isDotted, nextSubBeat: nextSubBeat, noteDuration: noteDuration, prevSubBeat: prevSubBeat};
 	});
-var $author$project$Main$NoteDurationParam = F3(
-	function (noteDuration, isDotted, nextSubBeat) {
-		return {isDotted: isDotted, nextSubBeat: nextSubBeat, noteDuration: noteDuration};
-	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
@@ -6472,6 +6599,26 @@ var $elm$core$List$minimum = function (list) {
 };
 var $author$project$Main$getNoteDuration = F2(
 	function (currNoteSubBeat, allNoteSubBeats) {
+		var prevSubBeat = function () {
+			var _v1 = $elm$core$List$maximum(
+				A2(
+					$elm$core$List$map,
+					function (nsb) {
+						return nsb.subBeat;
+					},
+					A2(
+						$elm$core$List$filter,
+						function (nsb) {
+							return (_Utils_cmp(nsb.subBeat, currNoteSubBeat.subBeat) < 0) && (!nsb.isRest);
+						},
+						allNoteSubBeats)));
+			if (_v1.$ === 'Just') {
+				var pSubBeat = _v1.a;
+				return pSubBeat;
+			} else {
+				return currNoteSubBeat.subBeat;
+			}
+		}();
 		var nextSubBeat = $elm$core$List$minimum(
 			A2(
 				$elm$core$List$map,
@@ -6486,16 +6633,16 @@ var $author$project$Main$getNoteDuration = F2(
 					allNoteSubBeats)));
 		if (nextSubBeat.$ === 'Just') {
 			var nxtSubBeat = nextSubBeat.a;
-			return ((nxtSubBeat - currNoteSubBeat.subBeat) === 3) ? A3($author$project$Main$NoteDurationParam, $author$project$Main$SemiQuaver, false, nxtSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 6) ? A3($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, false, nxtSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 9) ? A3($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, true, nxtSubBeat) : A3($author$project$Main$NoteDurationParam, $author$project$Main$Crotchet, false, nxtSubBeat)));
+			return ((nxtSubBeat - currNoteSubBeat.subBeat) === 3) ? A4($author$project$Main$NoteDurationParam, $author$project$Main$SemiQuaver, false, nxtSubBeat, prevSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 6) ? A4($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, false, nxtSubBeat, prevSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 9) ? A4($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, true, nxtSubBeat, prevSubBeat) : A4($author$project$Main$NoteDurationParam, $author$project$Main$Crotchet, false, nxtSubBeat, prevSubBeat)));
 		} else {
-			return (currNoteSubBeat.subBeat === 1) ? A3($author$project$Main$NoteDurationParam, $author$project$Main$Crotchet, false, currNoteSubBeat.nextSubBeat) : ((currNoteSubBeat.subBeat === 4) ? A3($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, true, currNoteSubBeat.nextSubBeat) : ((currNoteSubBeat.subBeat === 7) ? A3($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, false, currNoteSubBeat.nextSubBeat) : A3($author$project$Main$NoteDurationParam, $author$project$Main$SemiQuaver, false, currNoteSubBeat.nextSubBeat)));
+			return (currNoteSubBeat.subBeat === 1) ? A4($author$project$Main$NoteDurationParam, $author$project$Main$Crotchet, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subBeat === 4) ? A4($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, true, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subBeat === 7) ? A4($author$project$Main$NoteDurationParam, $author$project$Main$Quaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : A4($author$project$Main$NoteDurationParam, $author$project$Main$SemiQuaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat)));
 		}
 	});
 var $author$project$Main$updateNoteDuration = function (noteSubBeats) {
 	var updNoteSubBeats = A2(
 		$elm$core$List$map,
 		function (x) {
-			return A9($author$project$Main$NoteSubBeat, x.a.subBeat, x.a.instrumentName, x.b.noteDuration, x.b.isDotted, x.a.isRest, x.a.subdivision, x.a.stalkHeight, x.b.nextSubBeat, x.a.nextSubBeatNoteDuration);
+			return $author$project$Main$NoteSubBeat(x.a.subBeat)(x.a.instrumentName)(x.b.noteDuration)(x.b.isDotted)(x.a.isRest)(x.a.subdivision)(x.a.stalkHeight)(x.b.nextSubBeat)(x.a.nextSubBeatNoteDuration)(x.b.prevSubBeat);
 		},
 		A2(
 			$elm$core$List$map,
@@ -6523,7 +6670,7 @@ var $author$project$Main$updateNoteDuration = function (noteSubBeats) {
 					}),
 				$author$project$Main$SemiQuaver,
 				nextNoteSubBeats);
-			return A9($author$project$Main$NoteSubBeat, nsb.subBeat, nsb.instrumentName, nsb.noteDuration, nsb.isDotted, nsb.isRest, nsb.subdivision, nsb.stalkHeight, nsb.nextSubBeat, maxNoteDuration);
+			return $author$project$Main$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(nsb.stalkHeight)(nsb.nextSubBeat)(maxNoteDuration)(nsb.prevSubBeat);
 		},
 		updNoteSubBeats);
 };
@@ -6561,7 +6708,7 @@ var $author$project$Main$updateStalkHeight = function (noteSubBeats) {
 	return A2(
 		$elm$core$List$map,
 		function (nsb) {
-			return A9($author$project$Main$NoteSubBeat, nsb.subBeat, nsb.instrumentName, nsb.noteDuration, nsb.isDotted, nsb.isRest, nsb.subdivision, justStalkHeight, nsb.nextSubBeat, nsb.nextSubBeatNoteDuration);
+			return $author$project$Main$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(justStalkHeight)(nsb.nextSubBeat)(nsb.nextSubBeatNoteDuration)(nsb.prevSubBeat);
 		},
 		noteSubBeats);
 };
@@ -6576,7 +6723,7 @@ var $author$project$Main$updateNoteSubBeats = function (noteSubBeats) {
 			},
 			updateStalks) ? _List_Nil : _List_fromArray(
 			[
-				A9($author$project$Main$NoteSubBeat, 1, 'Rest', $author$project$Main$Crotchet, false, true, '4-16', 0, 1, $author$project$Main$Crotchet)
+				$author$project$Main$NoteSubBeat(1)('Rest')($author$project$Main$Crotchet)(false)(true)('4-16')(0)(1)($author$project$Main$Crotchet)(1)
 			]),
 		updateStalks);
 	return $author$project$Main$updateNoteDuration(noteSubBeatsWithRests);
@@ -6617,6 +6764,19 @@ var $author$project$Main$renderBar = function (instrumentBlocks) {
 		},
 		beatCount);
 };
+var $author$project$Main$singleBarLine = _List_fromArray(
+	[
+		A2(
+		$elm$svg$Svg$path,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$d(
+				'M 195 ' + ($elm$core$String$fromFloat($author$project$Main$staveShiftY) + (' L 195 ' + $elm$core$String$fromFloat(12 + $author$project$Main$staveShiftY))))
+			]),
+		_List_Nil)
+	]);
 var $author$project$Main$staveLines = _List_fromArray(
 	[0, 3, 6, 9, 12]);
 var $author$project$Main$stave = A2(
@@ -6629,7 +6789,7 @@ var $author$project$Main$stave = A2(
 					$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 					$elm$svg$Svg$Attributes$stroke('black'),
 					$elm$svg$Svg$Attributes$d(
-					'M 0 ' + ($elm$core$String$fromFloat(n + $author$project$Main$staveShiftY) + (' L 355 ' + $elm$core$String$fromFloat(n + $author$project$Main$staveShiftY))))
+					'M 0 ' + ($elm$core$String$fromFloat(n + $author$project$Main$staveShiftY) + (' L 195 ' + $elm$core$String$fromFloat(n + $author$project$Main$staveShiftY))))
 				]),
 			_List_Nil);
 	},
@@ -6737,7 +6897,9 @@ var $author$project$Main$view = function (model) {
 								$author$project$Main$percussionClef,
 								_Utils_ap(
 									$author$project$Main$staveTimeSignature(model),
-									$author$project$Main$renderBar(model.arrangement)))))
+									_Utils_ap(
+										$author$project$Main$singleBarLine,
+										$author$project$Main$renderBar(model.arrangement))))))
 					])),
 				$elm$html$Html$text(model.debugText)
 			]),

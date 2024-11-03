@@ -1,3 +1,7 @@
+body {
+  font-family: "Trebuchet MS", Sans-Serif;
+}
+
 .instrumentTableHeaderRow {
 }
 
@@ -52,6 +56,21 @@
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
-  min-width: 100;
+.instrumentBlockOpts {
+  background-image: url('assets/images/options.svg');
+  min-width: 15;
+  min-height: 35;
+  vertical-align: top;
+}
+
+.instrumentBlockOptsImg {
+  width: 10;
+  height: 31;
+}
+
+.blockOptionsDialogButtons {
+  width: 100%;
+  text-align: center;
 }

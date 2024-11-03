@@ -5165,9 +5165,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$Main$InstrumentBlocks = F2(
-	function (instrumentName, blocks) {
-		return {blocks: blocks, instrumentName: instrumentName};
+var $author$project$Main$InstrumentBlocks = F3(
+	function (instrumentName, blocks, hasAddedGhostNotes) {
+		return {blocks: blocks, hasAddedGhostNotes: hasAddedGhostNotes, instrumentName: instrumentName};
 	});
 var $author$project$Main$Block = F4(
 	function (blockName, imageName, notePlacement, subdivision) {
@@ -5334,7 +5334,7 @@ var $author$project$Main$pBlock = A4(
 var $author$project$Main$initialModel = {
 	arrangement: _List_fromArray(
 		[
-			A2(
+			A3(
 			$author$project$Main$InstrumentBlocks,
 			'Hi-Hat',
 			$elm$core$Dict$fromList(
@@ -5344,8 +5344,9 @@ var $author$project$Main$initialModel = {
 						_Utils_Tuple2(2, $author$project$Main$aBlock),
 						_Utils_Tuple2(3, $author$project$Main$aBlock),
 						_Utils_Tuple2(4, $author$project$Main$aBlock)
-					]))),
-			A2(
+					])),
+			false),
+			A3(
 			$author$project$Main$InstrumentBlocks,
 			'Snare',
 			$elm$core$Dict$fromList(
@@ -5355,8 +5356,9 @@ var $author$project$Main$initialModel = {
 						_Utils_Tuple2(2, $author$project$Main$aBlock),
 						_Utils_Tuple2(3, $author$project$Main$pBlock),
 						_Utils_Tuple2(4, $author$project$Main$aBlock)
-					]))),
-			A2(
+					])),
+			false),
+			A3(
 			$author$project$Main$InstrumentBlocks,
 			'Bass Drum',
 			$elm$core$Dict$fromList(
@@ -5366,10 +5368,13 @@ var $author$project$Main$initialModel = {
 						_Utils_Tuple2(2, $author$project$Main$pBlock),
 						_Utils_Tuple2(3, $author$project$Main$aBlock),
 						_Utils_Tuple2(4, $author$project$Main$pBlock)
-					])))
+					])),
+			false)
 		]),
+	blockOptionsDialogParams: $elm$core$Maybe$Nothing,
 	debugText: '',
-	timeSignature: '4/4'
+	timeSignature: '4/4',
+	tmp: false
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5393,6 +5398,8 @@ var $elm$core$List$head = function (list) {
 	}
 };
 var $elm$core$Debug$toString = _Debug_toString;
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$toggleDialog = _Platform_outgoingPort('toggleDialog', $elm$json$Json$Encode$string);
 var $author$project$Main$blockDict = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
@@ -5650,9 +5657,9 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $author$project$Main$updateArrangement = F4(
-	function (instrName, blockIndex, newVal, currArrangement) {
-		var newBlock = A2($elm$core$Dict$get, newVal, $author$project$Main$blockDict);
+var $author$project$Main$updateArrangementBlock = F4(
+	function (instrName, blockIndex, newBlockName, currArrangement) {
+		var newBlock = A2($elm$core$Dict$get, newBlockName, $author$project$Main$blockDict);
 		var _v0 = $elm$core$String$toInt(blockIndex);
 		if (_v0.$ === 'Just') {
 			var bIndex = _v0.a;
@@ -5661,10 +5668,11 @@ var $author$project$Main$updateArrangement = F4(
 				return A2(
 					$elm$core$List$map,
 					function (a) {
-						return _Utils_eq(a.instrumentName, instrName) ? A2(
+						return _Utils_eq(a.instrumentName, instrName) ? A3(
 							$author$project$Main$InstrumentBlocks,
 							instrName,
-							A3($elm$core$Dict$insert, bIndex, nBlock, a.blocks)) : a;
+							A3($elm$core$Dict$insert, bIndex, nBlock, a.blocks),
+							a.hasAddedGhostNotes) : a;
 					},
 					currArrangement);
 			} else {
@@ -5674,7 +5682,6 @@ var $author$project$Main$updateArrangement = F4(
 			return currArrangement;
 		}
 	});
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5685,24 +5692,34 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'BlockSelectedChange') {
-			var param = msg.a;
-			var idList = A2($elm$core$String$split, '~', param.id);
-			var instrName = $elm$core$List$head(idList);
-			var blockIndex = $elm$core$List$head(
-				$elm$core$List$reverse(idList));
-			var arr = model.arrangement;
-			if (instrName.$ === 'Just') {
-				var iName = instrName.a;
-				if (blockIndex.$ === 'Just') {
-					var bIndex = blockIndex.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								arrangement: A4($author$project$Main$updateArrangement, iName, bIndex, param.value, arr)
-							}),
-						$elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'BlockSelectedChange':
+				var param = msg.a;
+				var idList = A2($elm$core$String$split, '~', param.id);
+				var instrName = $elm$core$List$head(idList);
+				var blockIndex = $elm$core$List$head(
+					$elm$core$List$reverse(idList));
+				var arr = model.arrangement;
+				if (instrName.$ === 'Just') {
+					var iName = instrName.a;
+					if (blockIndex.$ === 'Just') {
+						var bIndex = blockIndex.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									arrangement: A4($author$project$Main$updateArrangementBlock, iName, bIndex, param.value, arr)
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									debugText: $elm$core$Debug$toString($elm$html$Html$Attributes$value)
+								}),
+							$elm$core$Platform$Cmd$none);
+					}
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -5712,25 +5729,166 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			} else {
+			case 'BlockOptionsDialogOpen':
+				var params = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							debugText: $elm$core$Debug$toString($elm$html$Html$Attributes$value)
+							blockOptionsDialogParams: $elm$core$Maybe$Just(params)
 						}),
+					$author$project$Main$toggleDialog('block-options-dialog'));
+			case 'BlockOptionsDialogSave':
+				var params = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{debugText: params.checked}),
+					$author$project$Main$toggleDialog('block-options-dialog'));
+			case 'BlockOptionsDialogCancel':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$toggleDialog('block-options-dialog'));
+			case 'CheckBoxChanged':
+				var param = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{debugText: 'kjd', tmp: true}),
 					$elm$core$Platform$Cmd$none);
-			}
-		} else {
-			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$BlockOptionsDialogCancel = {$: 'BlockOptionsDialogCancel'};
+var $author$project$Main$BlockOptionsDialogSave = function (a) {
+	return {$: 'BlockOptionsDialogSave', a: a};
+};
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
+var $author$project$Main$blockOptionsDialog = F2(
+	function (dialogId, content) {
+		return A3(
+			$elm$html$Html$node,
+			'dialog',
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$id(dialogId)
+				]),
+			content);
+	});
+var $author$project$Main$CheckBoxChanged = function (a) {
+	return {$: 'CheckBoxChanged', a: a};
+};
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$Main$SelectIdValue = F2(
+	function (id, value) {
+		return {id: id, value: value};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$targetIdDecoder = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'id']),
+	$elm$json$Json$Decode$string);
+var $author$project$Main$targetValueDecoder = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $author$project$Main$selectDecoder = A3($elm$json$Json$Decode$map2, $author$project$Main$SelectIdValue, $author$project$Main$targetIdDecoder, $author$project$Main$targetValueDecoder);
+var $author$project$Main$onBlockSelectChange = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, tagger, $author$project$Main$selectDecoder));
+};
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$buildblockOptionsDialog = function (model) {
+	var _v0 = model.blockOptionsDialogParams;
+	if (_v0.$ === 'Just') {
+		var params = _v0.a;
+		return _List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				A2(
+					$elm$core$List$cons,
+					A2(
+						$elm$html$Html$img,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$src('assets/images/' + (params.blockName + '.png'))
+							]),
+						_List_Nil),
+					(params.instrumentName === 'Snare') ? _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Add Ghost Notes?'),
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$type_('checkbox'),
+											$author$project$Main$onBlockSelectChange($author$project$Main$CheckBoxChanged)
+										]),
+									_List_Nil)
+								]))
+						]) : _List_Nil))
+			]);
+	} else {
+		return _List_Nil;
+	}
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
-var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Main$BlockOptionsDialogOpen = function (a) {
+	return {$: 'BlockOptionsDialogOpen', a: a};
+};
+var $author$project$Main$BlockOptionsOpenParams = F4(
+	function (beat, subBeat, instrumentName, blockName) {
+		return {beat: beat, blockName: blockName, instrumentName: instrumentName, subBeat: subBeat};
+	});
 var $author$project$Main$BlockSelectedChange = function (a) {
 	return {$: 'BlockSelectedChange', a: a};
 };
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5752,8 +5910,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$getBlockOptions = function (blockName) {
 	var tripletBlocks = A2(
 		$elm$core$List$filter,
@@ -5800,58 +5956,73 @@ var $author$project$Main$getBlockOptions = function (blockName) {
 			},
 			tripletBlocks));
 };
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $author$project$Main$SelectIdValue = F2(
-	function (id, value) {
-		return {id: id, value: value};
-	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$targetIdDecoder = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'id']),
-	$elm$json$Json$Decode$string);
-var $author$project$Main$targetValueDecoder = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $author$project$Main$selectDecoder = A3($elm$json$Json$Decode$map2, $author$project$Main$SelectIdValue, $author$project$Main$targetIdDecoder, $author$project$Main$targetValueDecoder);
-var $author$project$Main$onChange = function (tagger) {
+var $elm$html$Html$Events$onClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$on,
-		'change',
-		A2($elm$json$Json$Decode$map, tagger, $author$project$Main$selectDecoder));
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Main$blockButton = F3(
 	function (instrName, index, blockName) {
 		return A2(
-			$elm$html$Html$select,
+			$elm$core$List$cons,
+			A2(
+				$elm$html$Html$select,
+				_List_fromArray(
+					[
+						$author$project$Main$onBlockSelectChange($author$project$Main$BlockSelectedChange),
+						$elm$html$Html$Attributes$id(
+						instrName + ('~' + $elm$core$String$fromInt(index))),
+						$elm$html$Html$Attributes$class('instrumentBlockSelect'),
+						$elm$html$Html$Attributes$alt('Block Picker'),
+						$elm$html$Html$Attributes$title('Block Picker')
+					]),
+				$author$project$Main$getBlockOptions(blockName)),
 			_List_fromArray(
 				[
-					$author$project$Main$onChange($author$project$Main$BlockSelectedChange),
-					$elm$html$Html$Attributes$id(
-					instrName + ('~' + $elm$core$String$fromInt(index))),
-					$elm$html$Html$Attributes$class('instrumentBlockSelect')
-				]),
-			$author$project$Main$getBlockOptions(blockName));
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$id(
+							'blockOpt~' + (instrName + ('~' + $elm$core$String$fromInt(index)))),
+							$elm$html$Html$Attributes$class('instrumentBlockOpts'),
+							$elm$html$Html$Attributes$alt('Block Options'),
+							$elm$html$Html$Attributes$title('Block Options'),
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$BlockOptionsDialogOpen(
+								A4($author$project$Main$BlockOptionsOpenParams, 1, index, instrName, blockName)))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$img,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$src('assets/images/options.svg'),
+									$elm$html$Html$Attributes$class('instrumentBlockOptsImg')
+								]),
+							_List_Nil)
+						]))
+				]));
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
 	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
@@ -5861,7 +6032,7 @@ var $author$project$Main$blockView = function (instrblocks) {
 	var instrName = instrblocks.instrumentName;
 	var blocks = instrblocks.blocks;
 	return A2(
-		$elm$core$List$map,
+		$elm$core$List$concatMap,
 		function (i) {
 			return A3($author$project$Main$blockButton, instrName, i.a, i.b.blockName);
 		},
@@ -5908,6 +6079,22 @@ var $author$project$Main$instrumentView = function (instrumentBlocks) {
 		},
 		instrumentBlocks);
 };
+var $author$project$Main$BlockOptionsSaveParams = F2(
+	function (id, checked) {
+		return {checked: checked, id: id};
+	});
+var $author$project$Main$targetSelectedDecoder = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'id']),
+	$elm$json$Json$Decode$string);
+var $author$project$Main$blockOptionsSaveDecoder = A3($elm$json$Json$Decode$map2, $author$project$Main$BlockOptionsSaveParams, $author$project$Main$targetIdDecoder, $author$project$Main$targetSelectedDecoder);
+var $author$project$Main$onBlockOptionsSave = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		A2($elm$json$Json$Decode$map, tagger, $author$project$Main$blockOptionsSaveDecoder));
+};
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
@@ -5938,22 +6125,6 @@ var $author$project$Main$percussionClef = _List_fromArray(
 			]),
 		_List_Nil)
 	]);
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
 var $author$project$Main$Crotchet = {$: 'Crotchet'};
 var $author$project$Main$NoteSubBeat = function (subBeat) {
 	return function (instrumentName) {
@@ -6177,9 +6348,9 @@ var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
-var $author$project$Main$Instrument = F3(
-	function (staveLocation, stavePosition, noteShape) {
-		return {noteShape: noteShape, staveLocation: staveLocation, stavePosition: stavePosition};
+var $author$project$Main$Instrument = F4(
+	function (staveLocation, stavePosition, noteShape, isGhostNoteable) {
+		return {isGhostNoteable: isGhostNoteable, noteShape: noteShape, staveLocation: staveLocation, stavePosition: stavePosition};
 	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -6189,31 +6360,31 @@ var $author$project$Main$instrumentDict = $elm$core$Dict$fromList(
 		[
 			_Utils_Tuple2(
 			'Hi-Hat',
-			A3($author$project$Main$Instrument, 'G5', -1.5, $author$project$Main$Cross)),
+			A4($author$project$Main$Instrument, 'G5', -1.5, $author$project$Main$Cross, false)),
 			_Utils_Tuple2(
 			'Ride Cymbal',
-			A3($author$project$Main$Instrument, 'F5', 0, $author$project$Main$CrossLedger)),
+			A4($author$project$Main$Instrument, 'F5', 0, $author$project$Main$CrossLedger, false)),
 			_Utils_Tuple2(
 			'High Tom',
-			A3($author$project$Main$Instrument, 'E5', 1.5, $author$project$Main$Ovoid)),
+			A4($author$project$Main$Instrument, 'E5', 1.5, $author$project$Main$Ovoid, true)),
 			_Utils_Tuple2(
 			'Mid Tom',
-			A3($author$project$Main$Instrument, 'D5', 3, $author$project$Main$Ovoid)),
+			A4($author$project$Main$Instrument, 'D5', 3, $author$project$Main$Ovoid, true)),
 			_Utils_Tuple2(
 			'Snare',
-			A3($author$project$Main$Instrument, 'C5', 4.5, $author$project$Main$Ovoid)),
+			A4($author$project$Main$Instrument, 'C5', 4.5, $author$project$Main$Ovoid, true)),
 			_Utils_Tuple2(
 			'Floor Tom',
-			A3($author$project$Main$Instrument, 'A4', 7.5, $author$project$Main$Ovoid)),
+			A4($author$project$Main$Instrument, 'A4', 7.5, $author$project$Main$Ovoid, true)),
 			_Utils_Tuple2(
 			'Bass Drum',
-			A3($author$project$Main$Instrument, 'F4', 10.5, $author$project$Main$Ovoid)),
+			A4($author$project$Main$Instrument, 'F4', 10.5, $author$project$Main$Ovoid, false)),
 			_Utils_Tuple2(
 			'Hi-hat Foot',
-			A3($author$project$Main$Instrument, 'D4', 13, $author$project$Main$Cross)),
+			A4($author$project$Main$Instrument, 'D4', 13, $author$project$Main$Cross, false)),
 			_Utils_Tuple2(
 			'Rest',
-			A3($author$project$Main$Instrument, '', 7, $author$project$Main$Rest))
+			A4($author$project$Main$Instrument, '', 7, $author$project$Main$Rest, false))
 		]));
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Basics$not = _Basics_not;
@@ -6901,7 +7072,47 @@ var $author$project$Main$view = function (model) {
 										$author$project$Main$singleBarLine,
 										$author$project$Main$renderBar(model.arrangement))))))
 					])),
-				$elm$html$Html$text(model.debugText)
+				$elm$html$Html$text(model.debugText),
+				A2(
+				$author$project$Main$blockOptionsDialog,
+				'block-options-dialog',
+				_Utils_ap(
+					$author$project$Main$buildblockOptionsDialog(model),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('blockOptionsDialogButtons')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$author$project$Main$onBlockOptionsSave($author$project$Main$BlockOptionsDialogSave),
+											$elm$html$Html$Attributes$class('blockOptionsDialogButton'),
+											$elm$html$Html$Attributes$id('bb')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Save')
+										])),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick($author$project$Main$BlockOptionsDialogCancel),
+											$elm$html$Html$Attributes$class('blockOptionsDialogButton')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Cancel')
+										]))
+								]))
+						])))
 			]),
 		title: 'Drum Blocks'
 	};

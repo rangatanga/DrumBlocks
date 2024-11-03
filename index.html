@@ -12,6 +12,16 @@
   var app = Elm.Main.init({
     node: document.getElementById('drumBlocksApp')
   });
+
+  app.ports.toggleDialog.subscribe(id => {
+  const dialog = document.querySelector(`#${id}`)
+
+  if (dialog.open) {
+      dialog.close();
+  } else {
+      dialog.showModal();
+  }
+  });
   </script>
 </body>
 </html>

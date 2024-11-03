@@ -1,11 +1,11 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes as HA
-import Html.Events exposing (on)
+import Html.Events exposing (on, onClick)
 import Url
 --import Platform exposing (Router)
 import Binary exposing (..)
@@ -37,7 +37,9 @@ main =
 type alias Model =
   { arrangement : List InstrumentBlocks
   , timeSignature : String
+  , blockOptionsDialogParams : Maybe BlockOptionsOpenParams
   , debugText : String
+  , tmp : Bool
   }
 
 type alias Bar = 
@@ -62,6 +64,7 @@ type alias Instrument =
   { staveLocation : String
   , stavePosition : Float 
   , noteShape : NoteShape
+  , isGhostNoteable : Bool
   }
 
 type NoteDuration =
@@ -74,7 +77,7 @@ type NoteDuration =
 
 type alias NoteSubBeat = 
   {subBeat : Int
-  , instrumentName : String --this gives me stave position and note shape
+  , instrumentName : String --this gives stave position and note shape
   , noteDuration : NoteDuration
   , isDotted : Bool
   , isRest : Bool
@@ -118,13 +121,16 @@ type alias Block =
 type alias InstrumentBlocks = 
   { instrumentName : String
   , blocks : BeatBlockDict
+  , hasAddedGhostNotes : Bool
   }
 
-type alias NoteBlock =
-  { blockBeat : Int
-  ,stavePos : Float
-  ,noteShape : NoteShape
-  ,blockName : String
+type alias BeatBlockDict = Dict Int Block
+
+type alias BlockOptionsOpenParams = 
+  {beat : Int
+  , subBeat : Int
+  , instrumentName : String
+  , blockName : String
   }
 
 subdivisions : List Subdivision
@@ -142,17 +148,16 @@ staveShiftY = 20
 
 instrumentDict : Dict String Instrument
 instrumentDict = Dict.fromList 
-    [("Hi-Hat", Instrument "G5" -1.5 Cross)
-    , ("Ride Cymbal", Instrument "F5" 0 CrossLedger)
-    , ("High Tom", Instrument "E5" 1.5 Ovoid)
-    , ("Mid Tom", Instrument "D5" 3 Ovoid)
-    , ("Snare", Instrument "C5" 4.5 Ovoid)
-    , ("Floor Tom", Instrument "A4" 7.5 Ovoid)
-    , ("Bass Drum", Instrument "F4" 10.5 Ovoid)      
-    , ("Hi-hat Foot", Instrument "D4" 13 Cross)
-    , ("Rest", Instrument "" 7 Rest)
+    [("Hi-Hat", Instrument "G5" -1.5 Cross False)
+    , ("Ride Cymbal", Instrument "F5" 0 CrossLedger False)
+    , ("High Tom", Instrument "E5" 1.5 Ovoid True)
+    , ("Mid Tom", Instrument "D5" 3 Ovoid True)
+    , ("Snare", Instrument "C5" 4.5 Ovoid True)
+    , ("Floor Tom", Instrument "A4" 7.5 Ovoid True)
+    , ("Bass Drum", Instrument "F4" 10.5 Ovoid False)      
+    , ("Hi-hat Foot", Instrument "D4" 13 Cross False)
+    , ("Rest", Instrument "" 7 Rest False)
     ]
-type alias BeatBlockDict = Dict Int Block
 
 {-
   A and P blocks are needed in the initial setup
@@ -191,6 +196,12 @@ blockDict = Dict.fromList
               , ("X", Block "X" "X.png" (Binary.fromIntegers [0,0,0]) "3-8")
               ]
 
+blockOptionsDialog : String -> List (Html msg) -> Html msg
+blockOptionsDialog dialogId content =
+    Html.node "dialog" [ HA.id dialogId ] content
+
+port toggleDialog : String -> Cmd msg
+
 -- INIT
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -203,14 +214,16 @@ init flags url key =
 
 initialModel : Model
 initialModel = 
-    { arrangement = [ InstrumentBlocks "Hi-Hat" (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)])
-                    , InstrumentBlocks "Snare" (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)])
-                    , InstrumentBlocks "Bass Drum" (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)])
+    { arrangement = [ InstrumentBlocks "Hi-Hat" (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]) False
+                    , InstrumentBlocks "Snare" (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)]) False
+                    , InstrumentBlocks "Bass Drum" (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)]) False
                     ]     
     , timeSignature = "4/4"
+    , blockOptionsDialogParams = Nothing
     --, subdivisionSelect = Select.init "select-subdivision" |> Select.setItems [Subdivision "4-16" "Four 16ths" 4
     --                                                                          ,Subdivision "3-8" "Three 8ths" 3]
     , debugText = ""
+    , tmp = False
     }   
 
 
@@ -221,6 +234,10 @@ type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
   | BlockSelectedChange SelectIdValue
+  | BlockOptionsDialogOpen BlockOptionsOpenParams
+  | BlockOptionsDialogSave BlockOptionsSaveParams
+  | BlockOptionsDialogCancel
+  | CheckBoxChanged SelectIdValue
   --| SubdivisionSelectMsg (Select.Msg Subdivision)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -234,22 +251,26 @@ update msg model =
                                       in
                                       case instrName of
                                           Just iName -> case blockIndex of
-                                                          Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value arr)}, Cmd.none)
+                                                          Just bIndex -> ({model | arrangement = (updateArrangementBlock iName bIndex param.value arr)}, Cmd.none)
                                                           _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
                                           _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+        BlockOptionsDialogOpen params -> ({model | blockOptionsDialogParams = Just params}, toggleDialog "block-options-dialog")
+        BlockOptionsDialogSave params -> ({model | debugText = params.checked}, toggleDialog "block-options-dialog")
+        BlockOptionsDialogCancel -> (model, toggleDialog "block-options-dialog")
+        CheckBoxChanged param -> ({model | debugText = "kjd", tmp = True}, Cmd.none)
         _ -> (model, Cmd.none)
 
 
-updateArrangement : String -> String -> String -> List InstrumentBlocks -> List InstrumentBlocks
-updateArrangement instrName blockIndex newVal currArrangement =
+updateArrangementBlock : String -> String -> String -> List InstrumentBlocks -> List InstrumentBlocks
+updateArrangementBlock instrName blockIndex newBlockName currArrangement =
   let
-    newBlock = Dict.get newVal blockDict
+    newBlock = Dict.get newBlockName blockDict
   in
   case String.toInt blockIndex of
       Just bIndex -> case newBlock of
                         Just nBlock -> (currArrangement) |> List.map (\a -> if a.instrumentName == instrName then 
-                                                             InstrumentBlocks instrName (Dict.insert bIndex nBlock a.blocks)
-                                                          else a)
+                                                                              InstrumentBlocks instrName (Dict.insert bIndex nBlock a.blocks) a.hasAddedGhostNotes
+                                                                            else a)
                         _ -> currArrangement
       _ -> currArrangement
 
@@ -297,10 +318,33 @@ view model =
 
       , Html.text model.debugText
       --, Html.text (renderBar model.arrangement)
+      ,blockOptionsDialog "block-options-dialog"
+                (buildblockOptionsDialog model
+                ++  [Html.div [HA.class "blockOptionsDialogButtons"] 
+                              [button [ onBlockOptionsSave BlockOptionsDialogSave, HA.class "blockOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
+                              , button [ onClick BlockOptionsDialogCancel, HA.class "blockOptionsDialogButton" ] [ Html.text "Cancel" ]
+                              ]
+                    ]
+                )
       ]
   }
 
+buildblockOptionsDialog : Model -> List (Html Msg)
+buildblockOptionsDialog model = 
+  case model.blockOptionsDialogParams of
+      Just params -> [Html.div  []
+                                (Html.img [HA.src ("assets/images/" ++ params.blockName ++ ".png")] []
+                                :: (if params.instrumentName == "Snare" then 
+                                      [Html.div [] [Html.text "Add Ghost Notes?"
+                                                   , Html.input [HA.type_ "checkbox"
+                                                                , onBlockSelectChange CheckBoxChanged][]
+                                                   ]]
+                                    else []
+                                   ))]
+      _ ->  []
 
+
+{-
 subdivisionDropdown : Model -> Html Msg
 subdivisionDropdown model = 
      div
@@ -313,7 +357,7 @@ subdivisionDropdown model =
           ]
         ) 
       ]
-
+-}
 
 subdivisionOption : Subdivision -> Html Msg
 subdivisionOption subdiv = 
@@ -340,15 +384,24 @@ blockView instrblocks =
     instrName = instrblocks.instrumentName
     blocks = instrblocks.blocks
   in
-  (Dict.toList blocks) |> List.map (\i -> blockButton instrName (Tuple.first i) (Tuple.second i).blockName)
+  (Dict.toList blocks) |> List.concatMap (\i -> blockButton instrName (Tuple.first i) (Tuple.second i).blockName)
 
-blockButton : String -> Int -> String -> Html Msg
+blockButton : String -> Int -> String -> List (Html Msg)
 blockButton instrName index blockName = 
-  Html.select [onChange BlockSelectedChange
-              , HA.id (instrName ++ "~" ++ String.fromInt index)
+  Html.select [onBlockSelectChange BlockSelectedChange
+              , HA.id (instrName ++ "~" ++ (String.fromInt index))
               , HA.class "instrumentBlockSelect"
+              , HA.alt "Block Picker"
+              , HA.title "Block Picker"
               ]
               (getBlockOptions blockName)
+  :: [Html.button [HA.id ("blockOpt~" ++ instrName ++ "~" ++ String.fromInt index)
+                 , HA.class "instrumentBlockOpts"
+                 , HA.alt "Block Options"
+                 , HA.title "Block Options"
+                 , onClick (BlockOptionsDialogOpen (BlockOptionsOpenParams 1 index instrName blockName))
+                 ] [Html.img [HA.src "assets/images/options.svg"
+                              , HA.class "instrumentBlockOptsImg"] []]]
 
 getBlockOptions : String -> List (Html Msg)
 getBlockOptions blockName = 
@@ -369,9 +422,28 @@ type alias SelectIdValue =
     ,value : String
   }
 
-onChange : (SelectIdValue -> msg) -> Html.Attribute msg
-onChange tagger =
+type alias BlockOptionsSaveParams = 
+  {
+    id : String
+    ,checked : String
+  }
+   
+
+onBlockSelectChange : (SelectIdValue -> msg) -> Html.Attribute msg
+onBlockSelectChange tagger =
   on "change" (Json.map tagger selectDecoder)
+
+selectDecoder : Json.Decoder SelectIdValue
+selectDecoder =
+  Json.map2 SelectIdValue targetIdDecoder targetValueDecoder
+
+onBlockOptionsSave : (BlockOptionsSaveParams -> msg) -> Html.Attribute msg
+onBlockOptionsSave tagger =
+  on "click" (Json.map tagger blockOptionsSaveDecoder)
+
+blockOptionsSaveDecoder : Json.Decoder BlockOptionsSaveParams
+blockOptionsSaveDecoder =
+  Json.map2 BlockOptionsSaveParams targetIdDecoder targetSelectedDecoder
 
 targetIdDecoder : Json.Decoder String
 targetIdDecoder =
@@ -381,10 +453,11 @@ targetValueDecoder : Json.Decoder String
 targetValueDecoder =
   Json.at ["target", "value"] Json.string
 
+targetSelectedDecoder : Json.Decoder String
+targetSelectedDecoder =
+  Json.at ["target", "id"] Json.string
 
-selectDecoder : Json.Decoder SelectIdValue
-selectDecoder =
-  Json.map2 SelectIdValue targetIdDecoder targetValueDecoder
+
 
 stave : List (Svg Msg)
 stave =

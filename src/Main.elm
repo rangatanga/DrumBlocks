@@ -42,11 +42,7 @@ type alias Model =
   , tmp : Bool
   }
 
-type alias Bar = 
-  {
-    arrangement : List InstrumentBlocks
-    ,timeSignature : String
-  }
+
 type alias Subdivision =
   { name : String
   , description : String 
@@ -86,6 +82,7 @@ type alias NoteSubBeat =
   , nextSubBeat : Int
   , nextSubBeatNoteDuration : NoteDuration
   , prevSubBeat : Int
+  , ghostNotes : GhostNotes
   }
 
 type alias NoteDurationParam = 
@@ -118,19 +115,29 @@ type alias Block =
   , subdivision : String
   }
 
+type GhostNotes = 
+  HasGhostNotes
+  | NoGhostNotes
+
 type alias InstrumentBlocks = 
   { instrumentName : String
-  , blocks : BeatBlockDict
-  , hasAddedGhostNotes : Bool
+  , blockOptions : BeatBlockOptionsDict
   }
 
-type alias BeatBlockDict = Dict Int Block
+type alias BeatBlockOptionsDict = Dict Int BlockOptions
+
+type alias BlockOptions = 
+  { block : Block
+  , ghostNotes : GhostNotes
+  , accentPattern : Bits
+  }
 
 type alias BlockOptionsOpenParams = 
   {beat : Int
   , subBeat : Int
   , instrumentName : String
   , blockName : String
+  , ghostNotes : GhostNotes
   }
 
 subdivisions : List Subdivision
@@ -206,17 +213,26 @@ port toggleDialog : String -> Cmd msg
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    let 
-        model = initialModel
-    in
-    ( model, Cmd.none )
+  let 
+      model = initialModel
+  in
+  ( model, Cmd.none )
 
 
 initialModel : Model
 initialModel = 
-    { arrangement = [ InstrumentBlocks "Hi-Hat" (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]) False
-                    , InstrumentBlocks "Snare" (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)]) False
-                    , InstrumentBlocks "Bass Drum" (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)]) False
+    { arrangement = [ InstrumentBlocks "Hi-Hat" (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                , (2, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                , (4, BlockOptions aBlock NoGhostNotes Binary.empty)]) 
+                    , InstrumentBlocks "Snare" (Dict.fromList [(1, BlockOptions pBlock HasGhostNotes Binary.empty)
+                                                              , (2, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                              , (3, BlockOptions pBlock NoGhostNotes Binary.empty)
+                                                              , (4, BlockOptions aBlock NoGhostNotes Binary.empty)]) 
+                    , InstrumentBlocks "Bass Drum" (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                   , (2, BlockOptions pBlock NoGhostNotes Binary.empty)
+                                                                   , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                   , (4, BlockOptions pBlock NoGhostNotes Binary.empty)]) 
                     ]     
     , timeSignature = "4/4"
     , blockOptionsDialogParams = Nothing
@@ -237,7 +253,7 @@ type Msg
   | BlockOptionsDialogOpen BlockOptionsOpenParams
   | BlockOptionsDialogSave BlockOptionsSaveParams
   | BlockOptionsDialogCancel
-  | CheckBoxChanged SelectIdValue
+  | GhostNotesCheckBoxChanged SelectIdValue
   --| SubdivisionSelectMsg (Select.Msg Subdivision)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -252,12 +268,12 @@ update msg model =
                                       case instrName of
                                           Just iName -> case blockIndex of
                                                           Just bIndex -> ({model | arrangement = (updateArrangementBlock iName bIndex param.value arr)}, Cmd.none)
-                                                          _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+                                                          _           -> ({model | debugText = (Debug.toString value)}, Cmd.none)
                                           _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
         BlockOptionsDialogOpen params -> ({model | blockOptionsDialogParams = Just params}, toggleDialog "block-options-dialog")
         BlockOptionsDialogSave params -> ({model | debugText = params.checked}, toggleDialog "block-options-dialog")
-        BlockOptionsDialogCancel -> (model, toggleDialog "block-options-dialog")
-        CheckBoxChanged param -> ({model | debugText = "kjd", tmp = True}, Cmd.none)
+        BlockOptionsDialogCancel -> ({model | blockOptionsDialogParams = Nothing}, toggleDialog "block-options-dialog")
+        GhostNotesCheckBoxChanged param -> ({model | debugText = "kjd", tmp = True}, Cmd.none)
         _ -> (model, Cmd.none)
 
 
@@ -269,7 +285,12 @@ updateArrangementBlock instrName blockIndex newBlockName currArrangement =
   case String.toInt blockIndex of
       Just bIndex -> case newBlock of
                         Just nBlock -> (currArrangement) |> List.map (\a -> if a.instrumentName == instrName then 
-                                                                              InstrumentBlocks instrName (Dict.insert bIndex nBlock a.blocks) a.hasAddedGhostNotes
+                                                                              let
+                                                                                  bOpts = case Dict.get bIndex a.blockOptions of
+                                                                                            Just blockOpts -> BlockOptions nBlock blockOpts.ghostNotes blockOpts.accentPattern
+                                                                                            _              -> BlockOptions nBlock NoGhostNotes Binary.empty
+                                                                              in
+                                                                              InstrumentBlocks instrName (Dict.insert bIndex bOpts a.blockOptions) 
                                                                             else a)
                         _ -> currArrangement
       _ -> currArrangement
@@ -300,7 +321,7 @@ view model =
                         ,th [HA.class "instrumentTableHeaderCell"] 
                             [Html.text "Bar 1"]
                         ]
-               :: (instrumentView model.arrangement)
+               :: (instrumentView model)
                ++ [Html.tr 
                         [HA.class "instrumentTableRow"] 
                         [td [] [Html.text "+ Add Instrument"]
@@ -332,12 +353,17 @@ view model =
 buildblockOptionsDialog : Model -> List (Html Msg)
 buildblockOptionsDialog model = 
   case model.blockOptionsDialogParams of
-      Just params -> [Html.div  []
+      Just params ->  let
+                        instrumentName = params.instrumentName
+                        ghostNotes = params.ghostNotes
+                      in
+                      [Html.div  []
                                 (Html.img [HA.src ("assets/images/" ++ params.blockName ++ ".png")] []
-                                :: (if params.instrumentName == "Snare" then 
+                                :: (if instrumentName == "Snare" then 
                                       [Html.div [] [Html.text "Add Ghost Notes?"
                                                    , Html.input [HA.type_ "checkbox"
-                                                                , onBlockSelectChange CheckBoxChanged][]
+                                                                , onBlockSelectChange GhostNotesCheckBoxChanged
+                                                                , checked (if ghostNotes == HasGhostNotes then True else False)][]
                                                    ]]
                                     else []
                                    ))]
@@ -363,43 +389,44 @@ subdivisionOption : Subdivision -> Html Msg
 subdivisionOption subdiv = 
     Html.option [] [Html.text subdiv.description]
 
-instrumentView : List InstrumentBlocks -> List (Html Msg)
-instrumentView instrumentBlocks = 
-  (instrumentBlocks) |> List.map (\ib -> tr [Html.Attributes.class "instrumentTableRow"]
+instrumentView : Model -> List (Html Msg)
+instrumentView model = 
+  (model.arrangement) |> List.map (\ib -> tr [Html.Attributes.class "instrumentTableRow"]
                                             [td [Html.Attributes.class "instrumentTableCell"]
                                                 [Html.text ib.instrumentName]
                                             , td []
-                                                 [instrumentRow ib]
+                                                 [instrumentRow model ib]
                                             ])
 
-instrumentRow : InstrumentBlocks -> Html Msg
-instrumentRow instrumentBlock = 
+instrumentRow : Model -> InstrumentBlocks -> Html Msg
+instrumentRow model instrumentBlock = 
   div 
     [] 
-    (blockView instrumentBlock)
+    (blockView model instrumentBlock)
 
-blockView : InstrumentBlocks -> List (Html Msg)
-blockView instrblocks = 
+blockView : Model -> InstrumentBlocks -> List (Html Msg)
+blockView model instrblocks = 
+  (Dict.toList instrblocks.blockOptions) |> List.concatMap (\ib -> (blockButton model instrblocks (Tuple.first ib) (Tuple.second ib).block.blockName (Tuple.second ib).ghostNotes))
+
+blockButton : Model -> InstrumentBlocks -> Int -> String -> GhostNotes ->List (Html Msg)
+blockButton model instrblocks index blockName ghostNotes =
   let
-    instrName = instrblocks.instrumentName
-    blocks = instrblocks.blocks
+    blockOptionsOpenParams =  case model.blockOptionsDialogParams of 
+                                Just params -> params
+                                _ -> BlockOptionsOpenParams 1 index instrblocks.instrumentName blockName ghostNotes
   in
-  (Dict.toList blocks) |> List.concatMap (\i -> blockButton instrName (Tuple.first i) (Tuple.second i).blockName)
-
-blockButton : String -> Int -> String -> List (Html Msg)
-blockButton instrName index blockName = 
   Html.select [onBlockSelectChange BlockSelectedChange
-              , HA.id (instrName ++ "~" ++ (String.fromInt index))
+              , HA.id (instrblocks.instrumentName ++ "~" ++ (String.fromInt index))
               , HA.class "instrumentBlockSelect"
               , HA.alt "Block Picker"
               , HA.title "Block Picker"
               ]
               (getBlockOptions blockName)
-  :: [Html.button [HA.id ("blockOpt~" ++ instrName ++ "~" ++ String.fromInt index)
+  :: [Html.button [HA.id ("blockOpt~" ++ instrblocks.instrumentName ++ "~" ++ String.fromInt index)
                  , HA.class "instrumentBlockOpts"
                  , HA.alt "Block Options"
                  , HA.title "Block Options"
-                 , onClick (BlockOptionsDialogOpen (BlockOptionsOpenParams 1 index instrName blockName))
+                 , onClick (BlockOptionsDialogOpen blockOptionsOpenParams)
                  ] [Html.img [HA.src "assets/images/options.svg"
                               , HA.class "instrumentBlockOptsImg"] []]]
 
@@ -455,7 +482,7 @@ targetValueDecoder =
 
 targetSelectedDecoder : Json.Decoder String
 targetSelectedDecoder =
-  Json.at ["target", "id"] Json.string
+  Json.at ["target", "selected"] Json.string
 
 
 
@@ -533,31 +560,38 @@ renderBar instrumentBlocks =
 buildNoteSubBeats : Int -> List InstrumentBlocks -> List(Svg Msg)
 buildNoteSubBeats beat instrumentBlocks = 
   let
-      subBeats = [1, 4, 5, 7, 9, 10]
+      subBeats = [1, 4, 7, 10]
       --get alll instruments & blocks for the current beat
-      beatBlocks = (instrumentBlocks) |> List.map (\ib -> Tuple.pair ib.instrumentName (Dict.get beat ib.blocks))
-      noteSubBeats = updateNoteSubBeats (
-                        (subBeats) |> List.concatMap  (\sb -> getNoteSubBeats sb beatBlocks) )
+      beatBlocks = (instrumentBlocks) |> List.map (\ib -> Tuple.pair ib.instrumentName (Dict.get beat ib.blockOptions))
+      noteSubBeats = (subBeats) |> List.concatMap  (\sb -> getNoteSubBeats sb beatBlocks)
+                     |> updateNoteSubBeats
+ 
   in
   (noteSubBeats) |> List.concatMap (\nsb -> renderNote beat nsb)
   --(Debug.toString noteSubBeats) ++ " BEAT " ++ String.fromInt beat
 
 
-getNoteSubBeats : Int -> List (String, Maybe Block) -> List NoteSubBeat
-getNoteSubBeats subBeat beatBlocks = 
-  (beatBlocks) |> List.concatMap (\bb ->  let
-                                            isPlayed = case Tuple.second bb of
-                                                          Just block -> isSubBeatMatch subBeat block
-                                                          _ -> False
-                                            subDivision = case Tuple.second bb of
-                                                            Just block -> block.subdivision
-                                                            _ -> "4-16"
-                                          in
+getNoteSubBeats : Int -> List (String, Maybe BlockOptions) -> List NoteSubBeat
+getNoteSubBeats subBeat beatBlockOptions = 
+  (beatBlockOptions) |> List.concatMap (\bb -> let
+                                                    isPlayed = case Tuple.second bb of
+                                                                  Just blockOption -> isSubBeatMatch subBeat blockOption.block
+                                                                  _                -> False
+                                                    subDivision = case Tuple.second bb of
+                                                                    Just blockOption -> blockOption.block.subdivision
+                                                                    _ -> "4-16"
+                                                    ghostNotes = case Tuple.second bb of
+                                                                    Just blockOption -> blockOption.ghostNotes
+                                                                    _ -> NoGhostNotes
+                                                in
                                           if isPlayed == True then 
-                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat]
-                                          else 
+                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat NoGhostNotes]
+                                          else if ghostNotes == HasGhostNotes then
+                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat HasGhostNotes]
+                                          else
                                             []
                             )
+
 
 processNoteSubBeats : Int -> List NoteSubBeat ->List(Svg Msg)
 processNoteSubBeats beat noteSubBeats = 
@@ -576,7 +610,7 @@ updateNoteSubBeats noteSubBeats =
     noteSubBeatsWithRests = List.append (if List.any (\a -> a.subBeat == 1) updateStalks then 
                                             []
                                          else
-                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0 1 Crotchet 1]) updateStalks
+                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0 1 Crotchet 1 NoGhostNotes]) updateStalks
 
   in
   updateNoteDuration noteSubBeatsWithRests
@@ -603,7 +637,8 @@ updateStalkHeight noteSubBeats =
                                                   justStalkHeight 
                                                   nsb.nextSubBeat 
                                                   nsb.nextSubBeatNoteDuration
-                                                  nsb.prevSubBeat)
+                                                  nsb.prevSubBeat
+                                                  nsb.ghostNotes)
 
 updateNoteDuration : List NoteSubBeat -> List NoteSubBeat
 updateNoteDuration noteSubBeats = 
@@ -618,7 +653,8 @@ updateNoteDuration noteSubBeats =
                                                                     (Tuple.first x).stalkHeight
                                                                     (Tuple.second x).nextSubBeat
                                                                     (Tuple.first x).nextSubBeatNoteDuration
-                                                                    (Tuple.second x).prevSubBeat)
+                                                                    (Tuple.second x).prevSubBeat
+                                                                    (Tuple.first x).ghostNotes )
   in
   (updNoteSubBeats) |> List.map (\nsb ->  let
                                             nextNoteSubBeats = List.filter (\x -> x.subBeat == nsb.nextSubBeat) updNoteSubBeats
@@ -636,7 +672,8 @@ updateNoteDuration noteSubBeats =
                                                       nsb.stalkHeight
                                                       nsb.nextSubBeat
                                                       maxNoteDuration
-                                                      nsb.prevSubBeat)
+                                                      nsb.prevSubBeat
+                                                      nsb.ghostNotes)
 
   
 getNoteDuration : NoteSubBeat -> List NoteSubBeat -> NoteDurationParam
@@ -704,6 +741,7 @@ renderNote beat noteSubBeat =
                       , stroke "black"
                       , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
                       ] []]
+    
     semiQuaverBeam =  if noteSubBeat.noteDuration == SemiQuaver 
                          && Basics.not noteSubBeat.isRest then 
                         if noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --last (or only) note in the beat
@@ -758,7 +796,30 @@ renderNote beat noteSubBeat =
 
                            else
                               []
+    ghostNote = if noteSubBeat.ghostNotes == HasGhostNotes then
+                    [Svg.path 
+                      [ strokeWidth "0.2"
+                      , stroke "black"
+                      , d ("M " ++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY - 2.0)) 
+                                ++ "C "++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
+                                ++ " " ++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
+                                ++ " "++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY + 2.0)) 
+                                )]
+                      []
+                    ,Svg.path 
+                      [ strokeWidth "0.2"
+                      , stroke "black"
+                      , d ("M " ++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY - 2.0)) 
+                                ++ "C "++ (String.fromFloat (noteCenterX + 2.7)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
+                                ++ " " ++ (String.fromFloat (noteCenterX + 2.7)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
+                                ++ " "++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY + 2.0)) 
+                                )]
+                      []
+                    ]
+                  else []
   in
+  List.append
+    (
   List.append
     (
   List.append
@@ -832,7 +893,8 @@ renderNote beat noteSubBeat =
       stalk)
       dot)
       topBeam)
-      semiQuaverBeam
+      semiQuaverBeam)
+      ghostNote
 
 
 renderBeams : Int -> List NoteSubBeat -> List (Svg Msg)

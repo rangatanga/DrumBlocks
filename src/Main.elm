@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
+import Browser.Events exposing (onKeyDown)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes as HA
@@ -35,7 +36,7 @@ main =
 
 
 type alias Model =
-  { arrangement : List InstrumentBlocks
+  { arrangement : InstrumentBlocksDict
   , timeSignature : String
   , blockOptionsDialogParams : Maybe BlockOptionsOpenParams
   , debugText : String
@@ -61,6 +62,7 @@ type alias Instrument =
   , stavePosition : Float 
   , noteShape : NoteShape
   , isGhostNoteable : Bool
+  , sortOrder : Int
   }
 
 type NoteDuration =
@@ -119,10 +121,7 @@ type GhostNotes =
   HasGhostNotes
   | NoGhostNotes
 
-type alias InstrumentBlocks = 
-  { instrumentName : String
-  , blockOptions : BeatBlockOptionsDict
-  }
+type alias InstrumentBlocksDict = Dict String BeatBlockOptionsDict
 
 type alias BeatBlockOptionsDict = Dict Int BlockOptions
 
@@ -155,15 +154,15 @@ staveShiftY = 20
 
 instrumentDict : Dict String Instrument
 instrumentDict = Dict.fromList 
-    [("Hi-Hat", Instrument "G5" -1.5 Cross False)
-    , ("Ride Cymbal", Instrument "F5" 0 CrossLedger False)
-    , ("High Tom", Instrument "E5" 1.5 Ovoid True)
-    , ("Mid Tom", Instrument "D5" 3 Ovoid True)
-    , ("Snare", Instrument "C5" 4.5 Ovoid True)
-    , ("Floor Tom", Instrument "A4" 7.5 Ovoid True)
-    , ("Bass Drum", Instrument "F4" 10.5 Ovoid False)      
-    , ("Hi-hat Foot", Instrument "D4" 13 Cross False)
-    , ("Rest", Instrument "" 7 Rest False)
+    [("Hi-Hat", Instrument "G5" -1.5 Cross False 10)
+    , ("Ride Cymbal", Instrument "F5" 0 CrossLedger False 20)
+    , ("High Tom", Instrument "E5" 1.5 Ovoid True 30)
+    , ("Mid Tom", Instrument "D5" 3 Ovoid True 40)
+    , ("Snare", Instrument "C5" 4.5 Ovoid True 50)
+    , ("Floor Tom", Instrument "A4" 7.5 Ovoid True 60)
+    , ("Bass Drum", Instrument "F4" 10.5 Ovoid False 70)      
+    , ("Hi-hat Foot", Instrument "D4" 13 Cross False 80)
+    , ("Rest", Instrument "" 7 Rest False 0)
     ]
 
 {-
@@ -221,18 +220,18 @@ init flags url key =
 
 initialModel : Model
 initialModel = 
-    { arrangement = [ InstrumentBlocks "Hi-Hat" (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
+    { arrangement = Dict.fromList [("Hi-Hat", (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
                                                                 , (2, BlockOptions aBlock NoGhostNotes Binary.empty)
                                                                 , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                , (4, BlockOptions aBlock NoGhostNotes Binary.empty)]) 
-                    , InstrumentBlocks "Snare" (Dict.fromList [(1, BlockOptions pBlock HasGhostNotes Binary.empty)
-                                                              , (2, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                              , (3, BlockOptions pBlock NoGhostNotes Binary.empty)
-                                                              , (4, BlockOptions aBlock NoGhostNotes Binary.empty)]) 
-                    , InstrumentBlocks "Bass Drum" (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                   , (2, BlockOptions pBlock NoGhostNotes Binary.empty)
-                                                                   , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                   , (4, BlockOptions pBlock NoGhostNotes Binary.empty)]) 
+                                                                , (4, BlockOptions aBlock NoGhostNotes Binary.empty)])) 
+                                  , ("Snare", (Dict.fromList [(1, BlockOptions pBlock HasGhostNotes Binary.empty)
+                                                                            , (2, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                            , (3, BlockOptions pBlock NoGhostNotes Binary.empty)
+                                                                            , (4, BlockOptions aBlock NoGhostNotes Binary.empty)]))
+                                  , ("Bass Drum", (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                                , (2, BlockOptions pBlock NoGhostNotes Binary.empty)
+                                                                                , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                                , (4, BlockOptions pBlock NoGhostNotes Binary.empty)]))
                     ]     
     , timeSignature = "4/4"
     , blockOptionsDialogParams = Nothing
@@ -254,56 +253,116 @@ type Msg
   | BlockOptionsDialogSave BlockOptionsSaveParams
   | BlockOptionsDialogCancel
   | GhostNotesCheckBoxChanged SelectIdValue
+  | KeyPressedMsg KeyEventMsg
+  | KeyReleasedMsg KeyEventMsg
+
+type KeyEventMsg
+    = KeyEventControl
+    | KeyEventAlt
+    | KeyEventShift
+    | KeyEventMeta
+    | KeyEventLetter Char
+    | KeyEventUnknown String
   --| SubdivisionSelectMsg (Select.Msg Subdivision)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = 
     case msg of
-        BlockSelectedChange param ->  let
-                                        idList = String.split "~" param.id
-                                        instrName = List.head idList
-                                        blockIndex = List.head (List.reverse idList)
-                                        arr = model.arrangement
-                                      in
-                                      case instrName of
-                                          Just iName -> case blockIndex of
-                                                          Just bIndex -> ({model | arrangement = (updateArrangementBlock iName bIndex param.value arr)}, Cmd.none)
-                                                          _           -> ({model | debugText = (Debug.toString value)}, Cmd.none)
-                                          _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+        BlockSelectedChange param -> applyBlockSelectedChange model param
         BlockOptionsDialogOpen params -> ({model | blockOptionsDialogParams = Just params}, toggleDialog "block-options-dialog")
         BlockOptionsDialogSave params -> ({model | debugText = params.checked}, toggleDialog "block-options-dialog")
         BlockOptionsDialogCancel -> ({model | blockOptionsDialogParams = Nothing}, toggleDialog "block-options-dialog")
         GhostNotesCheckBoxChanged param -> ({model | debugText = "kjd", tmp = True}, Cmd.none)
-        _ -> (model, Cmd.none)
+        KeyPressedMsg keyEventMsg -> case keyEventMsg of
+                                      KeyEventUnknown key-> if key == "Escape" then ({model | blockOptionsDialogParams = Nothing}, toggleDialog "block-options-dialog")
+                                                            else (model, Cmd.none)
+                                      _ -> (model, Cmd.none)
+        _ -> ({model | debugText = Debug.toString msg}, Cmd.none)
 
 
-updateArrangementBlock : String -> String -> String -> List InstrumentBlocks -> List InstrumentBlocks
-updateArrangementBlock instrName blockIndex newBlockName currArrangement =
+applyBlockSelectedChange : Model -> SelectIdValue -> ( Model, Cmd Msg )
+applyBlockSelectedChange model param = 
+  let
+    idList = String.split "~" param.id
+    instrName = List.head idList
+    blockIndex = case List.head (List.reverse idList) of
+                  Just index -> index
+                  _ -> ""
+    arr = model.arrangement
+  in
+  case instrName of
+      Just iName -> case Dict.get iName arr of
+                      Just blockOptsDict ->
+                          case String.toInt blockIndex of
+                            Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value NoGhostNotes arr)}, Cmd.none)
+                            _           -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+                      _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+      _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+
+updateArrangement : String -> Int -> String -> GhostNotes -> InstrumentBlocksDict -> InstrumentBlocksDict
+updateArrangement instrName blockIndex newBlockName newGhostNotes currArrangement =
   let
     newBlock = Dict.get newBlockName blockDict
   in
-  case String.toInt blockIndex of
-      Just bIndex -> case newBlock of
-                        Just nBlock -> (currArrangement) |> List.map (\a -> if a.instrumentName == instrName then 
-                                                                              let
-                                                                                  bOpts = case Dict.get bIndex a.blockOptions of
-                                                                                            Just blockOpts -> BlockOptions nBlock blockOpts.ghostNotes blockOpts.accentPattern
-                                                                                            _              -> BlockOptions nBlock NoGhostNotes Binary.empty
-                                                                              in
-                                                                              InstrumentBlocks instrName (Dict.insert bIndex bOpts a.blockOptions) 
-                                                                            else a)
-                        _ -> currArrangement
+  case newBlock of
+      Just nBlock -> 
+          case Dict.get instrName currArrangement of
+              Just blockOptsDict -> 
+                  case Dict.get blockIndex blockOptsDict of
+                      Just blockOpts -> let
+                                          newBlockOpts = BlockOptions nBlock newGhostNotes Binary.empty
+                                        in
+                                        Dict.insert instrName (Dict.insert blockIndex newBlockOpts blockOptsDict) currArrangement
+                      _ -> currArrangement 
+              _ -> currArrangement
       _ -> currArrangement
 
 -- SUBSCRIPTIONS
 
+                        
+                     
+
+
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-  Sub.none
+subscriptions model =
+    Sub.batch
+        [ Browser.Events.onKeyDown keyPressedDecoder
+        , Browser.Events.onKeyUp keyReleasedDecoder
+        ]
+
+keyPressedDecoder : Json.Decoder Msg
+keyPressedDecoder =
+    Json.map (toKeyEventMsg >> KeyPressedMsg) (Json.field "key" Json.string)
 
 
+keyReleasedDecoder : Json.Decoder Msg
+keyReleasedDecoder =
+    Json.map (toKeyEventMsg >> KeyReleasedMsg) (Json.field "key" Json.string)
 
+
+toKeyEventMsg : String -> KeyEventMsg
+toKeyEventMsg eventKeyString =
+    case eventKeyString of
+        "Control" ->
+            KeyEventControl
+
+        "Shift" ->
+            KeyEventShift
+
+        "Alt" ->
+            KeyEventAlt
+
+        "Meta" ->
+            KeyEventMeta
+
+        string_ ->
+            case String.uncons string_ of
+                Just ( char, "" ) ->
+                    KeyEventLetter char
+
+                _ ->
+                    KeyEventUnknown eventKeyString
 -- VIEW
 
 
@@ -391,38 +450,47 @@ subdivisionOption subdiv =
 
 instrumentView : Model -> List (Html Msg)
 instrumentView model = 
-  (model.arrangement) |> List.map (\ib -> tr [Html.Attributes.class "instrumentTableRow"]
-                                            [td [Html.Attributes.class "instrumentTableCell"]
-                                                [Html.text ib.instrumentName]
-                                            , td []
-                                                 [instrumentRow model ib]
-                                            ])
+  (Dict.toList model.arrangement) |> List.map (\item  ->  let
+                                                            instrName = (Tuple.first item)
+                                                            blockOpts = (Tuple.second item)
+                                                            sortOrder = case Dict.get instrName instrumentDict of
+                                                                          Just instr -> instr.sortOrder
+                                                                          _ -> 100
+                                                          in
+                                                          {instrName = instrName, blockOpts = blockOpts, sortOrder = sortOrder})
+                                  |> List.sortBy .sortOrder
+                                  |> List.map (\a -> tr [Html.Attributes.class "instrumentTableRow"]
+                                                              [td [Html.Attributes.class "instrumentTableCell"]
+                                                                    [Html.text a.instrName]
+                                                              , td []
+                                                                   [instrumentRow model a.instrName a.blockOpts]
+                                                              ])
 
-instrumentRow : Model -> InstrumentBlocks -> Html Msg
-instrumentRow model instrumentBlock = 
+instrumentRow : Model -> String -> BeatBlockOptionsDict -> Html Msg
+instrumentRow model instrName beatBlockOptDict = 
   div 
     [] 
-    (blockView model instrumentBlock)
+    (blockView model instrName beatBlockOptDict)
 
-blockView : Model -> InstrumentBlocks -> List (Html Msg)
-blockView model instrblocks = 
-  (Dict.toList instrblocks.blockOptions) |> List.concatMap (\ib -> (blockButton model instrblocks (Tuple.first ib) (Tuple.second ib).block.blockName (Tuple.second ib).ghostNotes))
+blockView : Model -> String -> BeatBlockOptionsDict -> List (Html Msg)
+blockView model instrName beatBlockOptDict = 
+  (Dict.toList beatBlockOptDict) |> List.concatMap (\ib -> (blockButton model instrName (Tuple.first ib) (Tuple.second ib).block.blockName (Tuple.second ib).ghostNotes))
 
-blockButton : Model -> InstrumentBlocks -> Int -> String -> GhostNotes ->List (Html Msg)
-blockButton model instrblocks index blockName ghostNotes =
+blockButton : Model -> String -> Int -> String -> GhostNotes ->List (Html Msg)
+blockButton model instrName index blockName ghostNotes =
   let
     blockOptionsOpenParams =  case model.blockOptionsDialogParams of 
                                 Just params -> params
-                                _ -> BlockOptionsOpenParams 1 index instrblocks.instrumentName blockName ghostNotes
+                                _ -> BlockOptionsOpenParams 1 index instrName blockName ghostNotes
   in
-  Html.select [onBlockSelectChange BlockSelectedChange
-              , HA.id (instrblocks.instrumentName ++ "~" ++ (String.fromInt index))
+  [Html.select [onBlockSelectChange BlockSelectedChange
+              , HA.id (instrName ++ "~" ++ (String.fromInt index))
               , HA.class "instrumentBlockSelect"
               , HA.alt "Block Picker"
               , HA.title "Block Picker"
               ]
-              (getBlockOptions blockName)
-  :: [Html.button [HA.id ("blockOpt~" ++ instrblocks.instrumentName ++ "~" ++ String.fromInt index)
+              (getBlockOptions blockName)]
+  ++ [Html.button [HA.id ("blockOpt~" ++ instrName ++ "~" ++ String.fromInt index)
                  , HA.class "instrumentBlockOpts"
                  , HA.alt "Block Options"
                  , HA.title "Block Options"
@@ -547,7 +615,7 @@ One         E           And         A
 Iterate through all 12 spaces and all items in the arrangement, and draw a note if required.
 -}
 
-renderBar : List InstrumentBlocks -> List(Svg Msg)
+renderBar : InstrumentBlocksDict -> List(Svg Msg)
 renderBar instrumentBlocks = 
   let
     beatCount = List.range 1 4
@@ -557,12 +625,16 @@ renderBar instrumentBlocks =
               --|> Debug.toString
 
 
-buildNoteSubBeats : Int -> List InstrumentBlocks -> List(Svg Msg)
+buildNoteSubBeats : Int -> InstrumentBlocksDict -> List(Svg Msg)
 buildNoteSubBeats beat instrumentBlocks = 
   let
-      subBeats = [1, 4, 7, 10]
+      subBeats = [1, 4, 5, 7, 9, 10]
       --get alll instruments & blocks for the current beat
-      beatBlocks = (instrumentBlocks) |> List.map (\ib -> Tuple.pair ib.instrumentName (Dict.get beat ib.blockOptions))
+      beatBlocks = (Dict.toList instrumentBlocks) |> List.map (\ib -> let
+                                                                        instrName = Tuple.first ib
+                                                                        blockOptions = Tuple.second ib
+                                                                      in
+                                                                      Tuple.pair instrName (Dict.get beat blockOptions))
       noteSubBeats = (subBeats) |> List.concatMap  (\sb -> getNoteSubBeats sb beatBlocks)
                      |> updateNoteSubBeats
  
@@ -586,7 +658,9 @@ getNoteSubBeats subBeat beatBlockOptions =
                                                 in
                                           if isPlayed == True then 
                                             [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat NoGhostNotes]
-                                          else if ghostNotes == HasGhostNotes then
+                                          else if ghostNotes == HasGhostNotes 
+                                                  && ((subDivision == "4-16" && List.member subBeat [1,4,7,10])
+                                                      || (subDivision == "3-8" && List.member subBeat [1,5,9])) then
                                             [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat HasGhostNotes]
                                           else
                                             []
@@ -918,18 +992,6 @@ isSubBeatMatch subBeat block =
                             else False
                   _ -> False
 
-{-
-createInstrumentBlocks : InstrumentBlocks -> List(NoteBlock)
-createInstrumentBlocks instrBlocks = 
-  let
-    sp = getStavePosition instrBlocks.instrumentName
-    ns = getNoteShape instrBlocks.instrumentName
-  in
-  (instrBlocks.blockNames)  |> List.indexedMap (\i b ->  {blockBeat = i + 1
-                                                          , stavePos = sp
-                                                          , noteShape = ns
-                                                          , blockName = b})
--}
 
 getStavePosition : String -> Float
 getStavePosition  instrumentName =

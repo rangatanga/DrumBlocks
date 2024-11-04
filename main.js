@@ -5170,10 +5170,6 @@ var $author$project$Main$BlockOptions = F3(
 		return {accentPattern: accentPattern, block: block, ghostNotes: ghostNotes};
 	});
 var $author$project$Main$HasGhostNotes = {$: 'HasGhostNotes'};
-var $author$project$Main$InstrumentBlocks = F2(
-	function (instrumentName, blockOptions) {
-		return {blockOptions: blockOptions, instrumentName: instrumentName};
-	});
 var $author$project$Main$NoGhostNotes = {$: 'NoGhostNotes'};
 var $author$project$Main$Block = F4(
 	function (blockName, imageName, notePlacement, subdivision) {
@@ -5339,66 +5335,64 @@ var $author$project$Main$pBlock = A4(
 			[0, 0, 0, 0])),
 	'4-16');
 var $author$project$Main$initialModel = {
-	arrangement: _List_fromArray(
-		[
-			A2(
-			$author$project$Main$InstrumentBlocks,
-			'Hi-Hat',
-			$elm$core$Dict$fromList(
-				_List_fromArray(
-					[
-						_Utils_Tuple2(
-						1,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						2,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						3,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						4,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty))
-					]))),
-			A2(
-			$author$project$Main$InstrumentBlocks,
-			'Snare',
-			$elm$core$Dict$fromList(
-				_List_fromArray(
-					[
-						_Utils_Tuple2(
-						1,
-						A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$HasGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						2,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						3,
-						A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						4,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty))
-					]))),
-			A2(
-			$author$project$Main$InstrumentBlocks,
-			'Bass Drum',
-			$elm$core$Dict$fromList(
-				_List_fromArray(
-					[
-						_Utils_Tuple2(
-						1,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						2,
-						A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						3,
-						A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
-						_Utils_Tuple2(
-						4,
-						A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty))
-					])))
-		]),
+	arrangement: $elm$core$Dict$fromList(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'Hi-Hat',
+				$elm$core$Dict$fromList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							1,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							2,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							3,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							4,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty))
+						]))),
+				_Utils_Tuple2(
+				'Snare',
+				$elm$core$Dict$fromList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							1,
+							A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$HasGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							2,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							3,
+							A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							4,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty))
+						]))),
+				_Utils_Tuple2(
+				'Bass Drum',
+				$elm$core$Dict$fromList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							1,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							2,
+							A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							3,
+							A3($author$project$Main$BlockOptions, $author$project$Main$aBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty)),
+							_Utils_Tuple2(
+							4,
+							A3($author$project$Main$BlockOptions, $author$project$Main$pBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty))
+						])))
+			])),
 	blockOptionsDialogParams: $elm$core$Maybe$Nothing,
 	debugText: '',
 	timeSignature: '4/4',
@@ -5412,10 +5406,372 @@ var $author$project$Main$init = F3(
 		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$subscriptions = function (_v0) {
-	return $elm$core$Platform$Sub$none;
+var $author$project$Main$KeyPressedMsg = function (a) {
+	return {$: 'KeyPressedMsg', a: a};
 };
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$KeyEventAlt = {$: 'KeyEventAlt'};
+var $author$project$Main$KeyEventControl = {$: 'KeyEventControl'};
+var $author$project$Main$KeyEventLetter = function (a) {
+	return {$: 'KeyEventLetter', a: a};
+};
+var $author$project$Main$KeyEventMeta = {$: 'KeyEventMeta'};
+var $author$project$Main$KeyEventShift = {$: 'KeyEventShift'};
+var $author$project$Main$KeyEventUnknown = function (a) {
+	return {$: 'KeyEventUnknown', a: a};
+};
+var $author$project$Main$toKeyEventMsg = function (eventKeyString) {
+	switch (eventKeyString) {
+		case 'Control':
+			return $author$project$Main$KeyEventControl;
+		case 'Shift':
+			return $author$project$Main$KeyEventShift;
+		case 'Alt':
+			return $author$project$Main$KeyEventAlt;
+		case 'Meta':
+			return $author$project$Main$KeyEventMeta;
+		default:
+			var string_ = eventKeyString;
+			var _v1 = $elm$core$String$uncons(string_);
+			if ((_v1.$ === 'Just') && (_v1.a.b === '')) {
+				var _v2 = _v1.a;
+				var _char = _v2.a;
+				return $author$project$Main$KeyEventLetter(_char);
+			} else {
+				return $author$project$Main$KeyEventUnknown(eventKeyString);
+			}
+	}
+};
+var $author$project$Main$keyPressedDecoder = A2(
+	$elm$json$Json$Decode$map,
+	A2($elm$core$Basics$composeR, $author$project$Main$toKeyEventMsg, $author$project$Main$KeyPressedMsg),
+	A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string));
+var $author$project$Main$KeyReleasedMsg = function (a) {
+	return {$: 'KeyReleasedMsg', a: a};
+};
+var $author$project$Main$keyReleasedDecoder = A2(
+	$elm$json$Json$Decode$map,
+	A2($elm$core$Basics$composeR, $author$project$Main$toKeyEventMsg, $author$project$Main$KeyReleasedMsg),
+	A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string));
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
+	});
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
+	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.key;
+		var event = _v0.event;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
+var $elm$browser$Browser$Events$onKeyUp = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keyup');
+var $author$project$Main$subscriptions = function (model) {
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyPressedDecoder),
+				$elm$browser$Browser$Events$onKeyUp($author$project$Main$keyReleasedDecoder)
+			]));
+};
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -5426,8 +5782,6 @@ var $elm$core$List$head = function (list) {
 	}
 };
 var $elm$core$Debug$toString = _Debug_toString;
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$toggleDialog = _Platform_outgoingPort('toggleDialog', $elm$json$Json$Encode$string);
 var $author$project$Main$blockDict = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
@@ -5654,67 +6008,26 @@ var $author$project$Main$blockDict = $elm$core$Dict$fromList(
 						[0, 0, 0])),
 				'3-8'))
 		]));
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
-var $author$project$Main$updateArrangementBlock = F4(
-	function (instrName, blockIndex, newBlockName, currArrangement) {
+var $author$project$Main$updateArrangement = F5(
+	function (instrName, blockIndex, newBlockName, newGhostNotes, currArrangement) {
 		var newBlock = A2($elm$core$Dict$get, newBlockName, $author$project$Main$blockDict);
-		var _v0 = $elm$core$String$toInt(blockIndex);
-		if (_v0.$ === 'Just') {
-			var bIndex = _v0.a;
-			if (newBlock.$ === 'Just') {
-				var nBlock = newBlock.a;
-				return A2(
-					$elm$core$List$map,
-					function (a) {
-						if (_Utils_eq(a.instrumentName, instrName)) {
-							var bOpts = function () {
-								var _v2 = A2($elm$core$Dict$get, bIndex, a.blockOptions);
-								if (_v2.$ === 'Just') {
-									var blockOpts = _v2.a;
-									return A3($author$project$Main$BlockOptions, nBlock, blockOpts.ghostNotes, blockOpts.accentPattern);
-								} else {
-									return A3($author$project$Main$BlockOptions, nBlock, $author$project$Main$NoGhostNotes, $icidasset$elm_binary$Binary$empty);
-								}
-							}();
-							return A2(
-								$author$project$Main$InstrumentBlocks,
-								instrName,
-								A3($elm$core$Dict$insert, bIndex, bOpts, a.blockOptions));
-						} else {
-							return a;
-						}
-					},
-					currArrangement);
+		if (newBlock.$ === 'Just') {
+			var nBlock = newBlock.a;
+			var _v1 = A2($elm$core$Dict$get, instrName, currArrangement);
+			if (_v1.$ === 'Just') {
+				var blockOptsDict = _v1.a;
+				var _v2 = A2($elm$core$Dict$get, blockIndex, blockOptsDict);
+				if (_v2.$ === 'Just') {
+					var blockOpts = _v2.a;
+					var newBlockOpts = A3($author$project$Main$BlockOptions, nBlock, newGhostNotes, $icidasset$elm_binary$Binary$empty);
+					return A3(
+						$elm$core$Dict$insert,
+						instrName,
+						A3($elm$core$Dict$insert, blockIndex, newBlockOpts, blockOptsDict),
+						currArrangement);
+				} else {
+					return currArrangement;
+				}
 			} else {
 				return currArrangement;
 			}
@@ -5722,6 +6035,7 @@ var $author$project$Main$updateArrangementBlock = F4(
 			return currArrangement;
 		}
 	});
+var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5730,36 +6044,36 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'BlockSelectedChange':
-				var param = msg.a;
-				var idList = A2($elm$core$String$split, '~', param.id);
-				var instrName = $elm$core$List$head(idList);
-				var blockIndex = $elm$core$List$head(
-					$elm$core$List$reverse(idList));
-				var arr = model.arrangement;
-				if (instrName.$ === 'Just') {
-					var iName = instrName.a;
-					if (blockIndex.$ === 'Just') {
-						var bIndex = blockIndex.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									arrangement: A4($author$project$Main$updateArrangementBlock, iName, bIndex, param.value, arr)
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									debugText: $elm$core$Debug$toString($elm$html$Html$Attributes$value)
-								}),
-							$elm$core$Platform$Cmd$none);
-					}
+var $author$project$Main$applyBlockSelectedChange = F2(
+	function (model, param) {
+		var idList = A2($elm$core$String$split, '~', param.id);
+		var instrName = $elm$core$List$head(idList);
+		var blockIndex = function () {
+			var _v3 = $elm$core$List$head(
+				$elm$core$List$reverse(idList));
+			if (_v3.$ === 'Just') {
+				var index = _v3.a;
+				return index;
+			} else {
+				return '';
+			}
+		}();
+		var arr = model.arrangement;
+		if (instrName.$ === 'Just') {
+			var iName = instrName.a;
+			var _v1 = A2($elm$core$Dict$get, iName, arr);
+			if (_v1.$ === 'Just') {
+				var blockOptsDict = _v1.a;
+				var _v2 = $elm$core$String$toInt(blockIndex);
+				if (_v2.$ === 'Just') {
+					var bIndex = _v2.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								arrangement: A5($author$project$Main$updateArrangement, iName, bIndex, param.value, $author$project$Main$NoGhostNotes, arr)
+							}),
+						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -5769,6 +6083,32 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
+			} else {
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							debugText: $elm$core$Debug$toString($elm$html$Html$Attributes$value)
+						}),
+					$elm$core$Platform$Cmd$none);
+			}
+		} else {
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						debugText: $elm$core$Debug$toString($elm$html$Html$Attributes$value)
+					}),
+				$elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Main$toggleDialog = _Platform_outgoingPort('toggleDialog', $elm$json$Json$Encode$string);
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'BlockSelectedChange':
+				var param = msg.a;
+				return A2($author$project$Main$applyBlockSelectedChange, model, param);
 			case 'BlockOptionsDialogOpen':
 				var params = msg.a;
 				return _Utils_Tuple2(
@@ -5798,8 +6138,26 @@ var $author$project$Main$update = F2(
 						model,
 						{debugText: 'kjd', tmp: true}),
 					$elm$core$Platform$Cmd$none);
+			case 'KeyPressedMsg':
+				var keyEventMsg = msg.a;
+				if (keyEventMsg.$ === 'KeyEventUnknown') {
+					var key = keyEventMsg.a;
+					return (key === 'Escape') ? _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{blockOptionsDialogParams: $elm$core$Maybe$Nothing}),
+						$author$project$Main$toggleDialog('block-options-dialog')) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
 			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							debugText: $elm$core$Debug$toString(msg)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$BlockOptionsDialogCancel = {$: 'BlockOptionsDialogCancel'};
@@ -5853,12 +6211,10 @@ var $author$project$Main$SelectIdValue = F2(
 	function (id, value) {
 		return {id: id, value: value};
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$targetIdDecoder = A2(
 	$elm$json$Json$Decode$at,
 	_List_fromArray(
@@ -5933,6 +6289,48 @@ var $author$project$Main$buildblockOptionsDialog = function (model) {
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $author$project$Main$Cross = {$: 'Cross'};
+var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
+var $author$project$Main$Instrument = F5(
+	function (staveLocation, stavePosition, noteShape, isGhostNoteable, sortOrder) {
+		return {isGhostNoteable: isGhostNoteable, noteShape: noteShape, sortOrder: sortOrder, staveLocation: staveLocation, stavePosition: stavePosition};
+	});
+var $author$project$Main$Ovoid = {$: 'Ovoid'};
+var $author$project$Main$Rest = {$: 'Rest'};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Main$instrumentDict = $elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(
+			'Hi-Hat',
+			A5($author$project$Main$Instrument, 'G5', -1.5, $author$project$Main$Cross, false, 10)),
+			_Utils_Tuple2(
+			'Ride Cymbal',
+			A5($author$project$Main$Instrument, 'F5', 0, $author$project$Main$CrossLedger, false, 20)),
+			_Utils_Tuple2(
+			'High Tom',
+			A5($author$project$Main$Instrument, 'E5', 1.5, $author$project$Main$Ovoid, true, 30)),
+			_Utils_Tuple2(
+			'Mid Tom',
+			A5($author$project$Main$Instrument, 'D5', 3, $author$project$Main$Ovoid, true, 40)),
+			_Utils_Tuple2(
+			'Snare',
+			A5($author$project$Main$Instrument, 'C5', 4.5, $author$project$Main$Ovoid, true, 50)),
+			_Utils_Tuple2(
+			'Floor Tom',
+			A5($author$project$Main$Instrument, 'A4', 7.5, $author$project$Main$Ovoid, true, 60)),
+			_Utils_Tuple2(
+			'Bass Drum',
+			A5($author$project$Main$Instrument, 'F4', 10.5, $author$project$Main$Ovoid, false, 70)),
+			_Utils_Tuple2(
+			'Hi-hat Foot',
+			A5($author$project$Main$Instrument, 'D4', 13, $author$project$Main$Cross, false, 80)),
+			_Utils_Tuple2(
+			'Rest',
+			A5($author$project$Main$Instrument, '', 7, $author$project$Main$Rest, false, 0))
+		]));
 var $author$project$Main$BlockOptionsDialogOpen = function (a) {
 	return {$: 'BlockOptionsDialogOpen', a: a};
 };
@@ -6012,30 +6410,32 @@ var $elm$html$Html$Events$onClick = function (msg) {
 var $elm$html$Html$select = _VirtualDom_node('select');
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Main$blockButton = F5(
-	function (model, instrblocks, index, blockName, ghostNotes) {
+	function (model, instrName, index, blockName, ghostNotes) {
 		var blockOptionsOpenParams = function () {
 			var _v0 = model.blockOptionsDialogParams;
 			if (_v0.$ === 'Just') {
 				var params = _v0.a;
 				return params;
 			} else {
-				return A5($author$project$Main$BlockOptionsOpenParams, 1, index, instrblocks.instrumentName, blockName, ghostNotes);
+				return A5($author$project$Main$BlockOptionsOpenParams, 1, index, instrName, blockName, ghostNotes);
 			}
 		}();
-		return A2(
-			$elm$core$List$cons,
-			A2(
-				$elm$html$Html$select,
-				_List_fromArray(
-					[
-						$author$project$Main$onBlockSelectChange($author$project$Main$BlockSelectedChange),
-						$elm$html$Html$Attributes$id(
-						instrblocks.instrumentName + ('~' + $elm$core$String$fromInt(index))),
-						$elm$html$Html$Attributes$class('instrumentBlockSelect'),
-						$elm$html$Html$Attributes$alt('Block Picker'),
-						$elm$html$Html$Attributes$title('Block Picker')
-					]),
-				$author$project$Main$getBlockOptions(blockName)),
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$select,
+					_List_fromArray(
+						[
+							$author$project$Main$onBlockSelectChange($author$project$Main$BlockSelectedChange),
+							$elm$html$Html$Attributes$id(
+							instrName + ('~' + $elm$core$String$fromInt(index))),
+							$elm$html$Html$Attributes$class('instrumentBlockSelect'),
+							$elm$html$Html$Attributes$alt('Block Picker'),
+							$elm$html$Html$Attributes$title('Block Picker')
+						]),
+					$author$project$Main$getBlockOptions(blockName))
+				]),
 			_List_fromArray(
 				[
 					A2(
@@ -6043,7 +6443,7 @@ var $author$project$Main$blockButton = F5(
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$id(
-							'blockOpt~' + (instrblocks.instrumentName + ('~' + $elm$core$String$fromInt(index)))),
+							'blockOpt~' + (instrName + ('~' + $elm$core$String$fromInt(index)))),
 							$elm$html$Html$Attributes$class('instrumentBlockOpts'),
 							$elm$html$Html$Attributes$alt('Block Options'),
 							$elm$html$Html$Attributes$title('Block Options'),
@@ -6083,28 +6483,29 @@ var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $author$project$Main$blockView = F2(
-	function (model, instrblocks) {
+var $author$project$Main$blockView = F3(
+	function (model, instrName, beatBlockOptDict) {
 		return A2(
 			$elm$core$List$concatMap,
 			function (ib) {
-				return A5($author$project$Main$blockButton, model, instrblocks, ib.a, ib.b.block.blockName, ib.b.ghostNotes);
+				return A5($author$project$Main$blockButton, model, instrName, ib.a, ib.b.block.blockName, ib.b.ghostNotes);
 			},
-			$elm$core$Dict$toList(instrblocks.blockOptions));
+			$elm$core$Dict$toList(beatBlockOptDict));
 	});
-var $author$project$Main$instrumentRow = F2(
-	function (model, instrumentBlock) {
+var $author$project$Main$instrumentRow = F3(
+	function (model, instrName, beatBlockOptDict) {
 		return A2(
 			$elm$html$Html$div,
 			_List_Nil,
-			A2($author$project$Main$blockView, model, instrumentBlock));
+			A3($author$project$Main$blockView, model, instrName, beatBlockOptDict));
 	});
+var $elm$core$List$sortBy = _List_sortBy;
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Main$instrumentView = function (model) {
 	return A2(
 		$elm$core$List$map,
-		function (ib) {
+		function (a) {
 			return A2(
 				$elm$html$Html$tr,
 				_List_fromArray(
@@ -6121,18 +6522,39 @@ var $author$project$Main$instrumentView = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(ib.instrumentName)
+								$elm$html$Html$text(a.instrName)
 							])),
 						A2(
 						$elm$html$Html$td,
 						_List_Nil,
 						_List_fromArray(
 							[
-								A2($author$project$Main$instrumentRow, model, ib)
+								A3($author$project$Main$instrumentRow, model, a.instrName, a.blockOpts)
 							]))
 					]));
 		},
-		model.arrangement);
+		A2(
+			$elm$core$List$sortBy,
+			function ($) {
+				return $.sortOrder;
+			},
+			A2(
+				$elm$core$List$map,
+				function (item) {
+					var instrName = item.a;
+					var sortOrder = function () {
+						var _v0 = A2($elm$core$Dict$get, instrName, $author$project$Main$instrumentDict);
+						if (_v0.$ === 'Just') {
+							var instr = _v0.a;
+							return instr.sortOrder;
+						} else {
+							return 100;
+						}
+					}();
+					var blockOpts = item.b;
+					return {blockOpts: blockOpts, instrName: instrName, sortOrder: sortOrder};
+				},
+				$elm$core$Dict$toList(model.arrangement))));
 };
 var $author$project$Main$BlockOptionsSaveParams = F2(
 	function (id, checked) {
@@ -6359,6 +6781,36 @@ var $author$project$Main$isSubBeatMatch = F2(
 				return false;
 		}
 	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
 var $author$project$Main$getNoteSubBeats = F2(
 	function (subBeat, beatBlockOptions) {
 		return A2(
@@ -6394,7 +6846,15 @@ var $author$project$Main$getNoteSubBeats = F2(
 				return isPlayed ? _List_fromArray(
 					[
 						$author$project$Main$NoteSubBeat(subBeat)(bb.a)($author$project$Main$Crotchet)(false)(false)(subDivision)(0)(subBeat)($author$project$Main$Crotchet)(subBeat)($author$project$Main$NoGhostNotes)
-					]) : (_Utils_eq(ghostNotes, $author$project$Main$HasGhostNotes) ? _List_fromArray(
+					]) : ((_Utils_eq(ghostNotes, $author$project$Main$HasGhostNotes) && (((subDivision === '4-16') && A2(
+					$elm$core$List$member,
+					subBeat,
+					_List_fromArray(
+						[1, 4, 7, 10]))) || ((subDivision === '3-8') && A2(
+					$elm$core$List$member,
+					subBeat,
+					_List_fromArray(
+						[1, 5, 9]))))) ? _List_fromArray(
 					[
 						$author$project$Main$NoteSubBeat(subBeat)(bb.a)($author$project$Main$Crotchet)(false)(false)(subDivision)(0)(subBeat)($author$project$Main$Crotchet)(subBeat)($author$project$Main$HasGhostNotes)
 					]) : _List_Nil);
@@ -6405,11 +6865,7 @@ var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $author$project$Main$Cross = {$: 'Cross'};
-var $author$project$Main$CrossLedger = {$: 'CrossLedger'};
-var $author$project$Main$Ovoid = {$: 'Ovoid'};
 var $author$project$Main$Quaver = {$: 'Quaver'};
-var $author$project$Main$Rest = {$: 'Rest'};
 var $author$project$Main$SemiQuaver = {$: 'SemiQuaver'};
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
@@ -6417,44 +6873,6 @@ var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
-var $author$project$Main$Instrument = F4(
-	function (staveLocation, stavePosition, noteShape, isGhostNoteable) {
-		return {isGhostNoteable: isGhostNoteable, noteShape: noteShape, staveLocation: staveLocation, stavePosition: stavePosition};
-	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Main$instrumentDict = $elm$core$Dict$fromList(
-	_List_fromArray(
-		[
-			_Utils_Tuple2(
-			'Hi-Hat',
-			A4($author$project$Main$Instrument, 'G5', -1.5, $author$project$Main$Cross, false)),
-			_Utils_Tuple2(
-			'Ride Cymbal',
-			A4($author$project$Main$Instrument, 'F5', 0, $author$project$Main$CrossLedger, false)),
-			_Utils_Tuple2(
-			'High Tom',
-			A4($author$project$Main$Instrument, 'E5', 1.5, $author$project$Main$Ovoid, true)),
-			_Utils_Tuple2(
-			'Mid Tom',
-			A4($author$project$Main$Instrument, 'D5', 3, $author$project$Main$Ovoid, true)),
-			_Utils_Tuple2(
-			'Snare',
-			A4($author$project$Main$Instrument, 'C5', 4.5, $author$project$Main$Ovoid, true)),
-			_Utils_Tuple2(
-			'Floor Tom',
-			A4($author$project$Main$Instrument, 'A4', 7.5, $author$project$Main$Ovoid, true)),
-			_Utils_Tuple2(
-			'Bass Drum',
-			A4($author$project$Main$Instrument, 'F4', 10.5, $author$project$Main$Ovoid, false)),
-			_Utils_Tuple2(
-			'Hi-hat Foot',
-			A4($author$project$Main$Instrument, 'D4', 13, $author$project$Main$Cross, false)),
-			_Utils_Tuple2(
-			'Rest',
-			A4($author$project$Main$Instrument, '', 7, $author$project$Main$Rest, false))
-		]));
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Basics$not = _Basics_not;
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
@@ -6814,27 +7232,6 @@ var $author$project$Main$renderNote = F2(
 				semiQuaverBeam),
 			ghostNote);
 	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
 var $author$project$Main$NoteDurationParam = F4(
 	function (noteDuration, isDotted, nextSubBeat, prevSubBeat) {
 		return {isDotted: isDotted, nextSubBeat: nextSubBeat, noteDuration: noteDuration, prevSubBeat: prevSubBeat};
@@ -6997,16 +7394,18 @@ var $author$project$Main$updateNoteSubBeats = function (noteSubBeats) {
 var $author$project$Main$buildNoteSubBeats = F2(
 	function (beat, instrumentBlocks) {
 		var subBeats = _List_fromArray(
-			[1, 4, 7, 10]);
+			[1, 4, 5, 7, 9, 10]);
 		var beatBlocks = A2(
 			$elm$core$List$map,
 			function (ib) {
+				var instrName = ib.a;
+				var blockOptions = ib.b;
 				return A2(
 					$elm$core$Tuple$pair,
-					ib.instrumentName,
-					A2($elm$core$Dict$get, beat, ib.blockOptions));
+					instrName,
+					A2($elm$core$Dict$get, beat, blockOptions));
 			},
-			instrumentBlocks);
+			$elm$core$Dict$toList(instrumentBlocks));
 		var noteSubBeats = $author$project$Main$updateNoteSubBeats(
 			A2(
 				$elm$core$List$concatMap,

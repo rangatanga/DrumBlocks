@@ -73,4 +73,64 @@ body {
 .blockOptionsDialogButtons {
   width: 100%;
   text-align: center;
+  padding-top: 10;
+}
+
+.blockOptionsContainer {
+  padding-top: 10;
+}
+
+#accentPatternBox {
+  border-style: inset;
+  border-width: 2px;
+  border-color: gray;
+  border-radius: 3px;
+  width: 100%;
+  text-align: center;
+}
+
+.accentCheckbox {
+  -webkit-appearance: initial;
+  appearance: initial;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: #e3000b;
+  position: relative;
+  margin-right: 10px;
+}
+
+.accentCheckbox:disabled {
+  -webkit-appearance: initial;
+  appearance: initial;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: #dddddd;
+  position: relative;
+}
+
+.accentCheckbox:checked:after {
+  /* Heres your symbol replacement - this is a tick in Unicode. */
+  content: "\003E";
+  color: #fff;
+  /* The following positions my tick in the center, 
+   * but you could just overlay the entire box
+   * with a full after element with a background if you want to */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+  /*
+   * If you want to fully change the check appearance, use the following:
+   * content: " ";
+   * width: 100%;
+   * height: 100%;
+   * background: blue;
+   * top: 0;
+   * left: 0;
+   */
 }

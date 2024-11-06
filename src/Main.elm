@@ -15,6 +15,7 @@ import Svg.Attributes exposing (..)
 import Dict exposing (..)
 import Json.Decode as Json
 
+import CommonEvents exposing (..)
 
 -- MAIN
 
@@ -38,9 +39,8 @@ main =
 type alias Model =
   { arrangement : InstrumentBlocksDict
   , timeSignature : String
-  , blockOptionsDialogParams : Maybe BlockOptionsOpenParams
+  , blockOptionsParams : BlockOptionsParams
   , debugText : String
-  , tmp : Bool
   }
 
 
@@ -62,6 +62,7 @@ type alias Instrument =
   , stavePosition : Float 
   , noteShape : NoteShape
   , isGhostNoteable : Bool
+  , isAccentable : Bool
   , sortOrder : Int
   }
 
@@ -85,6 +86,7 @@ type alias NoteSubBeat =
   , nextSubBeatNoteDuration : NoteDuration
   , prevSubBeat : Int
   , ghostNotes : GhostNotes
+  , isAccented : Bool
   }
 
 type alias NoteDurationParam = 
@@ -131,12 +133,13 @@ type alias BlockOptions =
   , accentPattern : Bits
   }
 
-type alias BlockOptionsOpenParams = 
+type alias BlockOptionsParams = 
   {beat : Int
   , subBeat : Int
   , instrumentName : String
   , blockName : String
   , ghostNotes : GhostNotes
+  , accentPattern : Bits
   }
 
 subdivisions : List Subdivision
@@ -154,15 +157,15 @@ staveShiftY = 20
 
 instrumentDict : Dict String Instrument
 instrumentDict = Dict.fromList 
-    [("Hi-Hat", Instrument "G5" -1.5 Cross False 10)
-    , ("Ride Cymbal", Instrument "F5" 0 CrossLedger False 20)
-    , ("High Tom", Instrument "E5" 1.5 Ovoid True 30)
-    , ("Mid Tom", Instrument "D5" 3 Ovoid True 40)
-    , ("Snare", Instrument "C5" 4.5 Ovoid True 50)
-    , ("Floor Tom", Instrument "A4" 7.5 Ovoid True 60)
-    , ("Bass Drum", Instrument "F4" 10.5 Ovoid False 70)      
-    , ("Hi-hat Foot", Instrument "D4" 13 Cross False 80)
-    , ("Rest", Instrument "" 7 Rest False 0)
+    [("Hi-Hat", Instrument "G5" -1.5 Cross False True 10)
+    , ("Ride Cymbal", Instrument "F5" 0 CrossLedger False True 20)
+    , ("High Tom", Instrument "E5" 1.5 Ovoid True True 30)
+    , ("Mid Tom", Instrument "D5" 3 Ovoid True True 40)
+    , ("Snare", Instrument "C5" 4.5 Ovoid True True 50)
+    , ("Floor Tom", Instrument "A4" 7.5 Ovoid True True 60)
+    , ("Bass Drum", Instrument "F4" 10.5 Ovoid False False 70)      
+    , ("Hi-hat Foot", Instrument "D4" 13 Cross False False 80)
+    , ("Rest", Instrument "" 7 Rest False False 0)
     ]
 
 {-
@@ -208,6 +211,10 @@ blockOptionsDialog dialogId content =
 
 port toggleDialog : String -> Cmd msg
 
+defaultBlockOptions : BlockOptionsParams
+defaultBlockOptions = 
+  BlockOptionsParams -1 -1 "" "" NoGhostNotes Binary.empty
+
 -- INIT
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -225,7 +232,7 @@ initialModel =
                                                                 , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
                                                                 , (4, BlockOptions aBlock NoGhostNotes Binary.empty)])) 
                                   , ("Snare", (Dict.fromList [(1, BlockOptions pBlock HasGhostNotes Binary.empty)
-                                                                            , (2, BlockOptions aBlock NoGhostNotes Binary.empty)
+                                                                            , (2, BlockOptions aBlock NoGhostNotes (Binary.fromIntegers [1,0,0,0]))
                                                                             , (3, BlockOptions pBlock NoGhostNotes Binary.empty)
                                                                             , (4, BlockOptions aBlock NoGhostNotes Binary.empty)]))
                                   , ("Bass Drum", (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
@@ -234,11 +241,10 @@ initialModel =
                                                                                 , (4, BlockOptions pBlock NoGhostNotes Binary.empty)]))
                     ]     
     , timeSignature = "4/4"
-    , blockOptionsDialogParams = Nothing
+    , blockOptionsParams = defaultBlockOptions
     --, subdivisionSelect = Select.init "select-subdivision" |> Select.setItems [Subdivision "4-16" "Four 16ths" 4
     --                                                                          ,Subdivision "3-8" "Three 8ths" 3]
     , debugText = ""
-    , tmp = False
     }   
 
 
@@ -249,10 +255,11 @@ type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
   | BlockSelectedChange SelectIdValue
-  | BlockOptionsDialogOpen BlockOptionsOpenParams
-  | BlockOptionsDialogSave BlockOptionsSaveParams
+  | BlockOptionsDialogOpen BlockOptionsParams
+  | BlockOptionsDialogSave
   | BlockOptionsDialogCancel
-  | GhostNotesCheckBoxChanged SelectIdValue
+  | GhostNotesCheckBoxChanged CheckboxIdChecked
+  | AccentCheckBoxChanged CheckboxIdChecked
   | KeyPressedMsg KeyEventMsg
   | KeyReleasedMsg KeyEventMsg
 
@@ -269,14 +276,40 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = 
     case msg of
         BlockSelectedChange param -> applyBlockSelectedChange model param
-        BlockOptionsDialogOpen params -> ({model | blockOptionsDialogParams = Just params}, toggleDialog "block-options-dialog")
-        BlockOptionsDialogSave params -> ({model | debugText = params.checked}, toggleDialog "block-options-dialog")
-        BlockOptionsDialogCancel -> ({model | blockOptionsDialogParams = Nothing}, toggleDialog "block-options-dialog")
-        GhostNotesCheckBoxChanged param -> ({model | debugText = "kjd", tmp = True}, Cmd.none)
+        BlockOptionsDialogOpen params -> ({model | blockOptionsParams = params}, toggleDialog "block-options-dialog")
+        BlockOptionsDialogSave -> ({model | arrangement = updateArrangement model.blockOptionsParams.instrumentName
+                                                                            model.blockOptionsParams.subBeat
+                                                                            model.blockOptionsParams.blockName
+                                                                            model.blockOptionsParams.ghostNotes
+                                                                            model.blockOptionsParams.accentPattern
+                                                                            model.arrangement
+                                            , blockOptionsParams = defaultBlockOptions
+                                            }, toggleDialog "block-options-dialog")
+        BlockOptionsDialogCancel -> ({model | blockOptionsParams = defaultBlockOptions}, toggleDialog "block-options-dialog")
+        GhostNotesCheckBoxChanged param -> let 
+                                              opts = BlockOptionsParams model.blockOptionsParams.beat
+                                                                        model.blockOptionsParams.subBeat
+                                                                        model.blockOptionsParams.instrumentName
+                                                                        model.blockOptionsParams.blockName
+                                                                        (if param.checked then HasGhostNotes else NoGhostNotes)
+                                                                        model.blockOptionsParams.accentPattern
+                                           in
+                                           ({model | blockOptionsParams = opts}, Cmd.none)
         KeyPressedMsg keyEventMsg -> case keyEventMsg of
-                                      KeyEventUnknown key-> if key == "Escape" then ({model | blockOptionsDialogParams = Nothing}, toggleDialog "block-options-dialog")
-                                                            else (model, Cmd.none)
-                                      _ -> (model, Cmd.none)
+                                        KeyEventUnknown key-> if key == "Escape" then 
+                                                                ({model | blockOptionsParams = defaultBlockOptions}, toggleDialog "block-options-dialog")
+                                                              else 
+                                                                (model, Cmd.none)
+                                        _ -> (model, Cmd.none)
+        AccentCheckBoxChanged param ->  let 
+                                              opts = BlockOptionsParams model.blockOptionsParams.beat
+                                                                        model.blockOptionsParams.subBeat
+                                                                        model.blockOptionsParams.instrumentName
+                                                                        model.blockOptionsParams.blockName
+                                                                        model.blockOptionsParams.ghostNotes
+                                                                        (updateAccentPattern param model.blockOptionsParams.blockName model.blockOptionsParams.accentPattern)
+                                        in
+                                        ({model | blockOptionsParams = opts}, Cmd.none)
         _ -> ({model | debugText = Debug.toString msg}, Cmd.none)
 
 
@@ -294,13 +327,13 @@ applyBlockSelectedChange model param =
       Just iName -> case Dict.get iName arr of
                       Just blockOptsDict ->
                           case String.toInt blockIndex of
-                            Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value NoGhostNotes arr)}, Cmd.none)
+                            Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value NoGhostNotes (Binary.fromDecimal 0) arr)}, Cmd.none)
                             _           -> ({model | debugText = (Debug.toString value)}, Cmd.none)
                       _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
       _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
 
-updateArrangement : String -> Int -> String -> GhostNotes -> InstrumentBlocksDict -> InstrumentBlocksDict
-updateArrangement instrName blockIndex newBlockName newGhostNotes currArrangement =
+updateArrangement : String -> Int -> String -> GhostNotes -> Bits -> InstrumentBlocksDict -> InstrumentBlocksDict
+updateArrangement instrName blockIndex newBlockName newGhostNotes newAccentPattern currArrangement =
   let
     newBlock = Dict.get newBlockName blockDict
   in
@@ -310,18 +343,39 @@ updateArrangement instrName blockIndex newBlockName newGhostNotes currArrangemen
               Just blockOptsDict -> 
                   case Dict.get blockIndex blockOptsDict of
                       Just blockOpts -> let
-                                          newBlockOpts = BlockOptions nBlock newGhostNotes Binary.empty
+                                          newBlockOpts = BlockOptions nBlock newGhostNotes newAccentPattern
                                         in
                                         Dict.insert instrName (Dict.insert blockIndex newBlockOpts blockOptsDict) currArrangement
                       _ -> currArrangement 
               _ -> currArrangement
       _ -> currArrangement
 
+updateAccentPattern : CheckboxIdChecked -> String -> Bits -> Bits
+updateAccentPattern param blockName currAccentPattern =
+  let
+    subdivision = case Dict.get blockName blockDict of
+                    Just block -> block.subdivision
+                    _ -> "4-16"
+  in
+  case String.toInt (String.right 1 param.id) of
+    Just subBeat -> let
+                      bitmap =  if subdivision == "4-16" then
+                                    if subBeat == 1 then Binary.fromIntegers [1,0,0,0]
+                                    else if subBeat == 2 then Binary.fromIntegers [0,1,0,0]
+                                    else if subBeat == 3 then Binary.fromIntegers [0,0,1,0]
+                                    else Binary.fromIntegers [0,0,0,1]
+                                else
+                                    if subBeat == 1 then Binary.fromIntegers [1,0,0]
+                                    else if subBeat == 2 then Binary.fromIntegers [0,1,0]
+                                    else Binary.fromIntegers [0,0,1]
+                    in
+                    if param.checked then
+                                      Binary.or currAccentPattern bitmap
+                                    else
+                                      Binary.and currAccentPattern (Binary.not bitmap)
+    _ -> currAccentPattern
+
 -- SUBSCRIPTIONS
-
-                        
-                     
-
 
 
 subscriptions : Model -> Sub Msg
@@ -401,7 +455,7 @@ view model =
       ,blockOptionsDialog "block-options-dialog"
                 (buildblockOptionsDialog model
                 ++  [Html.div [HA.class "blockOptionsDialogButtons"] 
-                              [button [ onBlockOptionsSave BlockOptionsDialogSave, HA.class "blockOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
+                              [button [ onClick BlockOptionsDialogSave, HA.class "blockOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
                               , button [ onClick BlockOptionsDialogCancel, HA.class "blockOptionsDialogButton" ] [ Html.text "Cancel" ]
                               ]
                     ]
@@ -411,23 +465,62 @@ view model =
 
 buildblockOptionsDialog : Model -> List (Html Msg)
 buildblockOptionsDialog model = 
-  case model.blockOptionsDialogParams of
-      Just params ->  let
-                        instrumentName = params.instrumentName
-                        ghostNotes = params.ghostNotes
-                      in
-                      [Html.div  []
-                                (Html.img [HA.src ("assets/images/" ++ params.blockName ++ ".png")] []
-                                :: (if instrumentName == "Snare" then 
-                                      [Html.div [] [Html.text "Add Ghost Notes?"
-                                                   , Html.input [HA.type_ "checkbox"
-                                                                , onBlockSelectChange GhostNotesCheckBoxChanged
-                                                                , checked (if ghostNotes == HasGhostNotes then True else False)][]
-                                                   ]]
-                                    else []
-                                   ))]
-      _ ->  []
+  let
+    instrumentName = model.blockOptionsParams.instrumentName
+    ghostNotes = model.blockOptionsParams.ghostNotes
+    isAccentable = case Dict.get instrumentName instrumentDict of
+                      Just instr  -> instr.isAccentable
+                      _           -> False
+  in
+  [Html.div  []
+            (Html.img [HA.src ("assets/images/" ++ model.blockOptionsParams.blockName ++ ".png")] []
+            :: (if instrumentName == "Snare" then 
+                  [Html.div [HA.class "blockOptionsContainer"] 
+                            [Html.text "Add Ghost Notes?"
+                            , Html.input [HA.type_ "checkbox"
+                                         , onCheckboxChanged GhostNotesCheckBoxChanged
+                                         , checked (if ghostNotes == HasGhostNotes then True else False)
+                                         , HA.id "ghostnotes_checkbox"][]
+                            ]]
+                else []
+                )
+            ++ (if isAccentable then 
+                  [Html.div [HA.class "blockOptionsContainer"] 
+                            [Html.text "Accent Pattern"
+                            , Html.div [HA.id "accentPatternBox"]
+                                       (renderAccentCheckboxes model)
+                            ]
+                  ]
+                else []
+                )
+            )
+  ]
 
+renderAccentCheckboxes : Model -> List (Html Msg)
+renderAccentCheckboxes model =
+  let
+    subBeatRange = case Dict.get model.blockOptionsParams.blockName blockDict of
+                      Just block -> if block.subdivision == "4-16" then [{index = 1, bitmap = (Binary.fromIntegers [1,0,0,0])}
+                                                                        , {index = 2, bitmap = (Binary.fromIntegers [0,1,0,0])}
+                                                                        , {index = 3, bitmap = (Binary.fromIntegers [0,0,1,0])}
+                                                                        , {index = 4, bitmap = (Binary.fromIntegers [0,0,0,1])}] 
+                                                                   else [{index = 1, bitmap = (Binary.fromIntegers [1,0,0])}
+                                                                        , {index = 2, bitmap = (Binary.fromIntegers [0,1,0])}
+                                                                        , {index = 3, bitmap = (Binary.fromIntegers [0,0,1])}]
+                      _ -> []
+    notePlacement = case Dict.get model.blockOptionsParams.blockName blockDict of
+                      Just block -> block.notePlacement
+                      _ -> Binary.fromIntegers [0,0,0,0]
+    accentPattern = model.blockOptionsParams.accentPattern
+
+  in
+  subBeatRange |> List.map (\i -> Html.input [HA.type_ "checkbox"
+                                             , HA.id ("accent_checkbox_" ++ String.fromInt i.index)
+                                             , HA.class "accentCheckbox"
+                                             , onCheckboxChanged AccentCheckBoxChanged
+                                             , checked (Binary.toDecimal (Binary.and i.bitmap accentPattern) /= 0)
+                                             , HA.disabled (Binary.toDecimal (Binary.and i.bitmap notePlacement) == 0)][]
+                           )
 
 {-
 subdivisionDropdown : Model -> Html Msg
@@ -474,16 +567,22 @@ instrumentRow model instrName beatBlockOptDict =
 
 blockView : Model -> String -> BeatBlockOptionsDict -> List (Html Msg)
 blockView model instrName beatBlockOptDict = 
-  (Dict.toList beatBlockOptDict) |> List.concatMap (\ib -> (blockButton model instrName (Tuple.first ib) (Tuple.second ib).block.blockName (Tuple.second ib).ghostNotes))
+  (Dict.toList beatBlockOptDict) |> List.concatMap (\ib -> (blockButton model 
+                                                                        instrName 
+                                                                        (Tuple.first ib) 
+                                                                        (Tuple.second ib).block.blockName 
+                                                                        (Tuple.second ib).ghostNotes
+                                                                        (Tuple.second ib).accentPattern))
 
-blockButton : Model -> String -> Int -> String -> GhostNotes ->List (Html Msg)
-blockButton model instrName index blockName ghostNotes =
+blockButton : Model -> String -> Int -> String -> GhostNotes -> Bits ->List (Html Msg)
+blockButton model instrName index blockName ghostNotes accentPattern =
   let
-    blockOptionsOpenParams =  case model.blockOptionsDialogParams of 
-                                Just params -> params
-                                _ -> BlockOptionsOpenParams 1 index instrName blockName ghostNotes
+    blockOptionsOpenParams =  if model.blockOptionsParams.beat == -1 then
+                                BlockOptionsParams 1 index instrName blockName ghostNotes accentPattern
+                              else
+                                model.blockOptionsParams
   in
-  [Html.select [onBlockSelectChange BlockSelectedChange
+  [Html.select [onInputSelectChange BlockSelectedChange
               , HA.id (instrName ++ "~" ++ (String.fromInt index))
               , HA.class "instrumentBlockSelect"
               , HA.alt "Block Picker"
@@ -510,48 +609,6 @@ getBlockOptions blockName =
   (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False
                                                   , HA.class "blockSelect"] [Html.text k])))
   ++ (tripletBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
-
-type alias SelectIdValue = 
-  {
-    id : String
-    ,value : String
-  }
-
-type alias BlockOptionsSaveParams = 
-  {
-    id : String
-    ,checked : String
-  }
-   
-
-onBlockSelectChange : (SelectIdValue -> msg) -> Html.Attribute msg
-onBlockSelectChange tagger =
-  on "change" (Json.map tagger selectDecoder)
-
-selectDecoder : Json.Decoder SelectIdValue
-selectDecoder =
-  Json.map2 SelectIdValue targetIdDecoder targetValueDecoder
-
-onBlockOptionsSave : (BlockOptionsSaveParams -> msg) -> Html.Attribute msg
-onBlockOptionsSave tagger =
-  on "click" (Json.map tagger blockOptionsSaveDecoder)
-
-blockOptionsSaveDecoder : Json.Decoder BlockOptionsSaveParams
-blockOptionsSaveDecoder =
-  Json.map2 BlockOptionsSaveParams targetIdDecoder targetSelectedDecoder
-
-targetIdDecoder : Json.Decoder String
-targetIdDecoder =
-  Json.at ["target", "id"] Json.string
-
-targetValueDecoder : Json.Decoder String
-targetValueDecoder =
-  Json.at ["target", "value"] Json.string
-
-targetSelectedDecoder : Json.Decoder String
-targetSelectedDecoder =
-  Json.at ["target", "selected"] Json.string
-
 
 
 stave : List (Svg Msg)
@@ -655,13 +712,23 @@ getNoteSubBeats subBeat beatBlockOptions =
                                                     ghostNotes = case Tuple.second bb of
                                                                     Just blockOption -> blockOption.ghostNotes
                                                                     _ -> NoGhostNotes
+                                                    adjSubBeat =  if subDivision == "4-16" then
+                                                                    (subBeat + 2) // 3
+                                                                  else
+                                                                    (subBeat + 3) // 4
+
+                                                    isAccented = case Tuple.second bb of
+                                                                    Just blockOption -> Binary.toDecimal (Binary.and blockOption.accentPattern 
+                                                                                                                     (Binary.fromDecimal (2 ^ (4-adjSubBeat)))
+                                                                                                         ) /= 0
+                                                                    _ -> False
                                                 in
                                           if isPlayed == True then 
-                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat NoGhostNotes]
+                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat NoGhostNotes isAccented]
                                           else if ghostNotes == HasGhostNotes 
                                                   && ((subDivision == "4-16" && List.member subBeat [1,4,7,10])
                                                       || (subDivision == "3-8" && List.member subBeat [1,5,9])) then
-                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat HasGhostNotes]
+                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat HasGhostNotes False]
                                           else
                                             []
                             )
@@ -684,7 +751,7 @@ updateNoteSubBeats noteSubBeats =
     noteSubBeatsWithRests = List.append (if List.any (\a -> a.subBeat == 1) updateStalks then 
                                             []
                                          else
-                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0 1 Crotchet 1 NoGhostNotes]) updateStalks
+                                            [NoteSubBeat 1 "Rest" Crotchet False True "4-16" 0 1 Crotchet 1 NoGhostNotes False]) updateStalks
 
   in
   updateNoteDuration noteSubBeatsWithRests
@@ -712,7 +779,8 @@ updateStalkHeight noteSubBeats =
                                                   nsb.nextSubBeat 
                                                   nsb.nextSubBeatNoteDuration
                                                   nsb.prevSubBeat
-                                                  nsb.ghostNotes)
+                                                  nsb.ghostNotes
+                                                  nsb.isAccented)
 
 updateNoteDuration : List NoteSubBeat -> List NoteSubBeat
 updateNoteDuration noteSubBeats = 
@@ -728,7 +796,8 @@ updateNoteDuration noteSubBeats =
                                                                     (Tuple.second x).nextSubBeat
                                                                     (Tuple.first x).nextSubBeatNoteDuration
                                                                     (Tuple.second x).prevSubBeat
-                                                                    (Tuple.first x).ghostNotes )
+                                                                    (Tuple.first x).ghostNotes 
+                                                                    (Tuple.first x).isAccented )
   in
   (updNoteSubBeats) |> List.map (\nsb ->  let
                                             nextNoteSubBeats = List.filter (\x -> x.subBeat == nsb.nextSubBeat) updNoteSubBeats
@@ -747,7 +816,8 @@ updateNoteDuration noteSubBeats =
                                                       nsb.nextSubBeat
                                                       maxNoteDuration
                                                       nsb.prevSubBeat
-                                                      nsb.ghostNotes)
+                                                      nsb.ghostNotes
+                                                      nsb.isAccented)
 
   
 getNoteDuration : NoteSubBeat -> List NoteSubBeat -> NoteDurationParam
@@ -884,91 +954,100 @@ renderNote beat noteSubBeat =
                       [ strokeWidth "0.2"
                       , stroke "black"
                       , d ("M " ++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY - 2.0)) 
-                                ++ "C "++ (String.fromFloat (noteCenterX + 2.7)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
+                                ++ " C "++ (String.fromFloat (noteCenterX + 2.7)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
                                 ++ " " ++ (String.fromFloat (noteCenterX + 2.7)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
                                 ++ " "++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY + 2.0)) 
                                 )]
                       []
                     ]
                   else []
+    accent = if noteSubBeat.isAccented then
+                    [Svg.path 
+                      [ strokeWidth "0.3"
+                      , stroke "black"
+                      , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 3.0)) 
+                                ++ " L "++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 2.0)) 
+                                )]
+                      []
+                    ,Svg.path 
+                      [ strokeWidth "0.3"
+                      , stroke "black"
+                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 2.0)) 
+                                ++ " L "++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 1.0)) 
+                                )]
+                      []
+                    ]
+                  else []
   in
-  List.append
-    (
-  List.append
-    (
-  List.append
-    (
-  List.append
-    (
-  List.append 
-    (case noteShape of
-        Ovoid ->
-            [Svg.ellipse 
-              [cx (String.fromFloat noteCenterX)
-                , cy (String.fromFloat noteCenterY)
-                , rx "1.85"
-                , ry "1.3"
-                , transform ("rotate(-20, " ++ (String.fromFloat noteCenterX) ++ ", " ++ (String.fromFloat noteCenterY) ++ ")")
-              ] []
-            ]
-        Cross ->
-            [Svg.path
-              [ strokeWidth "0.4"
-                , stroke "black"
-                , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) )
-              ] []
-            ,Svg.path
-              [ strokeWidth "0.4"
-                , stroke "black"
-                , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) )
-              ] []
-            ]
-        CrossLedger ->
-            [Svg.path
-              [ strokeWidth "0.5"
-                , stroke "black"
-                , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) )
-              ] []
-            ,Svg.path
-              [ strokeWidth "0.5"
-                , stroke "black"
-                , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) )
-              ] []
-            ,Svg.path
-              [ strokeWidth "0.3"
-                , stroke "black"
-                , d ("M " ++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) ++ " L " ++ (String.fromFloat (noteCenterX + 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) )
-              ] []
-            ]
-        Triangle ->
-            [Svg.circle [cx (String.fromFloat noteCenterX), cy (String.fromFloat noteCenterY), r "1.5"] []]
-        Rest ->
-            case noteSubBeat.noteDuration of
-                Crotchet ->
-                        [Svg.image [xlinkHref "assets/images/crotchet-rest.svg"
-                                    , Svg.Attributes.width "7"
-                                    , Svg.Attributes.height "7"
-                                    , Svg.Attributes.x (String.fromFloat (noteCenterX - 4))
-                                    , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
-                Quaver ->
-                        [Svg.image [xlinkHref "assets/images/quaver-rest.svg"
-                                    , Svg.Attributes.width "6"
-                                    , Svg.Attributes.height "6"
-                                    , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
-                                    , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
-                SemiQuaver ->
-                        [Svg.image [xlinkHref "assets/images/semiquaver-rest.svg"
-                                    , Svg.Attributes.width "6"
-                                    , Svg.Attributes.height "6"
-                                    , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
-                                    , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
-                _ -> []
-            )                                    
-      stalk)
-      dot)
-      topBeam)
-      semiQuaverBeam)
-      ghostNote
+  (case noteShape of
+      Ovoid ->
+          [Svg.ellipse 
+            [cx (String.fromFloat noteCenterX)
+              , cy (String.fromFloat noteCenterY)
+              , rx "1.85"
+              , ry "1.3"
+              , transform ("rotate(-20, " ++ (String.fromFloat noteCenterX) ++ ", " ++ (String.fromFloat noteCenterY) ++ ")")
+            ] []
+          ]
+      Cross ->
+          [Svg.path
+            [ strokeWidth "0.4"
+              , stroke "black"
+              , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) )
+            ] []
+          ,Svg.path
+            [ strokeWidth "0.4"
+              , stroke "black"
+              , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) )
+            ] []
+          ]
+      CrossLedger ->
+          [Svg.path
+            [ strokeWidth "0.5"
+              , stroke "black"
+              , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) )
+            ] []
+          ,Svg.path
+            [ strokeWidth "0.5"
+              , stroke "black"
+              , d ("M " ++ (String.fromFloat (noteCenterX - 2)) ++ " " ++ (String.fromFloat (noteCenterY + 2)) ++ " L " ++ (String.fromFloat (noteCenterX + 2)) ++ " " ++ (String.fromFloat (noteCenterY - 2)) )
+            ] []
+          ,Svg.path
+            [ strokeWidth "0.3"
+              , stroke "black"
+              , d ("M " ++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) ++ " L " ++ (String.fromFloat (noteCenterX + 2.5)) ++ " " ++ (String.fromFloat (noteCenterY)) )
+            ] []
+          ]
+      Triangle ->
+          [Svg.circle [cx (String.fromFloat noteCenterX), cy (String.fromFloat noteCenterY), r "1.5"] []]
+      Rest ->
+          case noteSubBeat.noteDuration of
+              Crotchet ->
+                      [Svg.image [xlinkHref "assets/images/crotchet-rest.svg"
+                                  , Svg.Attributes.width "7"
+                                  , Svg.Attributes.height "7"
+                                  , Svg.Attributes.x (String.fromFloat (noteCenterX - 4))
+                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
+              Quaver ->
+                      [Svg.image [xlinkHref "assets/images/quaver-rest.svg"
+                                  , Svg.Attributes.width "6"
+                                  , Svg.Attributes.height "6"
+                                  , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
+                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
+              SemiQuaver ->
+                      [Svg.image [xlinkHref "assets/images/semiquaver-rest.svg"
+                                  , Svg.Attributes.width "6"
+                                  , Svg.Attributes.height "6"
+                                  , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
+                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
+              _ -> []
+          )                                    
+      ++ stalk
+      ++ dot
+      ++ topBeam
+      ++ semiQuaverBeam
+      ++ ghostNote
+      ++ accent
 
 
 renderBeams : Int -> List NoteSubBeat -> List (Svg Msg)

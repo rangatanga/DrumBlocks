@@ -891,60 +891,60 @@ renderNote beat noteSubBeat =
                       , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
                       ] []]
     
-    semiQuaverBeam =  if noteSubBeat.noteDuration == SemiQuaver 
-                         && Basics.not noteSubBeat.isRest then 
-                        if noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --last (or only) note in the beat
-                          if noteSubBeat.subBeat == 10 then --last subBeat position 
-                            if noteSubBeat.prevSubBeat /= noteSubBeat.subBeat then --short semi quaver bar goes to the left
-                              [Svg.path 
-                                [ strokeWidth "0.8"
-                                , stroke "black"
-                                , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX - 0.4)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
-                                ] []
-                              ]
-                            else  --single semiquaver, no beam
-                              [Svg.image [xlinkHref "assets/images/semiquaver.svg"
-                                          , Svg.Attributes.width "6"
-                                          , Svg.Attributes.height "6"
-                                          , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.4))
-                                          , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 0.6))] []]
-                          else --short semi quaver bar goes to the right
-                              [Svg.path 
-                                [ strokeWidth "0.8"
-                                , stroke "black"
-                                , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
-                                ] []
-                              ]
-                        else if noteSubBeat.nextSubBeatNoteDuration == SemiQuaver then --full semi quaver bar goes to next note
+    semiQuaverBeam =  if noteSubBeat.subdivision == "4-16" then
+                        if noteSubBeat.noteDuration == SemiQuaver 
+                          && Basics.not noteSubBeat.isRest then 
+                          if noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --last (or only) note in the beat
+                            if noteSubBeat.subBeat == 10 then --last subBeat position 
+                              if noteSubBeat.prevSubBeat /= noteSubBeat.subBeat then --short semi quaver bar goes to the left
                                 [Svg.path 
                                   [ strokeWidth "0.8"
                                   , stroke "black"
-                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX - 0.4)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
                                   ] []
-                              ]
-                             else --short semi quaver bar goes to the right
-                                if noteSubBeat.subBeat /= noteSubBeat.nextSubBeat
-                                  && noteSubBeat.subBeat /= noteSubBeat.prevSubBeat then
-                                    [] --this handles the K block issue
-                                else
+                                ]
+                              else  --single semiquaver, no beam
+                                [Svg.image [xlinkHref "assets/images/semiquaver.svg"
+                                            , Svg.Attributes.width "6"
+                                            , Svg.Attributes.height "6"
+                                            , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.4))
+                                            , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 0.6))] []]
+                            else --short semi quaver bar goes to the right
+                                [Svg.path 
+                                  [ strokeWidth "0.8"
+                                  , stroke "black"
+                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                  ] []
+                                ]
+                          else if noteSubBeat.nextSubBeatNoteDuration == SemiQuaver then --full semi quaver bar goes to next note
                                   [Svg.path 
                                     [ strokeWidth "0.8"
                                     , stroke "black"
-                                    , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                    , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
                                     ] []
-                                  ]
-                      else if noteSubBeat.noteDuration == Quaver 
-                              && Basics.not noteSubBeat.isRest
-                              && noteSubBeat.subBeat == noteSubBeat.prevSubBeat 
-                              && noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --single quaver, no beam
-                              [Svg.image [xlinkHref "assets/images/quaver.svg"
-                                          , Svg.Attributes.width "6"
-                                          , Svg.Attributes.height "6"
-                                          , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.4))
-                                          , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 0.6))] []]
-
-                           else
-                              []
+                                ]
+                              else --short semi quaver bar goes to the right
+                                  if noteSubBeat.subBeat /= noteSubBeat.nextSubBeat
+                                    && noteSubBeat.subBeat /= noteSubBeat.prevSubBeat then
+                                      [] --this handles the K block issue
+                                  else
+                                    [Svg.path 
+                                      [ strokeWidth "0.8"
+                                      , stroke "black"
+                                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                      ] []
+                                    ]
+                        else if noteSubBeat.noteDuration == Quaver 
+                                && Basics.not noteSubBeat.isRest
+                                && noteSubBeat.subBeat == noteSubBeat.prevSubBeat 
+                                && noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --single quaver, no beam
+                                [Svg.image [xlinkHref "assets/images/quaver.svg"
+                                            , Svg.Attributes.width "6"
+                                            , Svg.Attributes.height "6"
+                                            , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.4))
+                                            , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 0.6))] []]
+                            else []
+                      else []
     ghostNote = if noteSubBeat.ghostNotes == HasGhostNotes then
                     [Svg.path 
                       [ strokeWidth "0.2"

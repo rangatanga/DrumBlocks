@@ -7090,12 +7090,17 @@ var $author$project$Main$getNoteSubBeats = F2(
 					var _v0 = bb.b;
 					if (_v0.$ === 'Just') {
 						var blockOption = _v0.a;
-						return !(!$icidasset$elm_binary$Binary$toDecimal(
+						return (subDivision === '4-16') ? (!(!$icidasset$elm_binary$Binary$toDecimal(
 							A2(
 								$icidasset$elm_binary$Binary$and,
 								blockOption.accentPattern,
 								$icidasset$elm_binary$Binary$fromDecimal(
-									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))));
+									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))))) : (!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								blockOption.accentPattern,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 3 - adjSubBeat))))));
 					} else {
 						return false;
 					}

@@ -718,9 +718,14 @@ getNoteSubBeats subBeat beatBlockOptions =
                                                                     (subBeat + 3) // 4
 
                                                     isAccented = case Tuple.second bb of
-                                                                    Just blockOption -> Binary.toDecimal (Binary.and blockOption.accentPattern 
-                                                                                                                     (Binary.fromDecimal (2 ^ (4-adjSubBeat)))
-                                                                                                         ) /= 0
+                                                                    Just blockOption -> if subDivision == "4-16" then 
+                                                                                          Binary.toDecimal  (Binary.and blockOption.accentPattern 
+                                                                                                                        (Binary.fromDecimal (2 ^ (4-adjSubBeat)))
+                                                                                                            ) /= 0
+                                                                                        else 
+                                                                                          Binary.toDecimal  (Binary.and blockOption.accentPattern 
+                                                                                                                        (Binary.fromDecimal (2 ^ (3-adjSubBeat)))
+                                                                                                            ) /= 0
                                                                     _ -> False
                                                 in
                                           if isPlayed == True then 

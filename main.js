@@ -6373,6 +6373,21 @@ var $author$project$CommonEvents$onCheckboxChanged = function (tagger) {
 		'change',
 		A2($elm$json$Json$Decode$map, tagger, $author$project$CommonEvents$checkboxDecoder));
 };
+var $icidasset$elm_binary$Binary$or = F2(
+	function (a, b) {
+		return A2(
+			$icidasset$elm_binary$Binary$condense,
+			$elm$core$Basics$or,
+			A2($icidasset$elm_binary$Binary$makeIsometric, a, b));
+	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
 var $elm$core$Basics$pow = _Basics_pow;
 var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
 	var bits = _v0.a;
@@ -6394,7 +6409,6 @@ var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$renderAccentCheckboxes = F2(
 	function (model, beat) {
-		var x = $elm$core$Dict$toList(model.arrangement);
 		var subBeatRange = ('4-16' === '4-16') ? _List_fromArray(
 			[
 				{
@@ -6442,9 +6456,48 @@ var $author$project$Main$renderAccentCheckboxes = F2(
 				index: 3
 			}
 			]);
-		var notePlacement = $icidasset$elm_binary$Binary$fromIntegers(
-			_List_fromArray(
-				[0, 0, 0, 0]));
+		var accentableSubBeats = A3(
+			$elm$core$List$foldl,
+			$icidasset$elm_binary$Binary$or,
+			$icidasset$elm_binary$Binary$fromIntegers(
+				_List_fromArray(
+					[0, 0, 0, 0])),
+			A2(
+				$elm$core$List$map,
+				function (ib) {
+					var _v1 = ib.a;
+					if (_v1.$ === 'Just') {
+						var instrument = _v1.a;
+						if (instrument.isAccentable) {
+							var _v2 = ib.b;
+							if (_v2.$ === 'Just') {
+								var block = _v2.a;
+								return block.notePlacement;
+							} else {
+								return $icidasset$elm_binary$Binary$fromIntegers(
+									_List_fromArray(
+										[0, 0, 0, 0]));
+							}
+						} else {
+							return $icidasset$elm_binary$Binary$fromIntegers(
+								_List_fromArray(
+									[0, 0, 0, 0]));
+						}
+					} else {
+						return $icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[0, 0, 0, 0]));
+					}
+				},
+				A2(
+					$elm$core$List$map,
+					function (i) {
+						return A2(
+							$elm$core$Tuple$pair,
+							A2($elm$core$Dict$get, i.a, $author$project$Main$instrumentDict),
+							A2($elm$core$Dict$get, beat, i.b));
+					},
+					$elm$core$Dict$toList(model.arrangement))));
 		var accentPattern = function () {
 			var _v0 = model.beatOptionsParams;
 			if (_v0.$ === 'Just') {
@@ -6473,7 +6526,7 @@ var $author$project$Main$renderAccentCheckboxes = F2(
 								A2($icidasset$elm_binary$Binary$and, i.bitmap, accentPattern)))),
 							$elm$html$Html$Attributes$disabled(
 							!$icidasset$elm_binary$Binary$toDecimal(
-								A2($icidasset$elm_binary$Binary$and, i.bitmap, notePlacement)))
+								A2($icidasset$elm_binary$Binary$and, i.bitmap, accentableSubBeats)))
 						]),
 					_List_Nil);
 			},
@@ -6632,10 +6685,6 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $author$project$Main$getNoteSubBeats = F3(
 	function (subBeat, beatBlocks, beatOptions) {
 		return A2(
@@ -6714,10 +6763,6 @@ var $author$project$Main$getNoteSubBeats = F3(
 					]) : _List_Nil);
 			},
 			beatBlocks);
-	});
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
 	});
 var $author$project$Main$Quaver = {$: 'Quaver'};
 var $author$project$Main$SemiQuaver = {$: 'SemiQuaver'};

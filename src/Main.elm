@@ -476,10 +476,6 @@ getAvailableInstruments : Model -> List (Html Msg)
 getAvailableInstruments model =
   List.map (\i -> Html.option [] [Html.text i]) <| List.filter (\i -> List.member i (Dict.keys model.arrangement) == False  
                                                                                      && i /= "Rest") (Dict.keys instrumentDict) 
-  
-  
-                                         
-
 
 buildBeatOptionsDialog : Model -> List (Html Msg)
 buildBeatOptionsDialog model =
@@ -533,20 +529,29 @@ renderAccentCheckboxes model beat =
                                                                    else [{index = 1, bitmap = (Binary.fromIntegers [1,0,0])}
                                                                         , {index = 2, bitmap = (Binary.fromIntegers [0,1,0])}
                                                                         , {index = 3, bitmap = (Binary.fromIntegers [0,0,1])}]
-    x = Dict.toList model.arrangement
-    notePlacement = Binary.fromIntegers [0,0,0,0]
+    accentableSubBeats = (Dict.toList model.arrangement)  |> List.map (\i -> Tuple.pair (Dict.get (Tuple.first i) instrumentDict) (Dict.get beat (Tuple.second i)) )
+                                                          |> List.map (\ib -> case (Tuple.first ib) of
+                                                                                Just instrument ->  if instrument.isAccentable then
+                                                                                                      case (Tuple.second ib) of 
+                                                                                                          Just block -> block.notePlacement
+                                                                                                          _ -> (Binary.fromIntegers [0,0,0,0])
+                                                                                                    else 
+                                                                                                      (Binary.fromIntegers [0,0,0,0])
+                                                                                _ -> (Binary.fromIntegers [0,0,0,0]))
+                                                          |> List.foldl (Binary.or) (Binary.fromIntegers [0,0,0,0])
     accentPattern = case model.beatOptionsParams of
                       Just beatOpts -> beatOpts.beatOptions.accents
                       _ -> Binary.fromIntegers [0,0,0,0]
 
   in
-  subBeatRange |> List.map (\i -> Html.input [HA.type_ "checkbox"
+  (subBeatRange |> List.map (\i -> Html.input [HA.type_ "checkbox"
                                              , HA.id ("accent_checkbox_" ++ String.fromInt i.index)
                                              , HA.class "accentCheckbox"
                                              , onCheckboxChanged AccentCheckBoxChanged
                                              , checked (Binary.toDecimal (Binary.and i.bitmap accentPattern) /= 0)
-                                             , HA.disabled (Binary.toDecimal (Binary.and i.bitmap notePlacement) == 0)][]
+                                             , HA.disabled (Binary.toDecimal (Binary.and i.bitmap accentableSubBeats) == 0)][]
                            )
+  )--  ++ [Html.text (Debug.toString accentableSubBeats)]
 
 
 {-

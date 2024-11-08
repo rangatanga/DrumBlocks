@@ -5165,9 +5165,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$Main$SubBeatOptions = F2(
-	function (ghostNotes, accentPattern) {
-		return {accentPattern: accentPattern, ghostNotes: ghostNotes};
+var $author$project$Main$BeatOptions = F2(
+	function (ghostNotes, accents) {
+		return {accents: accents, ghostNotes: ghostNotes};
 	});
 var $author$project$Main$Block = F4(
 	function (blockName, imageName, notePlacement, subdivision) {
@@ -5200,15 +5200,6 @@ var $author$project$Main$aBlock = A4(
 		_List_fromArray(
 			[1, 0, 0, 0])),
 	'4-16');
-var $author$project$Main$SubBeatOptionsParams = F3(
-	function (subBeat, ghostNotes, accentPattern) {
-		return {accentPattern: accentPattern, ghostNotes: ghostNotes, subBeat: subBeat};
-	});
-var $icidasset$elm_binary$Binary$empty = $icidasset$elm_binary$Binary$Bits(_List_Nil);
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Main$defaultSubBeatOptions = A3($author$project$Main$SubBeatOptionsParams, -1, $icidasset$elm_binary$Binary$empty, $icidasset$elm_binary$Binary$empty);
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -5379,19 +5370,17 @@ var $author$project$Main$initialModel = {
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				1,
-				$elm$core$Dict$fromList(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							1,
-							A2($author$project$Main$SubBeatOptions, $icidasset$elm_binary$Binary$empty, $icidasset$elm_binary$Binary$empty))
-						]))),
-				_Utils_Tuple2(2, $elm$core$Dict$empty),
-				_Utils_Tuple2(3, $elm$core$Dict$empty),
-				_Utils_Tuple2(4, $elm$core$Dict$empty)
+				2,
+				A2(
+					$author$project$Main$BeatOptions,
+					$icidasset$elm_binary$Binary$fromIntegers(
+						_List_fromArray(
+							[0, 1, 1, 1])),
+					$icidasset$elm_binary$Binary$fromIntegers(
+						_List_fromArray(
+							[1, 0, 0, 0]))))
 			])),
-	blockOptionsParams: $author$project$Main$defaultSubBeatOptions,
+	beatOptionsParams: $elm$core$Maybe$Nothing,
 	debugText: '',
 	timeSignature: '4/4'
 };
@@ -5777,6 +5766,9 @@ var $author$project$Main$Instrument = F6(
 	});
 var $author$project$Main$Ovoid = {$: 'Ovoid'};
 var $author$project$Main$Rest = {$: 'Rest'};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $author$project$Main$instrumentDict = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
@@ -6174,19 +6166,22 @@ var $author$project$Main$update = F2(
 			case 'AddInstrumentSelectedChange':
 				var param = msg.a;
 				return A2($author$project$Main$addInstrument, model, param);
-			case 'SubBeatOptionsDialogOpen':
+			case 'BeatOptionsDialogOpen':
 				var params = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{blockOptionsParams: params}),
-					$author$project$Main$toggleDialog('block-options-dialog'));
+						{
+							beatOptionsParams: $elm$core$Maybe$Just(params),
+							debugText: $elm$core$Debug$toString(params)
+						}),
+					$author$project$Main$toggleDialog('beat-options-dialog'));
 			case 'BlockOptionsDialogCancel':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{blockOptionsParams: $author$project$Main$defaultSubBeatOptions}),
-					$author$project$Main$toggleDialog('block-options-dialog'));
+						{beatOptionsParams: $elm$core$Maybe$Nothing}),
+					$author$project$Main$toggleDialog('beat-options-dialog'));
 			case 'KeyPressedMsg':
 				var keyEventMsg = msg.a;
 				if (keyEventMsg.$ === 'KeyEventUnknown') {
@@ -6194,8 +6189,8 @@ var $author$project$Main$update = F2(
 					return (key === 'Escape') ? _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{blockOptionsParams: $author$project$Main$defaultSubBeatOptions}),
-						$author$project$Main$toggleDialog('block-options-dialog')) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+							{beatOptionsParams: $elm$core$Maybe$Nothing}),
+						$author$project$Main$toggleDialog('beat-options-dialog')) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
@@ -6212,354 +6207,39 @@ var $author$project$Main$update = F2(
 var $author$project$Main$AddInstrumentSelectedChange = function (a) {
 	return {$: 'AddInstrumentSelectedChange', a: a};
 };
+var $author$project$Main$BeatOptionsDialogOpen = function (a) {
+	return {$: 'BeatOptionsDialogOpen', a: a};
+};
+var $author$project$Main$BeatOptionsParams = F2(
+	function (beat, beatOptions) {
+		return {beat: beat, beatOptions: beatOptions};
+	});
 var $author$project$Main$BlockOptionsDialogCancel = {$: 'BlockOptionsDialogCancel'};
 var $author$project$Main$BlockOptionsDialogSave = {$: 'BlockOptionsDialogSave'};
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
-var $author$project$Main$buildSubBeatOptionsDialog = function (model) {
-	return _List_Nil;
-};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
-var $elm$html$Html$Attributes$colspan = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'colspan',
-		$elm$core$String$fromInt(n));
-};
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $elm$html$Html$option = _VirtualDom_node('option');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$getAvailableInstruments = function (model) {
-	return A2(
-		$elm$core$List$map,
-		function (i) {
-			return A2(
-				$elm$html$Html$option,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(i)
-					]));
-		},
-		A2(
-			$elm$core$List$filter,
-			function (i) {
-				return (!A2(
-					$elm$core$List$member,
-					i,
-					$elm$core$Dict$keys(model.arrangement))) && (i !== 'Rest');
-			},
-			$elm$core$Dict$keys($author$project$Main$instrumentDict)));
-};
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $author$project$Main$BlockSelectedChange = function (a) {
-	return {$: 'BlockSelectedChange', a: a};
+var $elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
 };
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
-var $author$project$Main$getBlockOptions = function (blockName) {
-	var tripletBlocks = A2(
-		$elm$core$List$filter,
-		function (k) {
-			return k > 'P';
-		},
-		$elm$core$Dict$keys($author$project$Main$blockDict));
-	var quarterBlocks = A2(
-		$elm$core$List$filter,
-		function (k) {
-			return k <= 'P';
-		},
-		$elm$core$Dict$keys($author$project$Main$blockDict));
-	return _Utils_ap(
-		A2(
-			$elm$core$List$map,
-			function (k) {
-				return A2(
-					$elm$html$Html$option,
-					_List_fromArray(
-						[
-							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false),
-							$elm$html$Html$Attributes$class('blockSelect')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(k)
-						]));
-			},
-			quarterBlocks),
-		A2(
-			$elm$core$List$map,
-			function (k) {
-				return A2(
-					$elm$html$Html$option,
-					_List_fromArray(
-						[
-							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false)
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(k)
-						]));
-			},
-			tripletBlocks));
-};
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $author$project$CommonEvents$SelectIdValue = F2(
-	function (id, value) {
-		return {id: id, value: value};
-	});
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $author$project$CommonEvents$targetIdDecoder = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'id']),
-	$elm$json$Json$Decode$string);
-var $author$project$CommonEvents$targetValueDecoder = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $author$project$CommonEvents$selectDecoder = A3($elm$json$Json$Decode$map2, $author$project$CommonEvents$SelectIdValue, $author$project$CommonEvents$targetIdDecoder, $author$project$CommonEvents$targetValueDecoder);
-var $author$project$CommonEvents$onInputSelectChange = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'change',
-		A2($elm$json$Json$Decode$map, tagger, $author$project$CommonEvents$selectDecoder));
-};
-var $elm$html$Html$select = _VirtualDom_node('select');
-var $elm$html$Html$td = _VirtualDom_node('td');
-var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
-var $author$project$Main$blockButton = F3(
-	function (instrName, index, blockName) {
-		return A2(
-			$elm$html$Html$td,
-			_List_Nil,
+var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
+var $author$project$Main$beatOptionsDialog = F2(
+	function (dialogId, content) {
+		return A3(
+			$elm$html$Html$node,
+			'dialog',
 			_List_fromArray(
 				[
-					A2(
-					$elm$html$Html$select,
-					_List_fromArray(
-						[
-							$author$project$CommonEvents$onInputSelectChange($author$project$Main$BlockSelectedChange),
-							$elm$html$Html$Attributes$id(
-							instrName + ('~' + $elm$core$String$fromInt(index))),
-							$elm$html$Html$Attributes$class('instrumentBlockSelect'),
-							$elm$html$Html$Attributes$alt('Block Picker'),
-							$elm$html$Html$Attributes$title('Block Picker')
-						]),
-					$author$project$Main$getBlockOptions(blockName))
-				]));
+					$elm$html$Html$Attributes$id(dialogId)
+				]),
+			content);
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $author$project$Main$instrumentRow = F2(
-	function (instrName, instrBlock) {
-		var _v0 = A2($elm$core$Dict$get, instrName, instrBlock);
-		if (_v0.$ === 'Just') {
-			var beatBlockDict = _v0.a;
-			return A2(
-				$elm$core$List$map,
-				function (ib) {
-					return A3($author$project$Main$blockButton, instrName, ib.a, ib.b.blockName);
-				},
-				$elm$core$Dict$toList(beatBlockDict));
-		} else {
-			return _List_Nil;
-		}
-	});
-var $elm$core$List$sortBy = _List_sortBy;
-var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Main$instrumentView = function (model) {
-	return A2(
-		$elm$core$List$map,
-		function (a) {
-			return A2(
-				$elm$html$Html$tr,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('instrumentTableRow')
-					]),
-				A2(
-					$elm$core$List$cons,
-					A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('instrumentTableCell')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(a.instrName)
-							])),
-					A2($author$project$Main$instrumentRow, a.instrName, model.arrangement)));
-		},
-		A2(
-			$elm$core$List$sortBy,
-			function ($) {
-				return $.sortOrder;
-			},
-			A2(
-				$elm$core$List$map,
-				function (item) {
-					var instrName = item.a;
-					var sortOrder = function () {
-						var _v0 = A2($elm$core$Dict$get, instrName, $author$project$Main$instrumentDict);
-						if (_v0.$ === 'Just') {
-							var instr = _v0.a;
-							return instr.sortOrder;
-						} else {
-							return 100;
-						}
-					}();
-					return {instrName: instrName, sortOrder: sortOrder};
-				},
-				$elm$core$Dict$toList(model.arrangement))));
-};
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
-var $author$project$Main$staveShiftY = 20;
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $author$project$Main$percussionClef = _List_fromArray(
-	[
-		A2(
-		$elm$svg$Svg$path,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$d(
-				'M 3 ' + ($elm$core$String$fromFloat(3 + $author$project$Main$staveShiftY) + (' L 3 ' + $elm$core$String$fromFloat(9 + $author$project$Main$staveShiftY))))
-			]),
-		_List_Nil),
-		A2(
-		$elm$svg$Svg$path,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$d(
-				'M 6 ' + ($elm$core$String$fromFloat(3 + $author$project$Main$staveShiftY) + (' L 6 ' + $elm$core$String$fromFloat(9 + $author$project$Main$staveShiftY))))
-			]),
-		_List_Nil)
-	]);
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $author$project$Main$Crotchet = {$: 'Crotchet'};
-var $author$project$Main$NoGhostNotes = {$: 'NoGhostNotes'};
-var $author$project$Main$NoteSubBeat = function (subBeat) {
-	return function (instrumentName) {
-		return function (noteDuration) {
-			return function (isDotted) {
-				return function (isRest) {
-					return function (subdivision) {
-						return function (stalkHeight) {
-							return function (nextSubBeat) {
-								return function (nextSubBeatNoteDuration) {
-									return function (prevSubBeat) {
-										return function (ghostNotes) {
-											return function (isAccented) {
-												return {ghostNotes: ghostNotes, instrumentName: instrumentName, isAccented: isAccented, isDotted: isDotted, isRest: isRest, nextSubBeat: nextSubBeat, nextSubBeatNoteDuration: nextSubBeatNoteDuration, noteDuration: noteDuration, prevSubBeat: prevSubBeat, stalkHeight: stalkHeight, subBeat: subBeat, subdivision: subdivision};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $author$project$Main$AccentCheckBoxChanged = function (a) {
+	return {$: 'AccentCheckBoxChanged', a: a};
 };
 var $icidasset$elm_binary$Binary$condense = F2(
 	function (fn, _v0) {
@@ -6644,6 +6324,55 @@ var $icidasset$elm_binary$Binary$and = F2(
 			$elm$core$Basics$and,
 			A2($icidasset$elm_binary$Binary$makeIsometric, a, b));
 	});
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$CommonEvents$CheckboxIdChecked = F2(
+	function (id, checked) {
+		return {checked: checked, id: id};
+	});
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $author$project$CommonEvents$targetCheckedDecoder = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'checked']),
+	$elm$json$Json$Decode$bool);
+var $author$project$CommonEvents$targetIdDecoder = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'id']),
+	$elm$json$Json$Decode$string);
+var $author$project$CommonEvents$checkboxDecoder = A3($elm$json$Json$Decode$map2, $author$project$CommonEvents$CheckboxIdChecked, $author$project$CommonEvents$targetIdDecoder, $author$project$CommonEvents$targetCheckedDecoder);
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$CommonEvents$onCheckboxChanged = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, tagger, $author$project$CommonEvents$checkboxDecoder));
+};
 var $elm$core$Basics$pow = _Basics_pow;
 var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
 	var bits = _v0.a;
@@ -6662,6 +6391,163 @@ var $icidasset$elm_binary$Binary$toDecimal = function (_v0) {
 			$elm$core$List$length(bits) - 1),
 		bits).a;
 };
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$renderAccentCheckboxes = F2(
+	function (model, beat) {
+		var x = $elm$core$Dict$toList(model.arrangement);
+		var subBeatRange = ('4-16' === '4-16') ? _List_fromArray(
+			[
+				{
+				bitmap: $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 0, 0])),
+				index: 1
+			},
+				{
+				bitmap: $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 0, 0])),
+				index: 2
+			},
+				{
+				bitmap: $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 1, 0])),
+				index: 3
+			},
+				{
+				bitmap: $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 0, 1])),
+				index: 4
+			}
+			]) : _List_fromArray(
+			[
+				{
+				bitmap: $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[1, 0, 0])),
+				index: 1
+			},
+				{
+				bitmap: $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 1, 0])),
+				index: 2
+			},
+				{
+				bitmap: $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 1])),
+				index: 3
+			}
+			]);
+		var notePlacement = $icidasset$elm_binary$Binary$fromIntegers(
+			_List_fromArray(
+				[0, 0, 0, 0]));
+		var accentPattern = function () {
+			var _v0 = model.beatOptionsParams;
+			if (_v0.$ === 'Just') {
+				var beatOpts = _v0.a;
+				return beatOpts.beatOptions.accents;
+			} else {
+				return $icidasset$elm_binary$Binary$fromIntegers(
+					_List_fromArray(
+						[0, 0, 0, 0]));
+			}
+		}();
+		return A2(
+			$elm$core$List$map,
+			function (i) {
+				return A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('checkbox'),
+							$elm$html$Html$Attributes$id(
+							'accent_checkbox_' + $elm$core$String$fromInt(i.index)),
+							$elm$html$Html$Attributes$class('accentCheckbox'),
+							$author$project$CommonEvents$onCheckboxChanged($author$project$Main$AccentCheckBoxChanged),
+							$elm$html$Html$Attributes$checked(
+							!(!$icidasset$elm_binary$Binary$toDecimal(
+								A2($icidasset$elm_binary$Binary$and, i.bitmap, accentPattern)))),
+							$elm$html$Html$Attributes$disabled(
+							!$icidasset$elm_binary$Binary$toDecimal(
+								A2($icidasset$elm_binary$Binary$and, i.bitmap, notePlacement)))
+						]),
+					_List_Nil);
+			},
+			subBeatRange);
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $author$project$Main$Crotchet = {$: 'Crotchet'};
+var $author$project$Main$NoteSubBeat = function (subBeat) {
+	return function (instrumentName) {
+		return function (noteDuration) {
+			return function (isDotted) {
+				return function (isRest) {
+					return function (subdivision) {
+						return function (stalkHeight) {
+							return function (nextSubBeat) {
+								return function (nextSubBeatNoteDuration) {
+									return function (prevSubBeat) {
+										return function (isGhostNote) {
+											return function (isAccented) {
+												return {instrumentName: instrumentName, isAccented: isAccented, isDotted: isDotted, isGhostNote: isGhostNote, isRest: isRest, nextSubBeat: nextSubBeat, nextSubBeatNoteDuration: nextSubBeatNoteDuration, noteDuration: noteDuration, prevSubBeat: prevSubBeat, stalkHeight: stalkHeight, subBeat: subBeat, subdivision: subdivision};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $icidasset$elm_binary$Binary$fromDecimal_ = F2(
+	function (acc, n) {
+		fromDecimal_:
+		while (true) {
+			var _v0 = _Utils_Tuple2((n / 2) | 0, n % 2);
+			var x = _v0.a;
+			var bit = _v0.b;
+			var bits = A2(
+				$elm$core$List$cons,
+				A2($elm$core$Basics$modBy, 2, bit),
+				acc);
+			if (x > 0) {
+				var $temp$acc = bits,
+					$temp$n = x;
+				acc = $temp$acc;
+				n = $temp$n;
+				continue fromDecimal_;
+			} else {
+				return bits;
+			}
+		}
+	});
+var $icidasset$elm_binary$Binary$fromDecimal = A2(
+	$elm$core$Basics$composeR,
+	$icidasset$elm_binary$Binary$fromDecimal_(_List_Nil),
+	$icidasset$elm_binary$Binary$fromIntegers);
 var $author$project$Main$isSubBeatMatch = F2(
 	function (subBeat, block) {
 		var _v0 = block.subdivision;
@@ -6716,34 +6602,116 @@ var $author$project$Main$isSubBeatMatch = F2(
 				return false;
 		}
 	});
-var $author$project$Main$getNoteSubBeats = F2(
-	function (subBeat, beatBlocks) {
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Main$getNoteSubBeats = F3(
+	function (subBeat, beatBlocks, beatOptions) {
 		return A2(
 			$elm$core$List$concatMap,
 			function (bb) {
 				var subDivision = function () {
-					var _v1 = bb.b;
-					if (_v1.$ === 'Just') {
-						var block = _v1.a;
+					var _v3 = bb.b;
+					if (_v3.$ === 'Just') {
+						var block = _v3.a;
 						return block.subdivision;
 					} else {
 						return '4-16';
 					}
 				}();
 				var isPlayed = function () {
-					var _v0 = bb.b;
-					if (_v0.$ === 'Just') {
-						var block = _v0.a;
+					var _v2 = bb.b;
+					if (_v2.$ === 'Just') {
+						var block = _v2.a;
 						return A2($author$project$Main$isSubBeatMatch, subBeat, block);
 					} else {
 						return false;
 					}
 				}();
+				var instrumentName = bb.a;
 				var adjSubBeat = (subDivision === '4-16') ? (((subBeat + 2) / 3) | 0) : (((subBeat + 3) / 4) | 0);
+				var isAccented = function () {
+					if (beatOptions.$ === 'Just') {
+						var beatOpts = beatOptions.a;
+						return (subDivision === '4-16') ? (!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.accents,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))))) : (!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.accents,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 3 - adjSubBeat))))));
+					} else {
+						return false;
+					}
+				}();
+				var isGhostNote = function () {
+					if (beatOptions.$ === 'Just') {
+						var beatOpts = beatOptions.a;
+						return (subDivision === '4-16') ? ((!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.ghostNotes,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))))) && A2(
+							$elm$core$List$member,
+							subBeat,
+							_List_fromArray(
+								[1, 4, 7, 10]))) : ((!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.ghostNotes,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 3 - adjSubBeat)))))) && A2(
+							$elm$core$List$member,
+							subBeat,
+							_List_fromArray(
+								[1, 5, 9])));
+					} else {
+						return false;
+					}
+				}();
 				return isPlayed ? _List_fromArray(
 					[
-						$author$project$Main$NoteSubBeat(subBeat)(bb.a)($author$project$Main$Crotchet)(false)(false)(subDivision)(0)(subBeat)($author$project$Main$Crotchet)(subBeat)($author$project$Main$NoGhostNotes)(false)
-					]) : _List_Nil;
+						$author$project$Main$NoteSubBeat(subBeat)(instrumentName)($author$project$Main$Crotchet)(false)(false)(subDivision)(0)(subBeat)($author$project$Main$Crotchet)(subBeat)(false)(isAccented)
+					]) : ((isGhostNote && (instrumentName === 'Snare')) ? _List_fromArray(
+					[
+						$author$project$Main$NoteSubBeat(subBeat)(instrumentName)($author$project$Main$Crotchet)(false)(false)(subDivision)(0)(subBeat)($author$project$Main$Crotchet)(subBeat)(isGhostNote)(false)
+					]) : _List_Nil);
 			},
 			beatBlocks);
 	});
@@ -6751,19 +6719,24 @@ var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $author$project$Main$HasGhostNotes = {$: 'HasGhostNotes'};
 var $author$project$Main$Quaver = {$: 'Quaver'};
 var $author$project$Main$SemiQuaver = {$: 'SemiQuaver'};
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
 var $elm$core$Basics$not = _Basics_not;
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
 var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $author$project$Main$staveShiftY = 20;
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
@@ -6775,10 +6748,10 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 		_VirtualDom_noJavaScriptUri(value));
 };
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Main$renderNote = F2(
-	function (beat, noteSubBeat) {
-		var noteCenterX = 20.0 + ((((beat - 1) * 12) + (noteSubBeat.subBeat - 1)) * 3.6);
-		var nextNoteCenterX = 20.0 + ((((beat - 1) * 12) + (noteSubBeat.nextSubBeat - 1)) * 3.6);
+var $author$project$Main$renderNote = F3(
+	function (beat, beatsCount, noteSubBeat) {
+		var noteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 3.6);
+		var nextNoteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 3.6);
 		var semiQuaverBeam = (noteSubBeat.subdivision === '4-16') ? ((_Utils_eq(noteSubBeat.noteDuration, $author$project$Main$SemiQuaver) && (!noteSubBeat.isRest)) ? (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat) ? ((noteSubBeat.subBeat === 10) ? ((!_Utils_eq(noteSubBeat.prevSubBeat, noteSubBeat.subBeat)) ? _List_fromArray(
 			[
 				A2(
@@ -6913,7 +6886,7 @@ var $author$project$Main$renderNote = F2(
 					]),
 				_List_Nil)
 			]));
-		var ghostNote = _Utils_eq(noteSubBeat.ghostNotes, $author$project$Main$HasGhostNotes) ? _List_fromArray(
+		var ghostNote = noteSubBeat.isGhostNote ? _List_fromArray(
 			[
 				A2(
 				$elm$svg$Svg$path,
@@ -6943,7 +6916,8 @@ var $author$project$Main$renderNote = F2(
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat(noteCenterX + 2.6)),
+						$elm$core$String$fromFloat(
+							noteCenterX + (noteSubBeat.isGhostNote ? 3.1 : 2.6))),
 						$elm$svg$Svg$Attributes$cy(
 						$elm$core$String$fromFloat(noteCenterY)),
 						$elm$svg$Svg$Attributes$r('0.4')
@@ -7136,6 +7110,17 @@ var $author$project$Main$renderNote = F2(
 							semiQuaverBeam,
 							_Utils_ap(ghostNote, accent))))));
 	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $author$project$Main$NoteDurationParam = F4(
 	function (noteDuration, isDotted, nextSubBeat, prevSubBeat) {
 		return {isDotted: isDotted, nextSubBeat: nextSubBeat, noteDuration: noteDuration, prevSubBeat: prevSubBeat};
@@ -7209,7 +7194,7 @@ var $author$project$Main$updateNoteDuration = function (noteSubBeats) {
 	var updNoteSubBeats = A2(
 		$elm$core$List$map,
 		function (x) {
-			return $author$project$Main$NoteSubBeat(x.a.subBeat)(x.a.instrumentName)(x.b.noteDuration)(x.b.isDotted)(x.a.isRest)(x.a.subdivision)(x.a.stalkHeight)(x.b.nextSubBeat)(x.a.nextSubBeatNoteDuration)(x.b.prevSubBeat)(x.a.ghostNotes)(x.a.isAccented);
+			return $author$project$Main$NoteSubBeat(x.a.subBeat)(x.a.instrumentName)(x.b.noteDuration)(x.b.isDotted)(x.a.isRest)(x.a.subdivision)(x.a.stalkHeight)(x.b.nextSubBeat)(x.a.nextSubBeatNoteDuration)(x.b.prevSubBeat)(x.a.isGhostNote)(x.a.isAccented);
 		},
 		A2(
 			$elm$core$List$map,
@@ -7237,7 +7222,7 @@ var $author$project$Main$updateNoteDuration = function (noteSubBeats) {
 					}),
 				$author$project$Main$SemiQuaver,
 				nextNoteSubBeats);
-			return $author$project$Main$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(nsb.stalkHeight)(nsb.nextSubBeat)(maxNoteDuration)(nsb.prevSubBeat)(nsb.ghostNotes)(nsb.isAccented);
+			return $author$project$Main$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(nsb.stalkHeight)(nsb.nextSubBeat)(maxNoteDuration)(nsb.prevSubBeat)(nsb.isGhostNote)(nsb.isAccented);
 		},
 		updNoteSubBeats);
 };
@@ -7275,7 +7260,7 @@ var $author$project$Main$updateStalkHeight = function (noteSubBeats) {
 	return A2(
 		$elm$core$List$map,
 		function (nsb) {
-			return $author$project$Main$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(justStalkHeight)(nsb.nextSubBeat)(nsb.nextSubBeatNoteDuration)(nsb.prevSubBeat)(nsb.ghostNotes)(nsb.isAccented);
+			return $author$project$Main$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(justStalkHeight)(nsb.nextSubBeat)(nsb.nextSubBeatNoteDuration)(nsb.prevSubBeat)(nsb.isGhostNote)(nsb.isAccented);
 		},
 		noteSubBeats);
 };
@@ -7290,13 +7275,13 @@ var $author$project$Main$updateNoteSubBeats = function (noteSubBeats) {
 			},
 			updateStalks) ? _List_Nil : _List_fromArray(
 			[
-				$author$project$Main$NoteSubBeat(1)('Rest')($author$project$Main$Crotchet)(false)(true)('4-16')(0)(1)($author$project$Main$Crotchet)(1)($author$project$Main$NoGhostNotes)(false)
+				$author$project$Main$NoteSubBeat(1)('Rest')($author$project$Main$Crotchet)(false)(true)('4-16')(0)(1)($author$project$Main$Crotchet)(1)(false)(false)
 			]),
 		updateStalks);
 	return $author$project$Main$updateNoteDuration(noteSubBeatsWithRests);
 };
-var $author$project$Main$buildNoteSubBeats = F2(
-	function (beat, instrumentBlocks) {
+var $author$project$Main$buildNoteSubBeats = F4(
+	function (beat, beatsCount, instrumentBlocks, beatOptions) {
 		var subBeats = _List_fromArray(
 			[1, 4, 5, 7, 9, 10]);
 		var beatBlocks = A2(
@@ -7312,25 +7297,359 @@ var $author$project$Main$buildNoteSubBeats = F2(
 			A2(
 				$elm$core$List$concatMap,
 				function (sb) {
-					return A2($author$project$Main$getNoteSubBeats, sb, beatBlocks);
+					return A3($author$project$Main$getNoteSubBeats, sb, beatBlocks, beatOptions);
 				},
 				subBeats));
 		return A2(
 			$elm$core$List$concatMap,
 			function (nsb) {
-				return A2($author$project$Main$renderNote, beat, nsb);
+				return A3($author$project$Main$renderNote, beat, beatsCount, nsb);
 			},
 			noteSubBeats);
 	});
-var $author$project$Main$renderBar = function (instrumentBlocks) {
-	var beatCount = A2($elm$core$List$range, 1, 4);
-	return A2(
-		$elm$core$List$concatMap,
-		function (beat) {
-			return A2($author$project$Main$buildNoteSubBeats, beat, instrumentBlocks);
-		},
-		beatCount);
+var $author$project$Main$renderBar = F3(
+	function (beats, instrumentBlocks, beatOptions) {
+		return A2(
+			$elm$core$List$concatMap,
+			function (beat) {
+				return A4(
+					$author$project$Main$buildNoteSubBeats,
+					beat,
+					$elm$core$List$length(beats),
+					instrumentBlocks,
+					A2($elm$core$Dict$get, beat, beatOptions));
+			},
+			beats);
+	});
+var $author$project$Main$staveLines = _List_fromArray(
+	[0, 3, 6, 9, 12]);
+var $author$project$Main$stave = A2(
+	$elm$core$List$map,
+	function (n) {
+		return A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+					$elm$svg$Svg$Attributes$stroke('black'),
+					$elm$svg$Svg$Attributes$d(
+					'M 0 ' + ($elm$core$String$fromFloat(n + $author$project$Main$staveShiftY) + (' L 195 ' + $elm$core$String$fromFloat(n + $author$project$Main$staveShiftY))))
+				]),
+			_List_Nil);
+	},
+	$author$project$Main$staveLines);
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$buildBeatOptionsDialog = function (model) {
+	var isAccentable = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (i, isAccable) {
+				var _v1 = A2($elm$core$Dict$get, i, $author$project$Main$instrumentDict);
+				if (_v1.$ === 'Just') {
+					var instr = _v1.a;
+					return isAccable || instr.isAccentable;
+				} else {
+					return isAccable;
+				}
+			}),
+		false,
+		$elm$core$Dict$keys(model.arrangement));
+	var ghostNotes = '';
+	var beat = function () {
+		var _v0 = model.beatOptionsParams;
+		if (_v0.$ === 'Just') {
+			var params = _v0.a;
+			return params.beat;
+		} else {
+			return 0;
+		}
+	}();
+	return _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$svg,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$width('100'),
+							$elm$svg$Svg$Attributes$height('40'),
+							$elm$svg$Svg$Attributes$class('stave')
+						]),
+					_Utils_ap(
+						$author$project$Main$stave,
+						A3(
+							$author$project$Main$renderBar,
+							_List_fromArray(
+								[beat]),
+							model.arrangement,
+							model.beatOptions)))
+				])),
+			A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_Utils_ap(
+				('instrumentName' === 'Snare') ? _List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('blockOptionsContainer')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Accent Pattern'),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$id('accentPatternBox')
+									]),
+								A2($author$project$Main$renderAccentCheckboxes, model, beat))
+							]))
+					]) : _List_Nil,
+				isAccentable ? _List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('blockOptionsContainer')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Accent Pattern'),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$id('accentPatternBox')
+									]),
+								A2($author$project$Main$renderAccentCheckboxes, model, beat))
+							]))
+					]) : _List_Nil))
+		]);
 };
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$Attributes$colspan = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'colspan',
+		$elm$core$String$fromInt(n));
+};
+var $icidasset$elm_binary$Binary$empty = $icidasset$elm_binary$Binary$Bits(_List_Nil);
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $author$project$Main$getAvailableInstruments = function (model) {
+	return A2(
+		$elm$core$List$map,
+		function (i) {
+			return A2(
+				$elm$html$Html$option,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(i)
+					]));
+		},
+		A2(
+			$elm$core$List$filter,
+			function (i) {
+				return (!A2(
+					$elm$core$List$member,
+					i,
+					$elm$core$Dict$keys(model.arrangement))) && (i !== 'Rest');
+			},
+			$elm$core$Dict$keys($author$project$Main$instrumentDict)));
+};
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $author$project$Main$BlockSelectedChange = function (a) {
+	return {$: 'BlockSelectedChange', a: a};
+};
+var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
+var $author$project$Main$getBlockOptions = function (blockName) {
+	var tripletBlocks = A2(
+		$elm$core$List$filter,
+		function (k) {
+			return k > 'P';
+		},
+		$elm$core$Dict$keys($author$project$Main$blockDict));
+	var quarterBlocks = A2(
+		$elm$core$List$filter,
+		function (k) {
+			return k <= 'P';
+		},
+		$elm$core$Dict$keys($author$project$Main$blockDict));
+	return _Utils_ap(
+		A2(
+			$elm$core$List$map,
+			function (k) {
+				return A2(
+					$elm$html$Html$option,
+					_List_fromArray(
+						[
+							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false),
+							$elm$html$Html$Attributes$class('blockSelect')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(k)
+						]));
+			},
+			quarterBlocks),
+		A2(
+			$elm$core$List$map,
+			function (k) {
+				return A2(
+					$elm$html$Html$option,
+					_List_fromArray(
+						[
+							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(k)
+						]));
+			},
+			tripletBlocks));
+};
+var $author$project$CommonEvents$SelectIdValue = F2(
+	function (id, value) {
+		return {id: id, value: value};
+	});
+var $author$project$CommonEvents$targetValueDecoder = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $author$project$CommonEvents$selectDecoder = A3($elm$json$Json$Decode$map2, $author$project$CommonEvents$SelectIdValue, $author$project$CommonEvents$targetIdDecoder, $author$project$CommonEvents$targetValueDecoder);
+var $author$project$CommonEvents$onInputSelectChange = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, tagger, $author$project$CommonEvents$selectDecoder));
+};
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
+var $author$project$Main$blockButton = F3(
+	function (instrName, index, blockName) {
+		return A2(
+			$elm$html$Html$td,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$select,
+					_List_fromArray(
+						[
+							$author$project$CommonEvents$onInputSelectChange($author$project$Main$BlockSelectedChange),
+							$elm$html$Html$Attributes$id(
+							instrName + ('~' + $elm$core$String$fromInt(index))),
+							$elm$html$Html$Attributes$class('instrumentBlockSelect'),
+							$elm$html$Html$Attributes$alt('Block Picker'),
+							$elm$html$Html$Attributes$title('Block Picker')
+						]),
+					$author$project$Main$getBlockOptions(blockName))
+				]));
+	});
+var $author$project$Main$instrumentRow = F2(
+	function (instrName, instrBlock) {
+		var _v0 = A2($elm$core$Dict$get, instrName, instrBlock);
+		if (_v0.$ === 'Just') {
+			var beatBlockDict = _v0.a;
+			return A2(
+				$elm$core$List$map,
+				function (ib) {
+					return A3($author$project$Main$blockButton, instrName, ib.a, ib.b.blockName);
+				},
+				$elm$core$Dict$toList(beatBlockDict));
+		} else {
+			return _List_Nil;
+		}
+	});
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $author$project$Main$instrumentView = function (model) {
+	return A2(
+		$elm$core$List$map,
+		function (a) {
+			return A2(
+				$elm$html$Html$tr,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('instrumentTableRow')
+					]),
+				A2(
+					$elm$core$List$cons,
+					A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('instrumentTableCell')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(a.instrName)
+							])),
+					A2($author$project$Main$instrumentRow, a.instrName, model.arrangement)));
+		},
+		A2(
+			$elm$core$List$sortBy,
+			function ($) {
+				return $.sortOrder;
+			},
+			A2(
+				$elm$core$List$map,
+				function (item) {
+					var instrName = item.a;
+					var sortOrder = function () {
+						var _v0 = A2($elm$core$Dict$get, instrName, $author$project$Main$instrumentDict);
+						if (_v0.$ === 'Just') {
+							var instr = _v0.a;
+							return instr.sortOrder;
+						} else {
+							return 100;
+						}
+					}();
+					return {instrName: instrName, sortOrder: sortOrder};
+				},
+				$elm$core$Dict$toList(model.arrangement))));
+};
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $author$project$Main$percussionClef = _List_fromArray(
+	[
+		A2(
+		$elm$svg$Svg$path,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$d(
+				'M 3 ' + ($elm$core$String$fromFloat(3 + $author$project$Main$staveShiftY) + (' L 3 ' + $elm$core$String$fromFloat(9 + $author$project$Main$staveShiftY))))
+			]),
+		_List_Nil),
+		A2(
+		$elm$svg$Svg$path,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$d(
+				'M 6 ' + ($elm$core$String$fromFloat(3 + $author$project$Main$staveShiftY) + (' L 6 ' + $elm$core$String$fromFloat(9 + $author$project$Main$staveShiftY))))
+			]),
+		_List_Nil)
+	]);
 var $author$project$Main$singleBarLine = _List_fromArray(
 	[
 		A2(
@@ -7350,23 +7669,6 @@ var $elm$html$Html$Attributes$src = function (url) {
 		'src',
 		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
-var $author$project$Main$staveLines = _List_fromArray(
-	[0, 3, 6, 9, 12]);
-var $author$project$Main$stave = A2(
-	$elm$core$List$map,
-	function (n) {
-		return A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$d(
-					'M 0 ' + ($elm$core$String$fromFloat(n + $author$project$Main$staveShiftY) + (' L 195 ' + $elm$core$String$fromFloat(n + $author$project$Main$staveShiftY))))
-				]),
-			_List_Nil);
-	},
-	$author$project$Main$staveLines);
 var $author$project$Main$staveTimeSignature = function (model) {
 	var _v0 = model.timeSignature;
 	if (_v0 === '4/4') {
@@ -7388,23 +7690,6 @@ var $author$project$Main$staveTimeSignature = function (model) {
 		return _List_Nil;
 	}
 };
-var $elm$virtual_dom$VirtualDom$node = function (tag) {
-	return _VirtualDom_node(
-		_VirtualDom_noScript(tag));
-};
-var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
-var $author$project$Main$suBeatOptionsDialog = F2(
-	function (dialogId, content) {
-		return A3(
-			$elm$html$Html$node,
-			'dialog',
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$id(dialogId)
-				]),
-			content);
-	});
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
@@ -7492,7 +7777,7 @@ var $author$project$Main$view = function (model) {
 											])),
 									A2(
 										$elm$core$List$map,
-										function (opts) {
+										function (beat) {
 											return A2(
 												$elm$html$Html$td,
 												_List_fromArray(
@@ -7506,9 +7791,23 @@ var $author$project$Main$view = function (model) {
 														_List_fromArray(
 															[
 																$elm$html$Html$Attributes$id(
-																'beatOpts~' + $elm$core$String$fromInt(opts.a)),
+																'beatOpts~' + $elm$core$String$fromInt(beat)),
 																$elm$html$Html$Attributes$alt('Beat Options'),
-																$elm$html$Html$Attributes$title('Beat Options')
+																$elm$html$Html$Attributes$title('Beat Options'),
+																$elm$html$Html$Events$onClick(
+																$author$project$Main$BeatOptionsDialogOpen(
+																	A2(
+																		$author$project$Main$BeatOptionsParams,
+																		beat,
+																		function () {
+																			var _v0 = A2($elm$core$Dict$get, beat, model.beatOptions);
+																			if (_v0.$ === 'Just') {
+																				var beatOpts = _v0.a;
+																				return beatOpts;
+																			} else {
+																				return A2($author$project$Main$BeatOptions, $icidasset$elm_binary$Binary$empty, $icidasset$elm_binary$Binary$empty);
+																			}
+																		}())))
 															]),
 														_List_fromArray(
 															[
@@ -7523,7 +7822,7 @@ var $author$project$Main$view = function (model) {
 															]))
 													]));
 										},
-										$elm$core$Dict$toList(model.beatOptions))))
+										A2($elm$core$List$range, 1, 4))))
 							])))),
 				A2(
 				$elm$html$Html$div,
@@ -7545,14 +7844,18 @@ var $author$project$Main$view = function (model) {
 									$author$project$Main$staveTimeSignature(model),
 									_Utils_ap(
 										$author$project$Main$singleBarLine,
-										$author$project$Main$renderBar(model.arrangement))))))
+										A3(
+											$author$project$Main$renderBar,
+											A2($elm$core$List$range, 1, 4),
+											model.arrangement,
+											model.beatOptions))))))
 					])),
 				$elm$html$Html$text(model.debugText),
 				A2(
-				$author$project$Main$suBeatOptionsDialog,
-				'subbeat-options-dialog',
+				$author$project$Main$beatOptionsDialog,
+				'beat-options-dialog',
 				_Utils_ap(
-					$author$project$Main$buildSubBeatOptionsDialog(model),
+					$author$project$Main$buildBeatOptionsDialog(model),
 					_List_fromArray(
 						[
 							A2(

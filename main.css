@@ -7,7 +7,7 @@ body {
 
 .instrumentTableHeaderCell {
     min-height: 50;
-    font-size: 24;
+    font-size: 20;
 }
 
 .instrumentTableRow {
@@ -15,14 +15,21 @@ body {
 }
 
 .instrumentTableCell {
-    min-height: 50;
-    font-size: 22;
+    font-size: 18;
+}
+
+.addInstrumentTableCell {
+  font-size: 18;
+}
+
+.optionsTableCell {
+  font-size: 16;
+  text-align: right;
 }
 
 .instrumentBlockSelect {
     min-width: 75;
-    min-height: 30;
-    font-size: 30;
+    font-size: 24;
 
 }
 
@@ -58,27 +65,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.instrumentBlockOpts {
-  background-image: url('assets/images/options.svg');
-  min-width: 15;
-  min-height: 35;
-  vertical-align: top;
-}
 
 .instrumentBlockOptsImg {
   width: 10;
   height: 31;
 }
-
-.blockOptionsDialogButtons {
+.subBeatOptionsDialogButtons {
   width: 100%;
   text-align: center;
   padding-top: 10;
 }
 
-.blockOptionsContainer {
-  padding-top: 10;
-}
 
 #accentPatternBox {
   border-style: inset;

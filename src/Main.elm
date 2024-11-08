@@ -38,8 +38,9 @@ main =
 
 type alias Model =
   { arrangement : InstrumentBlocksDict
+  , beatOptions : BeatOptionsDict
   , timeSignature : String
-  , blockOptionsParams : BlockOptionsParams
+  , blockOptionsParams : SubBeatOptionsParams
   , debugText : String
   }
 
@@ -123,22 +124,22 @@ type GhostNotes =
   HasGhostNotes
   | NoGhostNotes
 
-type alias InstrumentBlocksDict = Dict String BeatBlockOptionsDict
+type alias InstrumentBlocksDict = Dict String BeatBlockDict
 
-type alias BeatBlockOptionsDict = Dict Int BlockOptions
+type alias BeatBlockDict = Dict Int Block
 
-type alias BlockOptions = 
-  { block : Block
-  , ghostNotes : GhostNotes
+type alias BeatOptionsDict = Dict Int SubBeatOptionsDict
+
+type alias SubBeatOptionsDict = Dict Int SubBeatOptions
+
+type alias SubBeatOptions = 
+  { ghostNotes : Bits
   , accentPattern : Bits
   }
 
-type alias BlockOptionsParams = 
-  {beat : Int
-  , subBeat : Int
-  , instrumentName : String
-  , blockName : String
-  , ghostNotes : GhostNotes
+type alias SubBeatOptionsParams = 
+  {subBeat : Int
+  , ghostNotes : Bits
   , accentPattern : Bits
   }
 
@@ -205,15 +206,15 @@ blockDict = Dict.fromList
               , ("X", Block "X" "X.png" (Binary.fromIntegers [0,0,0]) "3-8")
               ]
 
-blockOptionsDialog : String -> List (Html msg) -> Html msg
-blockOptionsDialog dialogId content =
+suBeatOptionsDialog : String -> List (Html msg) -> Html msg
+suBeatOptionsDialog dialogId content =
     Html.node "dialog" [ HA.id dialogId ] content
 
 port toggleDialog : String -> Cmd msg
 
-defaultBlockOptions : BlockOptionsParams
-defaultBlockOptions = 
-  BlockOptionsParams -1 -1 "" "" NoGhostNotes Binary.empty
+defaultSubBeatOptions : SubBeatOptionsParams
+defaultSubBeatOptions = 
+  SubBeatOptionsParams -1 Binary.empty Binary.empty
 
 -- INIT
 
@@ -227,21 +228,17 @@ init flags url key =
 
 initialModel : Model
 initialModel = 
-    { arrangement = Dict.fromList [("Hi-Hat", (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                , (2, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                , (4, BlockOptions aBlock NoGhostNotes Binary.empty)])) 
-                                  , ("Snare", (Dict.fromList [(1, BlockOptions pBlock HasGhostNotes Binary.empty)
-                                                                            , (2, BlockOptions aBlock NoGhostNotes (Binary.fromIntegers [1,0,0,0]))
-                                                                            , (3, BlockOptions pBlock NoGhostNotes Binary.empty)
-                                                                            , (4, BlockOptions aBlock NoGhostNotes Binary.empty)]))
-                                  , ("Bass Drum", (Dict.fromList [(1, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                                , (2, BlockOptions pBlock NoGhostNotes Binary.empty)
-                                                                                , (3, BlockOptions aBlock NoGhostNotes Binary.empty)
-                                                                                , (4, BlockOptions pBlock NoGhostNotes Binary.empty)]))
-                    ]     
+    { arrangement = Dict.fromList [("Hi-Hat", (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]))
+                                  , ("Snare", (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)]))
+                                  , ("Bass Drum", (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)]))
+                                  ]     
+    , beatOptions = Dict.fromList [(1, (Dict.fromList [(1, (SubBeatOptions Binary.empty Binary.empty))]))
+                                  , (2, (Dict.empty))
+                                  , (3, (Dict.empty))
+                                  , (4, (Dict.empty))
+                                      ]
     , timeSignature = "4/4"
-    , blockOptionsParams = defaultBlockOptions
+    , blockOptionsParams = defaultSubBeatOptions
     --, subdivisionSelect = Select.init "select-subdivision" |> Select.setItems [Subdivision "4-16" "Four 16ths" 4
     --                                                                          ,Subdivision "3-8" "Three 8ths" 3]
     , debugText = ""
@@ -255,7 +252,8 @@ type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
   | BlockSelectedChange SelectIdValue
-  | BlockOptionsDialogOpen BlockOptionsParams
+  | AddInstrumentSelectedChange SelectIdValue
+  | SubBeatOptionsDialogOpen SubBeatOptionsParams
   | BlockOptionsDialogSave
   | BlockOptionsDialogCancel
   | GhostNotesCheckBoxChanged CheckboxIdChecked
@@ -276,16 +274,18 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = 
     case msg of
         BlockSelectedChange param -> applyBlockSelectedChange model param
-        BlockOptionsDialogOpen params -> ({model | blockOptionsParams = params}, toggleDialog "block-options-dialog")
+        AddInstrumentSelectedChange param -> addInstrument model param
+        SubBeatOptionsDialogOpen params -> ({model | blockOptionsParams = params}, toggleDialog "block-options-dialog")
+{-
         BlockOptionsDialogSave -> ({model | arrangement = updateArrangement model.blockOptionsParams.instrumentName
                                                                             model.blockOptionsParams.subBeat
                                                                             model.blockOptionsParams.blockName
-                                                                            model.blockOptionsParams.ghostNotes
-                                                                            model.blockOptionsParams.accentPattern
                                                                             model.arrangement
-                                            , blockOptionsParams = defaultBlockOptions
+                                            , blockOptionsParams = defaultSubBeatOptions
                                             }, toggleDialog "block-options-dialog")
-        BlockOptionsDialogCancel -> ({model | blockOptionsParams = defaultBlockOptions}, toggleDialog "block-options-dialog")
+-}                                            
+        BlockOptionsDialogCancel -> ({model | blockOptionsParams = defaultSubBeatOptions}, toggleDialog "block-options-dialog")
+{-
         GhostNotesCheckBoxChanged param -> let 
                                               opts = BlockOptionsParams model.blockOptionsParams.beat
                                                                         model.blockOptionsParams.subBeat
@@ -295,12 +295,14 @@ update msg model =
                                                                         model.blockOptionsParams.accentPattern
                                            in
                                            ({model | blockOptionsParams = opts}, Cmd.none)
+-}                                          
         KeyPressedMsg keyEventMsg -> case keyEventMsg of
                                         KeyEventUnknown key-> if key == "Escape" then 
-                                                                ({model | blockOptionsParams = defaultBlockOptions}, toggleDialog "block-options-dialog")
+                                                                ({model | blockOptionsParams = defaultSubBeatOptions}, toggleDialog "block-options-dialog")
                                                               else 
                                                                 (model, Cmd.none)
                                         _ -> (model, Cmd.none)
+{-
         AccentCheckBoxChanged param ->  let 
                                               opts = BlockOptionsParams model.blockOptionsParams.beat
                                                                         model.blockOptionsParams.subBeat
@@ -310,6 +312,7 @@ update msg model =
                                                                         (updateAccentPattern param model.blockOptionsParams.blockName model.blockOptionsParams.accentPattern)
                                         in
                                         ({model | blockOptionsParams = opts}, Cmd.none)
+-}
         _ -> ({model | debugText = Debug.toString msg}, Cmd.none)
 
 
@@ -327,26 +330,27 @@ applyBlockSelectedChange model param =
       Just iName -> case Dict.get iName arr of
                       Just blockOptsDict ->
                           case String.toInt blockIndex of
-                            Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value NoGhostNotes (Binary.fromDecimal 0) arr)}, Cmd.none)
+                            Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value arr)}, Cmd.none)
                             _           -> ({model | debugText = (Debug.toString value)}, Cmd.none)
                       _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
       _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
 
-updateArrangement : String -> Int -> String -> GhostNotes -> Bits -> InstrumentBlocksDict -> InstrumentBlocksDict
-updateArrangement instrName blockIndex newBlockName newGhostNotes newAccentPattern currArrangement =
+addInstrument : Model -> SelectIdValue -> ( Model, Cmd Msg )
+addInstrument model param = 
+  case Dict.get param.value instrumentDict of
+      Just instr -> ({model |arrangement = Dict.insert param.value (Dict.fromList [(1, pBlock), (2, pBlock), (3, pBlock), (4, pBlock)]) model.arrangement}, Cmd.none)
+      _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+
+updateArrangement : String -> Int -> String -> InstrumentBlocksDict -> InstrumentBlocksDict
+updateArrangement instrName blockIndex newBlockName currArrangement =
   let
     newBlock = Dict.get newBlockName blockDict
   in
   case newBlock of
       Just nBlock -> 
           case Dict.get instrName currArrangement of
-              Just blockOptsDict -> 
-                  case Dict.get blockIndex blockOptsDict of
-                      Just blockOpts -> let
-                                          newBlockOpts = BlockOptions nBlock newGhostNotes newAccentPattern
-                                        in
-                                        Dict.insert instrName (Dict.insert blockIndex newBlockOpts blockOptsDict) currArrangement
-                      _ -> currArrangement 
+              Just beatBlockDict -> 
+                      Dict.insert instrName (Dict.insert blockIndex nBlock beatBlockDict) currArrangement
               _ -> currArrangement
       _ -> currArrangement
 
@@ -431,15 +435,34 @@ view model =
                         [HA.class "instrumentTableHeaderRow"] 
                         [th [HA.class "instrumentTableHeaderCell"] 
                             [Html.text "Instrument"]
-                        ,th [HA.class "instrumentTableHeaderCell"] 
+                        ,th [HA.class "instrumentTableHeaderCell"
+                            , colspan 4] 
                             [Html.text "Bar 1"]
                         ]
                :: (instrumentView model)
                ++ [Html.tr 
                         [HA.class "instrumentTableRow"] 
-                        [td [] [Html.text "+ Add Instrument"]
-                        ,td [] []
-                        ]
+                        (td [HA.class "instrumentTableCell"] 
+                            [Html.select  [onInputSelectChange AddInstrumentSelectedChange
+                                          , HA.alt "Add New Instrument"
+                                          , HA.title "Add New Instrument"
+                                          , HA.class "addInstrumentTableCell"
+                                          ]
+                                          (Html.option [selected True ] [Html.text "Add Instrument"]
+                                          :: (getAvailableInstruments model))
+                            ]
+                        :: ((Dict.toList model.beatOptions) |> 
+                              List.map (\opts -> td [HA.class "optionsTableCell"] 
+                                                    [Html.button [HA.id ("beatOpts~" ++ (String.fromInt (Tuple.first opts)))
+                                                                 , HA.alt "Beat Options"
+                                                                 , HA.title "Beat Options"
+                                                                -- , onClick (SubBeatOptionsDialogOpen (SubBeatOptionsParams (Tuple.first opts) 
+                                                                 --                                                         (Tuple.second opts).ghostNotes
+                                                                                                                          --(Tuple.second opts).accentPattern)                                                                                                                          )
+                                                                ] [Html.img [HA.src "assets/images/options-horizontal.svg"
+                                                                              , HA.class "instrumentBlockOptsImg"] []]
+                                                    ]))
+                        )
                   ])
       , div []
             [svg
@@ -452,21 +475,31 @@ view model =
 
       , Html.text model.debugText
       --, Html.text (renderBar model.arrangement)
-      ,blockOptionsDialog "block-options-dialog"
-                (buildblockOptionsDialog model
-                ++  [Html.div [HA.class "blockOptionsDialogButtons"] 
-                              [button [ onClick BlockOptionsDialogSave, HA.class "blockOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
-                              , button [ onClick BlockOptionsDialogCancel, HA.class "blockOptionsDialogButton" ] [ Html.text "Cancel" ]
+      ,suBeatOptionsDialog "subbeat-options-dialog"
+                (buildSubBeatOptionsDialog model
+                ++  [Html.div [HA.class "subBeatOptionsDialogButtons"] 
+                              [button [ onClick BlockOptionsDialogSave, HA.class "subBeatOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
+                              , button [ onClick BlockOptionsDialogCancel, HA.class "subBeatOptionsDialogButton" ] [ Html.text "Cancel" ]
                               ]
                     ]
                 )
       ]
   }
 
-buildblockOptionsDialog : Model -> List (Html Msg)
-buildblockOptionsDialog model = 
+getAvailableInstruments : Model -> List (Html Msg)
+getAvailableInstruments model =
+  List.map (\i -> Html.option [] [Html.text i]) <| List.filter (\i -> List.member i (Dict.keys model.arrangement) == False  
+                                                                                     && i /= "Rest") (Dict.keys instrumentDict) 
+  
+  
+                                         
+
+
+buildSubBeatOptionsDialog : Model -> List (Html Msg)
+buildSubBeatOptionsDialog model = 
+  []
+{-
   let
-    instrumentName = model.blockOptionsParams.instrumentName
     ghostNotes = model.blockOptionsParams.ghostNotes
     isAccentable = case Dict.get instrumentName instrumentDict of
                       Just instr  -> instr.isAccentable
@@ -495,9 +528,13 @@ buildblockOptionsDialog model =
                 )
             )
   ]
+-}
+
 
 renderAccentCheckboxes : Model -> List (Html Msg)
 renderAccentCheckboxes model =
+  []
+{-
   let
     subBeatRange = case Dict.get model.blockOptionsParams.blockName blockDict of
                       Just block -> if block.subdivision == "4-16" then [{index = 1, bitmap = (Binary.fromIntegers [1,0,0,0])}
@@ -521,6 +558,8 @@ renderAccentCheckboxes model =
                                              , checked (Binary.toDecimal (Binary.and i.bitmap accentPattern) /= 0)
                                              , HA.disabled (Binary.toDecimal (Binary.and i.bitmap notePlacement) == 0)][]
                            )
+-}
+
 
 {-
 subdivisionDropdown : Model -> Html Msg
@@ -545,57 +584,46 @@ instrumentView : Model -> List (Html Msg)
 instrumentView model = 
   (Dict.toList model.arrangement) |> List.map (\item  ->  let
                                                             instrName = (Tuple.first item)
-                                                            blockOpts = (Tuple.second item)
                                                             sortOrder = case Dict.get instrName instrumentDict of
                                                                           Just instr -> instr.sortOrder
                                                                           _ -> 100
                                                           in
-                                                          {instrName = instrName, blockOpts = blockOpts, sortOrder = sortOrder})
+                                                          {instrName = instrName, sortOrder = sortOrder})
                                   |> List.sortBy .sortOrder
                                   |> List.map (\a -> tr [Html.Attributes.class "instrumentTableRow"]
-                                                              [td [Html.Attributes.class "instrumentTableCell"]
-                                                                    [Html.text a.instrName]
-                                                              , td []
-                                                                   [instrumentRow model a.instrName a.blockOpts]
-                                                              ])
+                                                              ((td [Html.Attributes.class "instrumentTableCell"] [Html.text a.instrName])
+                                                              :: (instrumentRow a.instrName model.arrangement))
+                                                              )
 
-instrumentRow : Model -> String -> BeatBlockOptionsDict -> Html Msg
-instrumentRow model instrName beatBlockOptDict = 
-  div 
-    [] 
-    (blockView model instrName beatBlockOptDict)
+instrumentRow : String -> InstrumentBlocksDict -> List (Html Msg)
+instrumentRow instrName instrBlock = 
+  case Dict.get instrName instrBlock of
+      Just beatBlockDict -> 
+          (Dict.toList beatBlockDict) |> List.map (\ib -> (blockButton instrName 
+                                                                       (Tuple.first ib) 
+                                                                       (Tuple.second ib).blockName))
+      _ -> []
 
-blockView : Model -> String -> BeatBlockOptionsDict -> List (Html Msg)
-blockView model instrName beatBlockOptDict = 
-  (Dict.toList beatBlockOptDict) |> List.concatMap (\ib -> (blockButton model 
-                                                                        instrName 
-                                                                        (Tuple.first ib) 
-                                                                        (Tuple.second ib).block.blockName 
-                                                                        (Tuple.second ib).ghostNotes
-                                                                        (Tuple.second ib).accentPattern))
-
-blockButton : Model -> String -> Int -> String -> GhostNotes -> Bits ->List (Html Msg)
-blockButton model instrName index blockName ghostNotes accentPattern =
-  let
-    blockOptionsOpenParams =  if model.blockOptionsParams.beat == -1 then
-                                BlockOptionsParams 1 index instrName blockName ghostNotes accentPattern
-                              else
-                                model.blockOptionsParams
-  in
-  [Html.select [onInputSelectChange BlockSelectedChange
+blockButton : String -> Int -> String ->Html Msg
+blockButton instrName index blockName =
+  td [] [Html.select [onInputSelectChange BlockSelectedChange
               , HA.id (instrName ++ "~" ++ (String.fromInt index))
               , HA.class "instrumentBlockSelect"
               , HA.alt "Block Picker"
               , HA.title "Block Picker"
               ]
-              (getBlockOptions blockName)]
-  ++ [Html.button [HA.id ("blockOpt~" ++ instrName ++ "~" ++ String.fromInt index)
+              (getBlockOptions blockName)
+        ]
+{-
+  , Html.button [HA.id ("blockOpt~" ++ instrName ++ "~" ++ String.fromInt index)
                  , HA.class "instrumentBlockOpts"
                  , HA.alt "Block Options"
                  , HA.title "Block Options"
                  , onClick (BlockOptionsDialogOpen blockOptionsOpenParams)
                  ] [Html.img [HA.src "assets/images/options.svg"
-                              , HA.class "instrumentBlockOptsImg"] []]]
+                              , HA.class "instrumentBlockOptsImg"] []]
+-}
+  
 
 getBlockOptions : String -> List (Html Msg)
 getBlockOptions blockName = 
@@ -687,56 +715,52 @@ buildNoteSubBeats beat instrumentBlocks =
   let
       subBeats = [1, 4, 5, 7, 9, 10]
       --get alll instruments & blocks for the current beat
-      beatBlocks = (Dict.toList instrumentBlocks) |> List.map (\ib -> let
-                                                                        instrName = Tuple.first ib
-                                                                        blockOptions = Tuple.second ib
-                                                                      in
-                                                                      Tuple.pair instrName (Dict.get beat blockOptions))
+      beatBlocks = (Dict.toList instrumentBlocks) |> List.map (\ib -> Tuple.pair (Tuple.first ib) (Dict.get beat (Tuple.second ib)))
       noteSubBeats = (subBeats) |> List.concatMap  (\sb -> getNoteSubBeats sb beatBlocks)
-                     |> updateNoteSubBeats
+                                |> updateNoteSubBeats
  
   in
   (noteSubBeats) |> List.concatMap (\nsb -> renderNote beat nsb)
   --(Debug.toString noteSubBeats) ++ " BEAT " ++ String.fromInt beat
 
 
-getNoteSubBeats : Int -> List (String, Maybe BlockOptions) -> List NoteSubBeat
-getNoteSubBeats subBeat beatBlockOptions = 
-  (beatBlockOptions) |> List.concatMap (\bb -> let
-                                                    isPlayed = case Tuple.second bb of
-                                                                  Just blockOption -> isSubBeatMatch subBeat blockOption.block
-                                                                  _                -> False
-                                                    subDivision = case Tuple.second bb of
-                                                                    Just blockOption -> blockOption.block.subdivision
-                                                                    _ -> "4-16"
-                                                    ghostNotes = case Tuple.second bb of
-                                                                    Just blockOption -> blockOption.ghostNotes
-                                                                    _ -> NoGhostNotes
-                                                    adjSubBeat =  if subDivision == "4-16" then
-                                                                    (subBeat + 2) // 3
-                                                                  else
-                                                                    (subBeat + 3) // 4
+getNoteSubBeats : Int -> List (String, Maybe Block) -> List NoteSubBeat
+getNoteSubBeats subBeat beatBlocks = 
+  (beatBlocks) |> List.concatMap (\bb -> let
+                                            isPlayed = case Tuple.second bb of
+                                                          Just block -> isSubBeatMatch subBeat block
+                                                          _ -> False
+                                            subDivision = case Tuple.second bb of
+                                                            Just block -> block.subdivision
+                                                            _ -> "4-16"
+--                                            ghostNotes = case Tuple.second bb of
+  --                                                          Just blockOption -> blockOption.ghostNotes
+    --                                                        _ -> NoGhostNotes
+                                            adjSubBeat =  if subDivision == "4-16" then
+                                                            (subBeat + 2) // 3
+                                                          else
+                                                            (subBeat + 3) // 4
 
-                                                    isAccented = case Tuple.second bb of
-                                                                    Just blockOption -> if subDivision == "4-16" then 
-                                                                                          Binary.toDecimal  (Binary.and blockOption.accentPattern 
-                                                                                                                        (Binary.fromDecimal (2 ^ (4-adjSubBeat)))
-                                                                                                            ) /= 0
-                                                                                        else 
-                                                                                          Binary.toDecimal  (Binary.and blockOption.accentPattern 
-                                                                                                                        (Binary.fromDecimal (2 ^ (3-adjSubBeat)))
-                                                                                                            ) /= 0
-                                                                    _ -> False
-                                                in
-                                          if isPlayed == True then 
-                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat NoGhostNotes isAccented]
-                                          else if ghostNotes == HasGhostNotes 
-                                                  && ((subDivision == "4-16" && List.member subBeat [1,4,7,10])
-                                                      || (subDivision == "3-8" && List.member subBeat [1,5,9])) then
-                                            [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat HasGhostNotes False]
-                                          else
-                                            []
-                            )
+      --                                      isAccented = case Tuple.second bb of
+        --                                                    Just blockOption -> if subDivision == "4-16" then 
+          --                                                                        Binary.toDecimal  (Binary.and blockOption.accentPattern 
+            --                                                                                                    (Binary.fromDecimal (2 ^ (4-adjSubBeat)))
+              --                                                                                      ) /= 0
+                --                                                                else 
+                  --                                                                Binary.toDecimal  (Binary.and blockOption.accentPattern 
+                    --                                                                                            (Binary.fromDecimal (2 ^ (3-adjSubBeat)))
+                      --                                                                              ) /= 0
+                        --                                    _ -> False
+                                        in
+                                  if isPlayed == True then 
+                                    [NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat NoGhostNotes False ] --isAccented]
+                                 -- else if ghostNotes == HasGhostNotes 
+                                   --       && ((subDivision == "4-16" && List.member subBeat [1,4,7,10])
+                                     --         || (subDivision == "3-8" && List.member subBeat [1,5,9])) then
+                                    --[NoteSubBeat subBeat (Tuple.first bb) Crotchet False False subDivision 0 subBeat Crotchet subBeat HasGhostNotes False]
+                                  else
+                                    []
+                    )
 
 
 processNoteSubBeats : Int -> List NoteSubBeat ->List(Svg Msg)

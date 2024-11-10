@@ -3,20 +3,12 @@ module CommonEvents exposing (..)
 import Json.Decode as Json
 import Html.Events exposing (on)
 import Html exposing (..)
+import Binary exposing (..)
+import File exposing (File)
+
+import CommonModel exposing (..)
 
 
-type alias SelectIdValue = 
-  {
-    id : String
-    ,value : String
-  }
-
-type alias CheckboxIdChecked = 
-  {
-    id : String
-    ,checked : Bool
-  }
-   
 
 onInputSelectChange : (SelectIdValue -> msg) -> Html.Attribute msg
 onInputSelectChange tagger =
@@ -47,3 +39,40 @@ targetCheckedDecoder : Json.Decoder Bool
 targetCheckedDecoder =
   Json.at ["target", "checked"] Json.bool
 
+
+
+keyPressedDecoder : Json.Decoder Msg
+keyPressedDecoder =
+    Json.map (toKeyEventMsg >> KeyPressedMsg) (Json.field "key" Json.string)
+
+
+keyReleasedDecoder : Json.Decoder Msg
+keyReleasedDecoder =
+    Json.map (toKeyEventMsg >> KeyReleasedMsg) (Json.field "key" Json.string)
+
+filesDecoder : Json.Decoder (List File)
+filesDecoder =
+  Json.at ["target","files"] (Json.list File.decoder)
+
+toKeyEventMsg : String -> KeyEventMsg
+toKeyEventMsg eventKeyString =
+    case eventKeyString of
+        "Control" ->
+            KeyEventControl
+
+        "Shift" ->
+            KeyEventShift
+
+        "Alt" ->
+            KeyEventAlt
+
+        "Meta" ->
+            KeyEventMeta
+
+        string_ ->
+            case String.uncons string_ of
+                Just ( char, "" ) ->
+                    KeyEventLetter char
+
+                _ ->
+                    KeyEventUnknown eventKeyString

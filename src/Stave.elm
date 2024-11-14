@@ -1,4 +1,4 @@
-module Stave exposing (stave, renderBar, singleBarLine, staveTimeSignature, percussionClef)
+module Stave exposing (stave, renderStaveBar, singleBarLine, staveTimeSignature, percussionClef)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -52,9 +52,9 @@ stave =
                     []
             )
 
-staveTimeSignature : Model -> List (Svg Msg)
-staveTimeSignature model = 
-  case model.timeSignature of
+staveTimeSignature : Bar -> List (Svg Msg)
+staveTimeSignature bar = 
+  case bar.timeSignature of
       "4/4" ->  [Svg.image [xlinkHref "assets/images/Timesignature4-4.svg"
                         , Svg.Attributes.width "18"
                         , Svg.Attributes.height "18"
@@ -100,10 +100,10 @@ One         E           And         A
 Iterate through all 12 spaces and all items in the arrangement, and draw a note if required.
 -}
 
-renderBar : List Int -> InstrumentBlocksDict -> BeatOptionsDict -> List(Svg Msg)
-renderBar beats instrumentBlocks beatOptions = 
+renderStaveBar : List Int -> Bar -> List(Svg Msg)
+renderStaveBar beats bar = 
   --loop through each beat of the bar (this can be limited to a single beat for the Beat Options dialog)
-  (beats) |> List.concatMap (\beat -> buildNoteSubBeats beat (List.length beats) instrumentBlocks (Dict.get beat beatOptions))
+  (beats) |> List.concatMap (\beat -> buildNoteSubBeats beat (List.length beats) bar.arrangement (Dict.get beat bar.beatOptions))
               --|> Debug.toString
 
 

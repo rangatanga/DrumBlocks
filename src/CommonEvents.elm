@@ -54,6 +54,26 @@ filesDecoder : Json.Decoder (List File)
 filesDecoder =
   Json.at ["target","files"] (Json.list File.decoder)
 
+
+beatOptionDecoder : Json.Decoder BeatOptionJson
+beatOptionDecoder =
+  Json.map3 BeatOptionJson
+    (Json.field "beat" Json.int)
+    (Json.field "ghostNotes" Json.int)
+    (Json.field "accents" Json.int)
+
+arrangementDecoder : Json.Decoder ArrangementJson
+arrangementDecoder =
+  Json.map2 ArrangementJson
+    (Json.field "instrument" Json.string)
+    (Json.field "blocks" (Json.list beatBlockDecoder))
+
+beatBlockDecoder : Json.Decoder BeatBlockJson
+beatBlockDecoder =
+  Json.map2 BeatBlockJson
+    (Json.field "beat" Json.int)
+    (Json.field "blockName" Json.string)
+
 toKeyEventMsg : String -> KeyEventMsg
 toKeyEventMsg eventKeyString =
     case eventKeyString of

@@ -21,8 +21,11 @@ type Msg
   | KeyReleasedMsg KeyEventMsg
   | PatternSave
   | PatternLoad
-  | FileSelected File
+  | UploadSelected File
   | FileLoaded String
+  | BarAdd
+  | BarOptionsDialogOpen
+
 type KeyEventMsg
     = KeyEventControl
     | KeyEventAlt
@@ -74,13 +77,20 @@ type alias NoteDurationParam =
 
 
 type alias Model =
-  { arrangement : InstrumentBlocksDict
-  , beatOptions : BeatOptionsDict
-  , timeSignature : String
+  { bars : BarDict
   , beatOptionsParams : Maybe BeatOptionsParams
+  , barOptionsParams : Maybe BeatOptionsParams
   , debugText : String
   }
 
+type alias BarDict = Dict Int Bar
+
+type alias Bar = 
+  {
+    arrangement : InstrumentBlocksDict
+  , beatOptions : BeatOptionsDict
+  , timeSignature : String
+  }
 
 type alias Subdivision =
   { name : String
@@ -119,3 +129,19 @@ type alias BeatBlockDict = Dict Int Block
 
 type alias BeatOptionsDict = Dict Int BeatOptions
 
+
+type alias BeatOptionJson = 
+  {beat : Int
+  , ghostNotes : Int
+  , accents : Int
+  }
+
+type alias ArrangementJson = 
+  {instrumentName : String
+  , blocks : List BeatBlockJson
+  }
+
+type alias BeatBlockJson = 
+  {beat : Int
+  , blockName : String
+  }

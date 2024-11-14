@@ -68,12 +68,20 @@ init flags url key =
 
 initialModel : Model
 initialModel = 
-    { arrangement = Dict.fromList [("Hi-Hat", (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]))
-                                  , ("Snare", (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)]))
-                                  , ("Bass Drum", (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)]))
-                                  ]     
-    , beatOptions = Dict.empty
-    , timeSignature = "4/4"
+    {bars = Dict.fromList [(1, Bar (Dict.fromList [("Hi-Hat", (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]))
+                                                 , ("Snare", (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)]))
+                                                 , ("Bass Drum", (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)]))
+                                                 ])
+                                  Dict.empty
+                                  "4/4")
+                          ,(2, Bar (Dict.fromList [("Hi-Hat", (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]))
+                                                 , ("Snare", (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]))
+                                                 , ("Bass Drum", (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, pBlock)]))
+                                                 ])
+                                  Dict.empty
+                                  "4/4")
+                          ]
+    , barOptionsParams = Nothing
     , beatOptionsParams = Nothing
     , debugText = ""
     }   
@@ -86,12 +94,14 @@ initialModel =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = 
     case msg of
+{-
         BlockSelectedChange param -> applyBlockSelectedChange model param
         AddInstrumentSelectedChange param -> addInstrument model param
         BeatOptionsDialogOpen params -> ({model | beatOptionsParams = Just params
                                                     ,  debugText = ""}, toggleDialog "beat-options-dialog")
         BeatOptionsDialogSave -> ({model | beatOptions = updateBeatOptions model
                                            , beatOptionsParams = Nothing
+                                           --, debugText = (Debug.toString (updateBeatOptions model))
                                             }, toggleDialog "beat-options-dialog")
         BeatOptionsDialogCancel -> ({model | beatOptionsParams = Nothing}, toggleDialog "beat-options-dialog")
         KeyPressedMsg keyEventMsg -> case keyEventMsg of
@@ -121,68 +131,114 @@ update msg model =
                                         in
                                         ({model | beatOptionsParams = opts}, Cmd.none)
         PatternSave -> ({model | debugText = ""}, Download.string "drum_pattern.json" "application/json" (getPatternJson model))
-        FileSelected file -> (model, Task.perform FileLoaded (File.toString file))
-        FileLoaded param -> (model, Cmd.none)
-
+        PatternLoad -> ({model | debugText = ""}, Select.file ["application/json"] UploadSelected)
+        UploadSelected file -> (model, Task.perform FileLoaded (File.toString file))
+        FileLoaded param -> (updateModelFromFile model param, Cmd.none)
+-}
         _ -> ({model | debugText = ""}, Cmd.none)
 
-type alias XXX = 
-  {beat : String
-  , ghostNotes : String
-  , accents : String
-  }
+{-
+updateModelFromFile : Model -> String -> Model
+updateModelFromFile model param = 
+  let
+    beatOptionsDict = case JsonD.decodeString (JsonD.field "beatOptions" (JsonD.list beatOptionDecoder)) param of 
+                        Ok val -> let
+                                      x = (val) |> List.map (\bo -> (bo.beat, (BeatOptions (Binary.fromDecimal bo.ghostNotes)(Binary.fromDecimal bo.accents))))
+                                  in
+                                  Dict.fromList x
+                        Err val -> model.beatOptions
+    newArrangement = case JsonD.decodeString (JsonD.field "arrangement" (JsonD.list arrangementDecoder)) param of 
+                        Ok val -> let
+                                      x = (val) |> List.map (\arr -> (arr.instrumentName, (buildBeatBlockDict arr.blocks)))
+                                  in
+                                  Dict.fromList x
+                        Err val -> model.arrangement
+  in
+  {model | beatOptions = beatOptionsDict
+           , arrangement = newArrangement
+           , debugText = Debug.toString beatOptionsDict}
+
+
+buildBeatBlockDict : List BeatBlockJson -> BeatBlockDict
+buildBeatBlockDict beatBlocks = 
+  List.foldl (\bb -> let
+                      block = case Dict.get bb.blockName blockDict of
+                                Just blok -> blok
+                                _ -> pBlock
+                     in 
+                     Dict.insert bb.beat block) Dict.empty beatBlocks
 
 getPatternJson : Model -> String
 getPatternJson model = 
   let
-    x = (Dict.toList model.beatOptions) |> List.concatMap (\bo -> [ (String.fromInt (Tuple.first bo))
-                                                                 ,(Binary.toString 4 ((Tuple.second bo).ghostNotes))
-                                                                 ,(Binary.toString 4 ((Tuple.second bo).accents))
-                                                                        ])
-                                                    
-                                                                 
+    beatOpts = (Dict.toList model.beatOptions) |> List.map (\bo ->  BeatOptionJson  (Tuple.first bo)
+                                                                                    (Binary.toDecimal ((Tuple.second bo).ghostNotes))
+                                                                                    (Binary.toDecimal ((Tuple.second bo).accents))
+                                                                  )
+    arrangement = (Dict.toList model.arrangement) |> List.map (\arr ->  ArrangementJson (Tuple.first arr)
+                                                                                        (Dict.keys (Tuple.second arr) |> List.map (\b -> BeatBlockJson b (case Dict.get b (Tuple.second arr) of
+                                                                                                                                                          Just block -> block.blockName
+                                                                                                                                                          _ -> "P")))
+                                                                  )
   in
-  JsonE.encode 1 (JsonE.object [("arrangement", JsonE.string "xxx")
-                               ,("beatOptions", JsonE.list JsonE.string x)
-                              ])
+  JsonE.encode 1 (JsonE.object ([("arrangement", JsonE.list (\arr -> JsonE.object [("instrument", JsonE.string arr.instrumentName)
+                                                                                  , ("blocks", JsonE.list (\b -> JsonE.object [("beat", JsonE.int b.beat)
+                                                                                                                              ,("blockName", JsonE.string b.blockName)]
+                                                                                                          ) arr.blocks)]) arrangement)
+                               ,("beatOptions", JsonE.list (\bo -> JsonE.object [("beat", JsonE.int bo.beat)
+                                                                                , ("ghostNotes", JsonE.int bo.ghostNotes)
+                                                                                , ("accents", JsonE.int bo.accents)]) beatOpts)])
+                  )
+-}
 
 applyBlockSelectedChange : Model -> SelectIdValue -> ( Model, Cmd Msg )
 applyBlockSelectedChange model param = 
   let
     idList = String.split "~" param.id
-    instrName = List.head idList
+    barNo = case List.head idList of
+              Just str -> case String.toInt str of
+                            Just int -> int
+                            _ -> -1
+              _ -> -1
+    instrName = List.head (List.drop 1 idList)
     blockIndex = case List.head (List.reverse idList) of
                   Just index -> index
                   _ -> ""
-    arr = model.arrangement
+    bar = Dict.get barNo model.bars
   in
-  case instrName of
-      Just iName -> case Dict.get iName arr of
-                      Just blockOptsDict ->
-                          case String.toInt blockIndex of
-                            Just bIndex -> ({model | arrangement = (updateArrangement iName bIndex param.value arr)}, Cmd.none)
-                            _           -> ({model | debugText = (Debug.toString value)}, Cmd.none)
-                      _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
-      _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+  case bar of 
+    Just currBar ->
+        case instrName of
+            Just iName -> case Dict.get iName currBar.arrangement of
+                            Just blockOptsDict ->
+                                case String.toInt blockIndex of
+                                  Just bIndex -> ({model | bars = (Dict.insert barNo (updateBarArrangement iName bIndex param.value currBar) model.bars)}, Cmd.none)
+                                  _           -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+                            _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+            _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
+    _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
 
+
+updateBarArrangement : String -> Int -> String -> Bar -> Bar
+updateBarArrangement instrName blockIndex newBlockName currBar =
+  let
+    newBlock = Dict.get newBlockName blockDict
+    currArrangement = currBar.arrangement
+  in
+  case newBlock of
+      Just nBlock -> 
+          case Dict.get instrName currArrangement of
+              Just beatBlockDict -> Bar (Dict.insert instrName (Dict.insert blockIndex nBlock beatBlockDict) currArrangement)
+                                        currBar.beatOptions
+                                        currBar.timeSignature
+              _ -> currBar
+      _ -> currBar
+{-
 addInstrument : Model -> SelectIdValue -> ( Model, Cmd Msg )
 addInstrument model param = 
   case Dict.get param.value instrumentDict of
       Just instr -> ({model |arrangement = Dict.insert param.value (Dict.fromList [(1, pBlock), (2, pBlock), (3, pBlock), (4, pBlock)]) model.arrangement}, Cmd.none)
       _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
-
-updateArrangement : String -> Int -> String -> InstrumentBlocksDict -> InstrumentBlocksDict
-updateArrangement instrName blockIndex newBlockName currArrangement =
-  let
-    newBlock = Dict.get newBlockName blockDict
-  in
-  case newBlock of
-      Just nBlock -> 
-          case Dict.get instrName currArrangement of
-              Just beatBlockDict -> 
-                      Dict.insert instrName (Dict.insert blockIndex nBlock beatBlockDict) currArrangement
-              _ -> currArrangement
-      _ -> currArrangement
 
 updateBeatOptions : Model -> BeatOptionsDict
 updateBeatOptions model = 
@@ -205,6 +261,7 @@ updateEmbellishmentPattern param currPattern =
                       Binary.and currPattern (Binary.not bitmap)
     _ -> currPattern
 
+-}
 
 -- SUBSCRIPTIONS
 
@@ -237,20 +294,18 @@ view model =
                          [ Html.text "Load Pattern" ]
                 ]
             ,div [HA.id "main"]
-                [Html.table
+                ((Html.table
                     [] 
-                    (Html.tr 
-                              [HA.class "instrumentTableHeaderRow"] 
+                    (Html.tr  [HA.class "instrumentTableHeaderRow"] 
                               [th [HA.class "instrumentTableHeaderCell"] 
                                   [Html.text "Instrument"]
-                              ,th [HA.class "instrumentTableHeaderCell"
-                                  , colspan 4] 
-                                  [Html.text "Bar 1"]
+                              ,td [HA.rowspan ((List.length (getIncludedInstrumentNames model.bars))+1)]
+                                  [displayBars model.bars]
                               ]
-                    :: (instrumentView model)
+                    :: (displayInstruments model.bars)
                     ++ [Html.tr 
                               [HA.class "instrumentTableRow"] 
-                              (td [HA.class "instrumentTableCell"] 
+                              [td [HA.class "instrumentTableCell"] 
                                   [Html.select  [onInputSelectChange AddInstrumentSelectedChange
                                                 , HA.alt "Add New Instrument"
                                                 , HA.title "Add New Instrument"
@@ -259,29 +314,11 @@ view model =
                                                 (Html.option [selected True ] [Html.text "Add Instrument"]
                                                 :: (getAvailableInstruments model))
                                   ]
-                              :: ((List.range 1 4) |> 
-                                    List.map (\beat -> td [HA.class "optionsTableCell"] 
-                                                          [Html.button [HA.id ("beatOpts~" ++ (String.fromInt beat))
-                                                                      , HA.alt "Beat Options"
-                                                                      , HA.title "Beat Options"
-                                                                      , onClick (BeatOptionsDialogOpen (BeatOptionsParams beat (case Dict.get beat model.beatOptions of
-                                                                                                                                  Just beatOpts -> beatOpts
-                                                                                                                                  _ -> BeatOptions Binary.empty Binary.empty)))
-                                                                      ] [Html.img [HA.src "assets/images/options-horizontal.svg"
-                                                                                    , HA.class "instrumentBlockOptsImg"] []]
-                                                          ]))
-                              )
+                              ]
                         ])
-                  , div []
-                        [svg
-                            [ viewBox "0 0 200 100"
-                            , Svg.Attributes.class "stave"
-                            ]
-                            (stave ++ percussionClef ++ (staveTimeSignature model) ++ singleBarLine ++ (renderBar (List.range 1 4) model.arrangement model.beatOptions))
-                            --(stave ++ percussionClef)
-                        ]
-                  , Html.text model.debugText
-                  ,beatOptionsDialog "beat-options-dialog"
+                 ) :: (renderStaveBars model)
+                  ++[ Html.text model.debugText
+                      ,beatOptionsDialog "beat-options-dialog"
                             (buildBeatOptionsDialog model
                             ++  [Html.div [HA.class "subBeatOptionsDialogButtons"] 
                                           [button [ onClick BeatOptionsDialogSave, HA.class "subBeatOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
@@ -290,17 +327,112 @@ view model =
                                 ]
                             )
                   ]
+                )
            ]
       ]
   }
 
 getAvailableInstruments : Model -> List (Html Msg)
 getAvailableInstruments model =
-  List.map (\i -> Html.option [] [Html.text i]) <| List.filter (\i -> List.member i (Dict.keys model.arrangement) == False  
+  List.map (\i -> Html.option [] [Html.text i]) <| List.filter (\i -> List.member i (getIncludedInstrumentNames model.bars) == False  
                                                                                      && i /= "Rest") (Dict.keys instrumentDict) 
+
+getIncludedInstrumentNames : BarDict -> List String
+getIncludedInstrumentNames bars = 
+  case (Dict.get 1 bars) of
+    Just bar -> Dict.keys bar.arrangement
+    _ -> []    
+
+displayBars : BarDict -> Html Msg
+displayBars bars = 
+  div [HA.id "bars", HA.class "flex-container"]
+      ((Dict.toList bars)
+          |> List.map (\bar -> table  []
+                                      ((tr []
+                                          [th [HA.class "instrumentTableHeaderCell"
+                                              , colspan 4] 
+                                              [div [HA.class "flex-container", HA.id "bar-header"] 
+                                                  [div[HA.id "bar-text"][Html.text ("Bar " ++ (String.fromInt (Tuple.first bar)))]
+                                                  ,div [HA.id "bar-buttons"] 
+                                                        [button [ onClick BeatOptionsDialogCancel, HA.class "barButton" ] 
+                                                                [ Html.img [HA.src "assets/images/settings.svg", HA.class "barButtonImg"] []]
+                                                        , button [ onClick BarAdd, HA.class "barButton" ] 
+                                                                [ Html.img [HA.src "assets/images/add.svg", HA.class "barButtonImg"] []]
+                                                        ]
+                                                  ]
+                                              ]
+                                          ] 
+                                       ) :: (instrumentView (Tuple.first bar) (Tuple.second bar))
+                                         ++ ((List.range 1 4) |> 
+                                              List.map (\beat -> td [HA.class "optionsTableCell"] 
+                                                                    [Html.button [HA.id ("beatOpts~"  ++ (String.fromInt (Tuple.first bar)) ++ "~" ++ (String.fromInt beat))
+                                                                                , HA.alt "Beat Options"
+                                                                                , HA.title "Beat Options"
+                                                                                , onClick (BeatOptionsDialogOpen (BeatOptionsParams beat (case Dict.get beat (Tuple.second bar).beatOptions of
+                                                                                                                                            Just beatOpts -> beatOpts
+                                                                                                                                            _ -> BeatOptions Binary.empty Binary.empty)))
+                                                                                ] [Html.img [HA.src "assets/images/options-horizontal.svg"
+                                                                                              , HA.class "instrumentBlockOptsImg"] []]
+                                                                    ]))                                     )
+                      )
+      )
+
+
+instrumentView : Int -> Bar -> List (Html Msg)
+instrumentView barNo bar = 
+  (Dict.toList bar.arrangement) |> List.map (\item  ->  let
+                                                            instrName = (Tuple.first item)
+                                                            sortOrder = case Dict.get instrName instrumentDict of
+                                                                          Just instr -> instr.sortOrder
+                                                                          _ -> 100
+                                                          in
+                                                          {instrName = instrName, sortOrder = sortOrder})
+                                  |> List.sortBy .sortOrder
+                                  |> List.map (\a -> tr [Html.Attributes.class "instrumentTableRow"]
+                                                               (instrumentRow barNo a.instrName bar.arrangement)
+                                                              )
+
+instrumentRow : Int -> String -> InstrumentBlocksDict -> List (Html Msg)
+instrumentRow barNo instrName instrBlock = 
+  case Dict.get instrName instrBlock of
+      Just beatBlockDict -> 
+          (Dict.toList beatBlockDict) |> List.map (\ib -> (blockButton barNo 
+                                                                       instrName 
+                                                                       (Tuple.first ib) 
+                                                                       (Tuple.second ib).blockName))
+      _ -> []
+
+
+blockButton : Int -> String -> Int -> String ->Html Msg
+blockButton barNo instrName index blockName =
+  td [] [Html.select [onInputSelectChange BlockSelectedChange
+              , HA.id ((String.fromInt barNo) ++ "~" ++ instrName ++ "~" ++ (String.fromInt index))
+              , HA.class "instrumentBlockSelect"
+              , HA.alt "Block Picker"
+              , HA.title "Block Picker"
+              ]
+              (getBlockOptions blockName)
+        ]
+  
+
+getBlockOptions : String -> List (Html Msg)
+getBlockOptions blockName = 
+  let
+    quarterBlocks = (Dict.keys blockDict) |> List.filter (\k -> k <= "P")
+    tripletBlocks = (Dict.keys blockDict) |> List.filter (\k -> k > "P")
+  in
+--  quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k]))
+  --Html.optgroup [HA.class "quarterBlocksOptGroup"] (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
+  --:: [Html.optgroup [HA.class "tripletBlocksOptGroup"] ((tripletBlocks) |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))]
+  (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False
+                                                  , HA.class "blockSelect"] [Html.text k])))
+  ++ (tripletBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
+
 
 buildBeatOptionsDialog : Model -> List (Html Msg)
 buildBeatOptionsDialog model =
+  []
+{-
   let
     beat = case model.beatOptionsParams of
             Just params -> params.beat
@@ -318,7 +450,7 @@ buildBeatOptionsDialog model =
                 , Svg.Attributes.height "40"
                 , Svg.Attributes.class "stave"
                 ]
-                (stave ++ (renderBar [beat] model.arrangement model.beatOptions))
+                []--(stave ++ (renderBar [beat] model.arrangement model.beatOptions))
             ]
   ,div  []
         ((if isGhostable then 
@@ -340,11 +472,11 @@ buildBeatOptionsDialog model =
           else []
           ))
   ]
+-}
 
-
-
-renderAccentCheckboxes : Model -> Int -> List (Html Msg)
-renderAccentCheckboxes model beat =
+{-
+displayAccentCheckboxes : Model -> Int -> List (Html Msg)
+displayAccentCheckboxes model beat =
   let
     subBeatRange = if "4-16" == "4-16" then [{index = 1, bitmap = (Binary.fromIntegers [1,0,0,0])}
                                                                         , {index = 2, bitmap = (Binary.fromIntegers [0,1,0,0])}
@@ -378,8 +510,8 @@ renderAccentCheckboxes model beat =
   )--  ++ [Html.text (Debug.toString accentableSubBeats)]
 
 
-renderGhostCheckboxes : Model -> Int -> List (Html Msg)
-renderGhostCheckboxes model beat =
+displayGhostCheckboxes : Model -> Int -> List (Html Msg)
+displayGhostCheckboxes model beat =
   let
     subBeatRange = if "4-16" == "4-16" then [{index = 1, bitmap = (Binary.fromIntegers [1,0,0,0])}
                                                                         , {index = 2, bitmap = (Binary.fromIntegers [0,1,0,0])}
@@ -412,82 +544,37 @@ renderGhostCheckboxes model beat =
                            )
   )--  ++ [Html.text (Debug.toString accentableSubBeats)]
 
-
-
-{-
-subdivisionDropdown : Model -> Html Msg
-subdivisionDropdown model = 
-     div
-      [] 
-      [
-        (div 
-          [] 
-          [ Html.text "Subdivision:"
-          , select [] (List.map subdivisionOption subdivisions)
-          ]
-        ) 
-      ]
 -}
+
+
 
 subdivisionOption : Subdivision -> Html Msg
 subdivisionOption subdiv = 
     Html.option [] [Html.text subdiv.description]
 
-instrumentView : Model -> List (Html Msg)
-instrumentView model = 
-  (Dict.toList model.arrangement) |> List.map (\item  ->  let
-                                                            instrName = (Tuple.first item)
-                                                            sortOrder = case Dict.get instrName instrumentDict of
+displayInstruments : BarDict -> List (Html Msg)
+displayInstruments bars = 
+  (getIncludedInstrumentNames bars) |> List.map (\instrName  ->   let
+                                                                    sortOrder = case Dict.get instrName instrumentDict of
                                                                           Just instr -> instr.sortOrder
                                                                           _ -> 100
-                                                          in
-                                                          {instrName = instrName, sortOrder = sortOrder})
+                                                                  in
+                                                                  {instrName = instrName, sortOrder = sortOrder})
                                   |> List.sortBy .sortOrder
                                   |> List.map (\a -> tr [Html.Attributes.class "instrumentTableRow"]
-                                                              ((td [Html.Attributes.class "instrumentTableCell"] [Html.text a.instrName])
-                                                              :: (instrumentRow a.instrName model.arrangement))
-                                                              )
+                                                        [td [Html.Attributes.class "instrumentTableCell"] [Html.text a.instrName]
+                                                              ])
 
-instrumentRow : String -> InstrumentBlocksDict -> List (Html Msg)
-instrumentRow instrName instrBlock = 
-  case Dict.get instrName instrBlock of
-      Just beatBlockDict -> 
-          (Dict.toList beatBlockDict) |> List.map (\ib -> (blockButton instrName 
-                                                                       (Tuple.first ib) 
-                                                                       (Tuple.second ib).blockName))
-      _ -> []
-
-blockButton : String -> Int -> String ->Html Msg
-blockButton instrName index blockName =
-  td [] [Html.select [onInputSelectChange BlockSelectedChange
-              , HA.id (instrName ++ "~" ++ (String.fromInt index))
-              , HA.class "instrumentBlockSelect"
-              , HA.alt "Block Picker"
-              , HA.title "Block Picker"
-              ]
-              (getBlockOptions blockName)
-        ]
-{-
-  , Html.button [HA.id ("blockOpt~" ++ instrName ++ "~" ++ String.fromInt index)
-                 , HA.class "instrumentBlockOpts"
-                 , HA.alt "Block Options"
-                 , HA.title "Block Options"
-                 , onClick (BlockOptionsDialogOpen blockOptionsOpenParams)
-                 ] [Html.img [HA.src "assets/images/options.svg"
-                              , HA.class "instrumentBlockOptsImg"] []]
--}
-  
-
-getBlockOptions : String -> List (Html Msg)
-getBlockOptions blockName = 
-  let
-    quarterBlocks = (Dict.keys blockDict) |> List.filter (\k -> k <= "P")
-    tripletBlocks = (Dict.keys blockDict) |> List.filter (\k -> k > "P")
-  in
---  quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k]))
-  --Html.optgroup [HA.class "quarterBlocksOptGroup"] (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
-  --:: [Html.optgroup [HA.class "tripletBlocksOptGroup"] ((tripletBlocks) |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))]
-  (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False
-                                                  , HA.class "blockSelect"] [Html.text k])))
-  ++ (tripletBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
-
+renderStaveBars : Model -> List (Html Msg)
+renderStaveBars model = 
+  (Dict.toList model.bars) 
+    |> List.map (\bar -> 
+                   div []
+                        [svg
+                            [ viewBox "0 0 200 20"
+                            , Svg.Attributes.class "stave"
+                            ]
+                            (stave ++ percussionClef ++ (staveTimeSignature (Tuple.second bar)) ++ singleBarLine ++ (renderStaveBar (List.range 1 4) (Tuple.second bar))
+                            )
+                            --(stave ++ percussionClef)
+                        ])

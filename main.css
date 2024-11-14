@@ -33,6 +33,28 @@ header {
   padding: 5px;
   margin-top: 10px;
 }
+
+#bar-text {
+  order: 1;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 100%;
+}
+
+#bar-buttons {
+  order: 2;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 80px;
+}
+
+.barButtonImg {
+  width: 15px;
+  height: 15px;
+  align-content: center;
+  text-align: center;
+}
+
 .instrumentTableHeaderRow {
 }
 

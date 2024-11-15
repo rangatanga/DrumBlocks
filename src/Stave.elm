@@ -33,10 +33,10 @@ type alias NoteSubBeat =
 
 staveLines : List Float
 staveLines =
-    [ 0, 3, 6, 9, 12]
+    [ 0, 2, 4, 6, 8]
 
 staveShiftY : Float
-staveShiftY = 20
+staveShiftY = 10
 
 
 stave : List (Svg Msg)
@@ -56,24 +56,24 @@ staveTimeSignature : Bar -> List (Svg Msg)
 staveTimeSignature bar = 
   case bar.timeSignature of
       "4/4" ->  [Svg.image [xlinkHref "assets/images/Timesignature4-4.svg"
-                        , Svg.Attributes.width "18"
-                        , Svg.Attributes.height "18"
-                        , Svg.Attributes.x "3"
-                        , Svg.Attributes.y "17.4"] [] ]
+                        , Svg.Attributes.width "9"
+                        , Svg.Attributes.height "11.5"
+                        , Svg.Attributes.x "4.5"
+                        , Svg.Attributes.y "8.6"] [] ]
       _ -> []
   
 percussionClef : List(Svg Msg)
 percussionClef =
   [Svg.path
-      [ strokeWidth "1.8"
+      [ strokeWidth "1.5"
       , stroke "black"
-      , d ("M 3 " ++ String.fromFloat (3 + staveShiftY) ++ " L 3 " ++ String.fromFloat (9 + staveShiftY))
+      , d ("M 3 " ++ String.fromFloat (1.8 + staveShiftY) ++ " L 3 " ++ String.fromFloat (6.2 + staveShiftY))
       ]
       []
   ,Svg.path
-      [ strokeWidth "1.8"
+      [ strokeWidth "1.5"
       , stroke "black"
-      , d ("M 6 " ++ String.fromFloat (3 + staveShiftY) ++ " L 6 " ++ String.fromFloat (9 + staveShiftY))
+      , d ("M 5 " ++ String.fromFloat (1.8 + staveShiftY) ++ " L 5 " ++ String.fromFloat (6.2 + staveShiftY))
       ]
       []
   ]
@@ -280,8 +280,9 @@ renderNote : Int -> Int -> NoteSubBeat -> List (Svg Msg)
 renderNote beat beatsCount noteSubBeat = 
   let
     instrument = Dict.get noteSubBeat.instrumentName instrumentDict
-    noteCenterX = 20.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1))) * 3.6)
-    nextNoteCenterX = 20.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1))) * 3.6)
+    noteCenterX = 20.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1))) * 1.8)
+    nextNoteCenterX = 20.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1))) * 1.8)
+    crossNoteOffset = 1.0
     noteCenterY = case instrument of
                     Just instr -> instr.stavePosition + staveShiftY
                     _ -> 0
@@ -294,14 +295,14 @@ renderNote beat beatsCount noteSubBeat =
                 [Svg.path
                   [ strokeWidth "0.3"
                   , stroke "black"
-                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat (noteCenterY + 1.2))
+                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ String.fromFloat (noteCenterY + 1.2))
                   ]
                   []]
               else
                 [Svg.path
                   [ strokeWidth "0.3"
                   , stroke "black"
-                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.65)) ++ " " ++ String.fromFloat noteCenterY)
+                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ String.fromFloat noteCenterY)
                   ]
                   []]
     dot = if noteSubBeat.isDotted then
@@ -418,8 +419,8 @@ renderNote beat beatsCount noteSubBeat =
           [Svg.ellipse 
             [cx (String.fromFloat noteCenterX)
               , cy (String.fromFloat noteCenterY)
-              , rx "1.85"
-              , ry "1.3"
+              , rx "1.3"
+              , ry "0.95"
               , transform ("rotate(-20, " ++ (String.fromFloat noteCenterX) ++ ", " ++ (String.fromFloat noteCenterY) ++ ")")
             ] []
           ]
@@ -427,12 +428,12 @@ renderNote beat beatsCount noteSubBeat =
           [Svg.path
             [ strokeWidth "0.4"
               , stroke "black"
-              , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) )
+              , d ("M " ++ (String.fromFloat (noteCenterX - crossNoteOffset)) ++ " " ++ (String.fromFloat (noteCenterY - crossNoteOffset)) ++ " L " ++ (String.fromFloat (noteCenterX + crossNoteOffset)) ++ " " ++ (String.fromFloat (noteCenterY + crossNoteOffset)) )
             ] []
           ,Svg.path
             [ strokeWidth "0.4"
               , stroke "black"
-              , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) ++ " L " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) )
+              , d ("M " ++ (String.fromFloat (noteCenterX - crossNoteOffset)) ++ " " ++ (String.fromFloat (noteCenterY + crossNoteOffset)) ++ " L " ++ (String.fromFloat (noteCenterX + crossNoteOffset)) ++ " " ++ (String.fromFloat (noteCenterY - crossNoteOffset)) )
             ] []
           ]
       CrossLedger ->

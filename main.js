@@ -6002,31 +6002,31 @@ var $author$project$Common$instrumentDict = $elm$core$Dict$fromList(
 		[
 			_Utils_Tuple2(
 			'Hi-Hat',
-			A6($author$project$CommonModel$Instrument, 'G5', -1.5, $author$project$CommonModel$Cross, false, true, 10)),
+			A6($author$project$CommonModel$Instrument, 'G5', -1.0, $author$project$CommonModel$Cross, false, true, 10)),
 			_Utils_Tuple2(
 			'Ride Cymbal',
 			A6($author$project$CommonModel$Instrument, 'F5', 0, $author$project$CommonModel$CrossLedger, false, true, 20)),
 			_Utils_Tuple2(
 			'High Tom',
-			A6($author$project$CommonModel$Instrument, 'E5', 1.5, $author$project$CommonModel$Ovoid, false, true, 30)),
+			A6($author$project$CommonModel$Instrument, 'E5', 1.0, $author$project$CommonModel$Ovoid, false, true, 30)),
 			_Utils_Tuple2(
 			'Mid Tom',
-			A6($author$project$CommonModel$Instrument, 'D5', 3, $author$project$CommonModel$Ovoid, false, true, 40)),
+			A6($author$project$CommonModel$Instrument, 'D5', 2, $author$project$CommonModel$Ovoid, false, true, 40)),
 			_Utils_Tuple2(
 			'Snare',
-			A6($author$project$CommonModel$Instrument, 'C5', 4.5, $author$project$CommonModel$Ovoid, true, true, 50)),
+			A6($author$project$CommonModel$Instrument, 'C5', 3.0, $author$project$CommonModel$Ovoid, true, true, 50)),
 			_Utils_Tuple2(
 			'Floor Tom',
-			A6($author$project$CommonModel$Instrument, 'A4', 7.5, $author$project$CommonModel$Ovoid, false, true, 60)),
+			A6($author$project$CommonModel$Instrument, 'A4', 5.0, $author$project$CommonModel$Ovoid, false, true, 60)),
 			_Utils_Tuple2(
 			'Bass Drum',
-			A6($author$project$CommonModel$Instrument, 'F4', 10.5, $author$project$CommonModel$Ovoid, false, false, 70)),
+			A6($author$project$CommonModel$Instrument, 'F4', 7.0, $author$project$CommonModel$Ovoid, false, false, 70)),
 			_Utils_Tuple2(
 			'Hi-hat Foot',
-			A6($author$project$CommonModel$Instrument, 'D4', 13, $author$project$CommonModel$Cross, false, false, 80)),
+			A6($author$project$CommonModel$Instrument, 'D4', 9, $author$project$CommonModel$Cross, false, false, 80)),
 			_Utils_Tuple2(
 			'Rest',
-			A6($author$project$CommonModel$Instrument, '', 7, $author$project$CommonModel$Rest, false, false, 0))
+			A6($author$project$CommonModel$Instrument, '', 4.5, $author$project$CommonModel$Rest, false, false, 0))
 		]));
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
@@ -6913,7 +6913,7 @@ var $author$project$Main$updateModelFromFile = F2(
 			model,
 			{
 				bars: barDict,
-				debugText: $elm$core$Debug$toString(barDict)
+				debugText: $elm$core$Debug$toString('')
 			});
 	});
 var $author$project$Main$update = F2(
@@ -7596,7 +7596,7 @@ var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
 var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
-var $author$project$Stave$staveShiftY = 20;
+var $author$project$Stave$staveShiftY = 10;
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
@@ -7612,8 +7612,8 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Stave$renderNote = F3(
 	function (beat, beatsCount, noteSubBeat) {
-		var noteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 3.6);
-		var nextNoteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 3.6);
+		var noteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 1.8);
+		var nextNoteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 1.8);
 		var semiQuaverBeam = (noteSubBeat.subdivision === '4-16') ? ((_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$SemiQuaver) && (!noteSubBeat.isRest)) ? (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat) ? ((noteSubBeat.subBeat === 10) ? ((!_Utils_eq(noteSubBeat.prevSubBeat, noteSubBeat.subBeat)) ? _List_fromArray(
 			[
 				A2(
@@ -7732,7 +7732,7 @@ var $author$project$Stave$renderNote = F3(
 						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.2))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.2))))))))
 					]),
 				_List_Nil)
 			]) : _List_fromArray(
@@ -7744,7 +7744,7 @@ var $author$project$Stave$renderNote = F3(
 						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.65) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
 					]),
 				_List_Nil)
 			]));
@@ -7786,6 +7786,7 @@ var $author$project$Stave$renderNote = F3(
 					]),
 				_List_Nil)
 			]) : _List_Nil;
+		var crossNoteOffset = 1.0;
 		var accent = noteSubBeat.isAccented ? _List_fromArray(
 			[
 				A2(
@@ -7823,8 +7824,8 @@ var $author$project$Stave$renderNote = F3(
 										$elm$core$String$fromFloat(noteCenterX)),
 										$elm$svg$Svg$Attributes$cy(
 										$elm$core$String$fromFloat(noteCenterY)),
-										$elm$svg$Svg$Attributes$rx('1.85'),
-										$elm$svg$Svg$Attributes$ry('1.3'),
+										$elm$svg$Svg$Attributes$rx('1.3'),
+										$elm$svg$Svg$Attributes$ry('0.95'),
 										$elm$svg$Svg$Attributes$transform(
 										'rotate(-20, ' + ($elm$core$String$fromFloat(noteCenterX) + (', ' + ($elm$core$String$fromFloat(noteCenterY) + ')'))))
 									]),
@@ -7840,7 +7841,7 @@ var $author$project$Stave$renderNote = F3(
 										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
 										$elm$svg$Svg$Attributes$stroke('black'),
 										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))
+										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY - crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY + crossNoteOffset))))))))
 									]),
 								_List_Nil),
 								A2(
@@ -7850,7 +7851,7 @@ var $author$project$Stave$renderNote = F3(
 										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
 										$elm$svg$Svg$Attributes$stroke('black'),
 										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.5) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + $elm$core$String$fromFloat(noteCenterY - 1.5))))))))
+										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY + crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY - crossNoteOffset))))))))
 									]),
 								_List_Nil)
 							]);
@@ -8184,7 +8185,7 @@ var $author$project$Stave$renderStaveBar = F2(
 			beats);
 	});
 var $author$project$Stave$staveLines = _List_fromArray(
-	[0, 3, 6, 9, 12]);
+	[0, 2, 4, 6, 8]);
 var $author$project$Stave$stave = A2(
 	$elm$core$List$map,
 	function (n) {
@@ -8718,20 +8719,20 @@ var $author$project$Stave$percussionClef = _List_fromArray(
 		$elm$svg$Svg$path,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
+				$elm$svg$Svg$Attributes$strokeWidth('1.5'),
 				$elm$svg$Svg$Attributes$stroke('black'),
 				$elm$svg$Svg$Attributes$d(
-				'M 3 ' + ($elm$core$String$fromFloat(3 + $author$project$Stave$staveShiftY) + (' L 3 ' + $elm$core$String$fromFloat(9 + $author$project$Stave$staveShiftY))))
+				'M 3 ' + ($elm$core$String$fromFloat(1.8 + $author$project$Stave$staveShiftY) + (' L 3 ' + $elm$core$String$fromFloat(6.2 + $author$project$Stave$staveShiftY))))
 			]),
 		_List_Nil),
 		A2(
 		$elm$svg$Svg$path,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$strokeWidth('1.8'),
+				$elm$svg$Svg$Attributes$strokeWidth('1.5'),
 				$elm$svg$Svg$Attributes$stroke('black'),
 				$elm$svg$Svg$Attributes$d(
-				'M 6 ' + ($elm$core$String$fromFloat(3 + $author$project$Stave$staveShiftY) + (' L 6 ' + $elm$core$String$fromFloat(9 + $author$project$Stave$staveShiftY))))
+				'M 5 ' + ($elm$core$String$fromFloat(1.8 + $author$project$Stave$staveShiftY) + (' L 5 ' + $elm$core$String$fromFloat(6.2 + $author$project$Stave$staveShiftY))))
 			]),
 		_List_Nil)
 	]);
@@ -8758,10 +8759,10 @@ var $author$project$Stave$staveTimeSignature = function (bar) {
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$xlinkHref('assets/images/Timesignature4-4.svg'),
-						$elm$svg$Svg$Attributes$width('18'),
-						$elm$svg$Svg$Attributes$height('18'),
-						$elm$svg$Svg$Attributes$x('3'),
-						$elm$svg$Svg$Attributes$y('17.4')
+						$elm$svg$Svg$Attributes$width('9'),
+						$elm$svg$Svg$Attributes$height('11.5'),
+						$elm$svg$Svg$Attributes$x('4.5'),
+						$elm$svg$Svg$Attributes$y('8.6')
 					]),
 				_List_Nil)
 			]);

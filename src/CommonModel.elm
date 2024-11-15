@@ -41,7 +41,8 @@ type alias BeatOptions =
   }
 
 type alias BeatOptionsParams = 
-  {beat : Int
+  {barNo : Int
+  , beat : Int
   , beatOptions : BeatOptions
   }
 
@@ -130,15 +131,22 @@ type alias BeatBlockDict = Dict Int Block
 type alias BeatOptionsDict = Dict Int BeatOptions
 
 
-type alias BeatOptionJson = 
-  {beat : Int
-  , ghostNotes : Int
-  , accents : Int
+
+type alias BarJson = 
+  {barNo : Int
+  , arrangement : List ArrangementJson
+  , beatOptions : List BeatOptionJson
   }
 
 type alias ArrangementJson = 
   {instrumentName : String
   , blocks : List BeatBlockJson
+  }
+
+type alias BeatOptionJson = 
+  {beat : Int
+  , ghostNotes : Int
+  , accents : Int
   }
 
 type alias BeatBlockJson = 

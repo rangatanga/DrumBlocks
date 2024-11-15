@@ -94,15 +94,15 @@ initialModel =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model = 
     case msg of
-{-
         BlockSelectedChange param -> applyBlockSelectedChange model param
         AddInstrumentSelectedChange param -> addInstrument model param
         BeatOptionsDialogOpen params -> ({model | beatOptionsParams = Just params
-                                                    ,  debugText = ""}, toggleDialog "beat-options-dialog")
-        BeatOptionsDialogSave -> ({model | beatOptions = updateBeatOptions model
+                                                  --, debugText = ""
+                                          }, toggleDialog "beat-options-dialog")
+        BeatOptionsDialogSave -> ({model | bars = updateBeatOptions model
                                            , beatOptionsParams = Nothing
                                            --, debugText = (Debug.toString (updateBeatOptions model))
-                                            }, toggleDialog "beat-options-dialog")
+                                  }, toggleDialog "beat-options-dialog")
         BeatOptionsDialogCancel -> ({model | beatOptionsParams = Nothing}, toggleDialog "beat-options-dialog")
         KeyPressedMsg keyEventMsg -> case keyEventMsg of
                                         KeyEventUnknown key-> if key == "Escape" then 
@@ -111,52 +111,54 @@ update msg model =
                                                                 (model, Cmd.none)
                                         _ -> (model, Cmd.none)
         GhostCheckBoxChanged param ->  let 
-                                              opts = case model.beatOptionsParams of
-                                                  Just bOptParams -> Just (BeatOptionsParams bOptParams.beat
-                                                                                      (BeatOptions (updateEmbellishmentPattern param bOptParams.beatOptions.ghostNotes)
-                                                                                                   bOptParams.beatOptions.accents
-                                                                                      )
-                                                                          )
-                                                  _ -> Nothing
+                                          opts = case model.beatOptionsParams of
+                                              Just bOptParams -> Just (BeatOptionsParams 
+                                                                                  bOptParams.barNo
+                                                                                  bOptParams.beat
+                                                                                  (BeatOptions (updateEmbellishmentPattern param bOptParams.beatOptions.ghostNotes)
+                                                                                                bOptParams.beatOptions.accents
+                                                                                  )
+                                                                      )
+                                              _ -> Nothing
                                         in
                                         ({model | beatOptionsParams = opts}, Cmd.none)
         AccentCheckBoxChanged param ->  let 
-                                              opts = case model.beatOptionsParams of
-                                                  Just bOptParams -> Just (BeatOptionsParams bOptParams.beat
-                                                                                      (BeatOptions bOptParams.beatOptions.ghostNotes
-                                                                                                   (updateEmbellishmentPattern param bOptParams.beatOptions.accents)
-                                                                                      )
-                                                                          )
-                                                  _ -> Nothing
+                                          opts = case model.beatOptionsParams of
+                                              Just bOptParams -> Just (BeatOptionsParams 
+                                                                                  bOptParams.barNo
+                                                                                  bOptParams.beat
+                                                                                  (BeatOptions bOptParams.beatOptions.ghostNotes
+                                                                                                (updateEmbellishmentPattern param bOptParams.beatOptions.accents)
+                                                                                  )
+                                                                      )
+                                              _ -> Nothing
                                         in
                                         ({model | beatOptionsParams = opts}, Cmd.none)
         PatternSave -> ({model | debugText = ""}, Download.string "drum_pattern.json" "application/json" (getPatternJson model))
         PatternLoad -> ({model | debugText = ""}, Select.file ["application/json"] UploadSelected)
         UploadSelected file -> (model, Task.perform FileLoaded (File.toString file))
         FileLoaded param -> (updateModelFromFile model param, Cmd.none)
--}
         _ -> ({model | debugText = ""}, Cmd.none)
 
-{-
 updateModelFromFile : Model -> String -> Model
 updateModelFromFile model param = 
   let
-    beatOptionsDict = case JsonD.decodeString (JsonD.field "beatOptions" (JsonD.list beatOptionDecoder)) param of 
-                        Ok val -> let
-                                      x = (val) |> List.map (\bo -> (bo.beat, (BeatOptions (Binary.fromDecimal bo.ghostNotes)(Binary.fromDecimal bo.accents))))
-                                  in
-                                  Dict.fromList x
-                        Err val -> model.beatOptions
-    newArrangement = case JsonD.decodeString (JsonD.field "arrangement" (JsonD.list arrangementDecoder)) param of 
-                        Ok val -> let
-                                      x = (val) |> List.map (\arr -> (arr.instrumentName, (buildBeatBlockDict arr.blocks)))
-                                  in
-                                  Dict.fromList x
-                        Err val -> model.arrangement
+    barDict = case JsonD.decodeString (JsonD.field "bars" (JsonD.list barDecoder)) param of 
+                Ok barVal -> (barVal) |> List.map (\bval -> (bval.barNo,(Bar ((bval.arrangement) |> List.map (\arr -> (arr.instrumentName, (buildBeatBlockDict arr.blocks)))
+                                                                                                 |>Dict.fromList)
+                                                                             ((bval.beatOptions) |> List.map (\bo -> (bo.beat, (BeatOptions (Binary.fromDecimal bo.ghostNotes)(Binary.fromDecimal bo.accents))))
+                                                                                                 |> Dict.fromList)
+                                                                             "4/4"
+                                                                        )
+                                                            )
+                                                  )
+                                      |> Dict.fromList 
+                Err val -> model.bars
+
+
   in
-  {model | beatOptions = beatOptionsDict
-           , arrangement = newArrangement
-           , debugText = Debug.toString beatOptionsDict}
+  {model | bars = barDict
+           , debugText = Debug.toString ""}
 
 
 buildBeatBlockDict : List BeatBlockJson -> BeatBlockDict
@@ -171,25 +173,31 @@ buildBeatBlockDict beatBlocks =
 getPatternJson : Model -> String
 getPatternJson model = 
   let
-    beatOpts = (Dict.toList model.beatOptions) |> List.map (\bo ->  BeatOptionJson  (Tuple.first bo)
-                                                                                    (Binary.toDecimal ((Tuple.second bo).ghostNotes))
-                                                                                    (Binary.toDecimal ((Tuple.second bo).accents))
-                                                                  )
-    arrangement = (Dict.toList model.arrangement) |> List.map (\arr ->  ArrangementJson (Tuple.first arr)
-                                                                                        (Dict.keys (Tuple.second arr) |> List.map (\b -> BeatBlockJson b (case Dict.get b (Tuple.second arr) of
-                                                                                                                                                          Just block -> block.blockName
-                                                                                                                                                          _ -> "P")))
-                                                                  )
+    bars = (Dict.toList model.bars) |> List.map (\bar ->  let 
+                                                            beatOpts = (Dict.toList (Tuple.second bar).beatOptions) |> List.map (\bo ->  BeatOptionJson  (Tuple.first bo)
+                                                                                                                                            (Binary.toDecimal ((Tuple.second bo).ghostNotes))
+                                                                                                                                            (Binary.toDecimal ((Tuple.second bo).accents)))
+                                                            arrangement = (Dict.toList (Tuple.second bar).arrangement) |> List.map (\arr ->  ArrangementJson (Tuple.first arr)
+                                                                                                                                                (Dict.keys (Tuple.second arr) |> List.map (\b -> BeatBlockJson b (case Dict.get b (Tuple.second arr) of
+                                                                                                                                                                                                                  Just block -> block.blockName
+                                                                                                                                                                                                                  _ -> "P"))))
+                                                          in                                                                                      
+                                                          BarJson (Tuple.first bar)
+                                                                  arrangement
+                                                                  beatOpts
+                                                )                                                                                                                                                                                                                  
   in
-  JsonE.encode 1 (JsonE.object ([("arrangement", JsonE.list (\arr -> JsonE.object [("instrument", JsonE.string arr.instrumentName)
-                                                                                  , ("blocks", JsonE.list (\b -> JsonE.object [("beat", JsonE.int b.beat)
-                                                                                                                              ,("blockName", JsonE.string b.blockName)]
-                                                                                                          ) arr.blocks)]) arrangement)
-                               ,("beatOptions", JsonE.list (\bo -> JsonE.object [("beat", JsonE.int bo.beat)
-                                                                                , ("ghostNotes", JsonE.int bo.ghostNotes)
-                                                                                , ("accents", JsonE.int bo.accents)]) beatOpts)])
+  JsonE.encode 1 (JsonE.object [("bars", JsonE.list (\bar -> JsonE.object [("barNo", JsonE.int bar.barNo)
+                                                                          ,("arrangement", JsonE.list (\arr -> JsonE.object [("instrument", JsonE.string arr.instrumentName)
+                                                                                                                                  , ("blocks", JsonE.list (\b -> JsonE.object [("beat", JsonE.int b.beat)
+                                                                                                                                                                              ,("blockName", JsonE.string b.blockName)]
+                                                                                                                                                          ) arr.blocks)]) bar.arrangement)
+                                                                          ,("beatOptions", JsonE.list (\bo -> JsonE.object [("beat", JsonE.int bo.beat)
+                                                                                                                                , ("ghostNotes", JsonE.int bo.ghostNotes)
+                                                                                                                                , ("accents", JsonE.int bo.accents)]) bar.beatOptions)
+                                                                          ]) bars
+                                )]                                                                                                                                
                   )
--}
 
 applyBlockSelectedChange : Model -> SelectIdValue -> ( Model, Cmd Msg )
 applyBlockSelectedChange model param = 
@@ -233,18 +241,32 @@ updateBarArrangement instrName blockIndex newBlockName currBar =
                                         currBar.timeSignature
               _ -> currBar
       _ -> currBar
-{-
 addInstrument : Model -> SelectIdValue -> ( Model, Cmd Msg )
 addInstrument model param = 
   case Dict.get param.value instrumentDict of
-      Just instr -> ({model |arrangement = Dict.insert param.value (Dict.fromList [(1, pBlock), (2, pBlock), (3, pBlock), (4, pBlock)]) model.arrangement}, Cmd.none)
+      Just instr -> let
+                      newBars = (Dict.toList model.bars) |> List.map (\bar -> ((Tuple.first bar), Bar (Dict.insert param.value (Dict.fromList [(1, pBlock), (2, pBlock), (3, pBlock), (4, pBlock)]) ((Tuple.second bar).arrangement))
+                                                                                                      (Tuple.second bar).beatOptions
+                                                                                                      (Tuple.second bar).timeSignature))
+                                                         |> Dict.fromList 
+                    in
+                    ({model |bars = newBars}, Cmd.none)
       _ -> ({model | debugText = (Debug.toString value)}, Cmd.none)
 
-updateBeatOptions : Model -> BeatOptionsDict
+updateBeatOptions : Model -> BarDict
 updateBeatOptions model = 
   case model.beatOptionsParams of
-    Just bOptParams -> Dict.insert bOptParams.beat bOptParams.beatOptions model.beatOptions
-    _ ->  model.beatOptions
+    Just bOptParams ->  let 
+                          bar = Dict.get bOptParams.barNo  model.bars 
+                        in
+                        case bar of
+                            Just b -> Dict.insert bOptParams.barNo (Bar b.arrangement
+                                                                       (Dict.insert bOptParams.beat bOptParams.beatOptions b.beatOptions) 
+                                                                       b.timeSignature)
+                                                                       model.bars
+                            _ -> model.bars
+    _ ->  model.bars
+
 
 updateEmbellishmentPattern : CheckboxIdChecked -> Bits -> Bits
 updateEmbellishmentPattern param currPattern =
@@ -261,7 +283,6 @@ updateEmbellishmentPattern param currPattern =
                       Binary.and currPattern (Binary.not bitmap)
     _ -> currPattern
 
--}
 
 -- SUBSCRIPTIONS
 
@@ -368,7 +389,9 @@ displayBars bars =
                                                                     [Html.button [HA.id ("beatOpts~"  ++ (String.fromInt (Tuple.first bar)) ++ "~" ++ (String.fromInt beat))
                                                                                 , HA.alt "Beat Options"
                                                                                 , HA.title "Beat Options"
-                                                                                , onClick (BeatOptionsDialogOpen (BeatOptionsParams beat (case Dict.get beat (Tuple.second bar).beatOptions of
+                                                                                , onClick (BeatOptionsDialogOpen (BeatOptionsParams (Tuple.first bar)
+                                                                                                                                    beat 
+                                                                                                                                    (case Dict.get beat (Tuple.second bar).beatOptions of
                                                                                                                                             Just beatOpts -> beatOpts
                                                                                                                                             _ -> BeatOptions Binary.empty Binary.empty)))
                                                                                 ] [Html.img [HA.src "assets/images/options-horizontal.svg"
@@ -431,52 +454,52 @@ getBlockOptions blockName =
 
 buildBeatOptionsDialog : Model -> List (Html Msg)
 buildBeatOptionsDialog model =
-  []
-{-
-  let
-    beat = case model.beatOptionsParams of
-            Just params -> params.beat
-            _ -> 0
-    isGhostable = (Dict.keys model.arrangement) |> List.foldl (\i isGhable -> case Dict.get i instrumentDict of
-                                                                                    Just instr -> isGhable || instr.isGhostable
-                                                                                    _ -> isGhable) False 
-    isAccentable = (Dict.keys model.arrangement) |> List.foldl (\i isAccable -> case Dict.get i instrumentDict of
-                                                                                    Just instr -> isAccable || instr.isAccentable
-                                                                                    _ -> isAccable) False 
-  in
-  [div []
-            [svg
-                [ Svg.Attributes.width "100"
-                , Svg.Attributes.height "40"
-                , Svg.Attributes.class "stave"
-                ]
-                []--(stave ++ (renderBar [beat] model.arrangement model.beatOptions))
-            ]
-  ,div  []
-        ((if isGhostable then 
-            [Html.div [HA.class "blockOptionsContainer"] 
-                      [Html.text "Ghost Notes"
-                      , Html.div [HA.class "embellishPatternBox"]
-                                  (renderGhostCheckboxes model beat)
+  case model.beatOptionsParams of
+      Just params ->
+        case Dict.get params.barNo model.bars of
+            Just bar ->
+                      let
+                        isGhostable = (Dict.keys bar.arrangement) |> List.foldl (\i isGhable -> case Dict.get i instrumentDict of
+                                                                                                        Just instr -> isGhable || instr.isGhostable
+                                                                                                        _ -> isGhable) False 
+                        isAccentable = (Dict.keys bar.arrangement) |> List.foldl (\i isAccable -> case Dict.get i instrumentDict of
+                                                                                                        Just instr -> isAccable || instr.isAccentable
+                                                                                                        _ -> isAccable) False 
+                      in
+                      [div []
+                                [svg
+                                    [ Svg.Attributes.width "100"
+                                    , Svg.Attributes.height "40"
+                                    , Svg.Attributes.class "stave"
+                                    ]
+                                    (stave ++ (renderStaveBar [params.beat] bar))
+                                ]
+                      ,div  []
+                            ((if isGhostable then 
+                                [Html.div [HA.class "blockOptionsContainer"] 
+                                          [Html.text "Ghost Notes"
+                                          , Html.div [HA.class "embellishPatternBox"]
+                                                    (displayGhostCheckboxes bar params)
+                                          ]
+                                ]
+                              else []
+                              )
+                          ++ (if isAccentable then 
+                                [Html.div [HA.class "blockOptionsContainer"] 
+                                          [Html.text "Accents"
+                                          , Html.div [HA.class "embellishPatternBox"]
+                                                    (displayAccentCheckboxes bar params)
+                                          ]
+                                ]
+                              else []
+                              ))
                       ]
-            ]
-          else []
-          )
-      ++ (if isAccentable then 
-            [Html.div [HA.class "blockOptionsContainer"] 
-                      [Html.text "Accents"
-                      , Html.div [HA.class "embellishPatternBox"]
-                                  (renderAccentCheckboxes model beat)
-                      ]
-            ]
-          else []
-          ))
-  ]
--}
+            _ -> []              
+      _ -> []              
 
-{-
-displayAccentCheckboxes : Model -> Int -> List (Html Msg)
-displayAccentCheckboxes model beat =
+
+displayAccentCheckboxes : Bar -> BeatOptionsParams -> List (Html Msg)
+displayAccentCheckboxes bar params =
   let
     subBeatRange = if "4-16" == "4-16" then [{index = 1, bitmap = (Binary.fromIntegers [1,0,0,0])}
                                                                         , {index = 2, bitmap = (Binary.fromIntegers [0,1,0,0])}
@@ -485,7 +508,7 @@ displayAccentCheckboxes model beat =
                                                                    else [{index = 1, bitmap = (Binary.fromIntegers [1,0,0])}
                                                                         , {index = 2, bitmap = (Binary.fromIntegers [0,1,0])}
                                                                         , {index = 3, bitmap = (Binary.fromIntegers [0,0,1])}]
-    accentableSubBeats = (Dict.toList model.arrangement)  |> List.map (\i -> Tuple.pair (Dict.get (Tuple.first i) instrumentDict) (Dict.get beat (Tuple.second i)) )
+    accentableSubBeats = (Dict.toList bar.arrangement)  |> List.map (\i -> Tuple.pair (Dict.get (Tuple.first i) instrumentDict) (Dict.get params.beat (Tuple.second i)) )
                                                           |> List.map (\ib -> case (Tuple.first ib) of
                                                                                 Just instrument ->  if instrument.isAccentable then
                                                                                                       case (Tuple.second ib) of 
@@ -495,9 +518,7 @@ displayAccentCheckboxes model beat =
                                                                                                       (Binary.fromIntegers [0,0,0,0])
                                                                                 _ -> (Binary.fromIntegers [0,0,0,0]))
                                                           |> List.foldl (Binary.or) (Binary.fromIntegers [0,0,0,0])
-    accentPattern = case model.beatOptionsParams of
-                      Just beatOpts -> beatOpts.beatOptions.accents
-                      _ -> Binary.fromIntegers [0,0,0,0]
+    accentPattern = params.beatOptions.accents
 
   in
   (subBeatRange |> List.map (\i -> Html.input [HA.type_ "checkbox"
@@ -510,8 +531,8 @@ displayAccentCheckboxes model beat =
   )--  ++ [Html.text (Debug.toString accentableSubBeats)]
 
 
-displayGhostCheckboxes : Model -> Int -> List (Html Msg)
-displayGhostCheckboxes model beat =
+displayGhostCheckboxes : Bar -> BeatOptionsParams -> List (Html Msg)
+displayGhostCheckboxes bar params =
   let
     subBeatRange = if "4-16" == "4-16" then [{index = 1, bitmap = (Binary.fromIntegers [1,0,0,0])}
                                                                         , {index = 2, bitmap = (Binary.fromIntegers [0,1,0,0])}
@@ -520,7 +541,7 @@ displayGhostCheckboxes model beat =
                                                                    else [{index = 1, bitmap = (Binary.fromIntegers [1,0,0])}
                                                                         , {index = 2, bitmap = (Binary.fromIntegers [0,1,0])}
                                                                         , {index = 3, bitmap = (Binary.fromIntegers [0,0,1])}]
-    ghostableSubBeats = (Dict.toList model.arrangement)   |> List.map (\i -> Tuple.pair (Dict.get (Tuple.first i) instrumentDict) (Dict.get beat (Tuple.second i)) )
+    ghostableSubBeats = (Dict.toList bar.arrangement)   |> List.map (\i -> Tuple.pair (Dict.get (Tuple.first i) instrumentDict) (Dict.get params.beat (Tuple.second i)) )
                                                           |> List.map (\ib -> case (Tuple.first ib) of
                                                                                 Just instrument ->  if instrument.isGhostable then
                                                                                                       case (Tuple.second ib) of 
@@ -530,9 +551,7 @@ displayGhostCheckboxes model beat =
                                                                                                       (Binary.fromIntegers [0,0,0,0])
                                                                                 _ -> (Binary.fromIntegers [0,0,0,0]))
                                                           |> List.foldl (Binary.xor) (Binary.fromIntegers [1,1,1,1])
-    ghostPattern = case model.beatOptionsParams of
-                      Just beatOpts -> beatOpts.beatOptions.ghostNotes
-                      _ -> Binary.fromIntegers [0,0,0,0]
+    ghostPattern = params.beatOptions.ghostNotes
 
   in
   (subBeatRange |> List.map (\i -> Html.input [HA.type_ "checkbox"
@@ -544,7 +563,7 @@ displayGhostCheckboxes model beat =
                            )
   )--  ++ [Html.text (Debug.toString accentableSubBeats)]
 
--}
+
 
 
 
@@ -576,5 +595,4 @@ renderStaveBars model =
                             ]
                             (stave ++ percussionClef ++ (staveTimeSignature (Tuple.second bar)) ++ singleBarLine ++ (renderStaveBar (List.range 1 4) (Tuple.second bar))
                             )
-                            --(stave ++ percussionClef)
                         ])

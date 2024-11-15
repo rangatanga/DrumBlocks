@@ -55,6 +55,14 @@ filesDecoder =
   Json.at ["target","files"] (Json.list File.decoder)
 
 
+barDecoder : Json.Decoder BarJson
+barDecoder =
+  Json.map3 BarJson
+    (Json.field "barNo" Json.int)
+    (Json.field "arrangement" (Json.list arrangementDecoder))
+    (Json.field "beatOptions" (Json.list beatOptionDecoder))
+
+
 beatOptionDecoder : Json.Decoder BeatOptionJson
 beatOptionDecoder =
   Json.map3 BeatOptionJson

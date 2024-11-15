@@ -7610,20 +7610,20 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 		_VirtualDom_noJavaScriptUri(value));
 };
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Stave$renderNote = F3(
-	function (beat, beatsCount, noteSubBeat) {
-		var noteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 1.8);
-		var nextNoteCenterX = 20.0 + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 1.8);
+var $author$project$Stave$renderNote = F4(
+	function (barOffset, beat, beatsCount, noteSubBeat) {
+		var noteCenterX = ((barOffset * 92) + 17.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 1.8);
+		var nextNoteCenterX = ((barOffset * 92) + 17.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 1.8);
 		var semiQuaverBeam = (noteSubBeat.subdivision === '4-16') ? ((_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$SemiQuaver) && (!noteSubBeat.isRest)) ? (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat) ? ((noteSubBeat.subBeat === 10) ? ((!_Utils_eq(noteSubBeat.prevSubBeat, noteSubBeat.subBeat)) ? _List_fromArray(
 			[
 				A2(
 				$elm$svg$Svg$path,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
+						$elm$svg$Svg$Attributes$strokeWidth('0.6'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 0.4) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 0.8) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4))))))))
 					]),
 				_List_Nil)
 			]) : _List_fromArray(
@@ -7647,10 +7647,10 @@ var $author$project$Stave$renderNote = F3(
 				$elm$svg$Svg$path,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
+						$elm$svg$Svg$Attributes$strokeWidth('0.6'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.5) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.1) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4))))))))
 					]),
 				_List_Nil)
 			])) : (_Utils_eq(noteSubBeat.nextSubBeatNoteDuration, $author$project$CommonModel$SemiQuaver) ? _List_fromArray(
@@ -7659,10 +7659,10 @@ var $author$project$Stave$renderNote = F3(
 				$elm$svg$Svg$path,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
+						$elm$svg$Svg$Attributes$strokeWidth('0.6'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 1.8) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 1.35) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4))))))))
 					]),
 				_List_Nil)
 			]) : (((!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) && (!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat))) ? _List_Nil : _List_fromArray(
@@ -7671,10 +7671,10 @@ var $author$project$Stave$renderNote = F3(
 				$elm$svg$Svg$path,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
+						$elm$svg$Svg$Attributes$strokeWidth('0.6'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.5) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.6))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 3.1) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + 1.4))))))))
 					]),
 				_List_Nil)
 			])))) : ((_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$Quaver) && ((!noteSubBeat.isRest) && (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat) && _Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)))) ? _List_fromArray(
@@ -7699,10 +7699,10 @@ var $author$project$Stave$renderNote = F3(
 				$elm$svg$Svg$path,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.8'),
+						$elm$svg$Svg$Attributes$strokeWidth('0.6'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 1.8) + (' ' + $elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 1.35) + (' ' + $elm$core$String$fromFloat(noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY))))))))
 					]),
 				_List_Nil)
 			]);
@@ -7757,7 +7757,7 @@ var $author$project$Stave$renderNote = F3(
 						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 2.0) + ('C ' + ($elm$core$String$fromFloat(noteCenterX - 2.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 2.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + $elm$core$String$fromFloat(noteCenterY + 2.0))))))))))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + ('C ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))))))))))
 					]),
 				_List_Nil),
 				A2(
@@ -7767,7 +7767,7 @@ var $author$project$Stave$renderNote = F3(
 						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 2.0) + (' C ' + ($elm$core$String$fromFloat(noteCenterX + 2.7) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 2.7) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + $elm$core$String$fromFloat(noteCenterY + 2.0))))))))))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.7) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + (' C ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 1.7) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))))))))))
 					]),
 				_List_Nil)
 			]) : _List_Nil;
@@ -7779,7 +7779,7 @@ var $author$project$Stave$renderNote = F3(
 					[
 						$elm$svg$Svg$Attributes$cx(
 						$elm$core$String$fromFloat(
-							noteCenterX + (noteSubBeat.isGhostNote ? 3.1 : 2.6))),
+							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
 						$elm$svg$Svg$Attributes$cy(
 						$elm$core$String$fromFloat(noteCenterY)),
 						$elm$svg$Svg$Attributes$r('0.4')
@@ -7796,7 +7796,7 @@ var $author$project$Stave$renderNote = F3(
 						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 3.0) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 2.0))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 3.0) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 2.0))))))))
 					]),
 				_List_Nil),
 				A2(
@@ -7806,7 +7806,7 @@ var $author$project$Stave$renderNote = F3(
 						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.5) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 2.0) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 1.0))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 2.0) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + $author$project$Stave$staveShiftY) - 1.0))))))))
 					]),
 				_List_Nil)
 			]) : _List_Nil;
@@ -8119,7 +8119,7 @@ var $author$project$Stave$updateStalkHeight = function (noteSubBeats) {
 		} else {
 			return 20;
 		}
-	}() - 8;
+	}() - 7;
 	return A2(
 		$elm$core$List$map,
 		function (nsb) {
@@ -8143,8 +8143,8 @@ var $author$project$Stave$updateNoteSubBeats = function (noteSubBeats) {
 		updateStalks);
 	return $author$project$Stave$updateNoteDuration(noteSubBeatsWithRests);
 };
-var $author$project$Stave$buildNoteSubBeats = F4(
-	function (beat, beatsCount, instrumentBlocks, beatOptions) {
+var $author$project$Stave$buildNoteSubBeats = F5(
+	function (barOffset, beat, beatsCount, instrumentBlocks, beatOptions) {
 		var subBeats = _List_fromArray(
 			[1, 4, 5, 7, 9, 10]);
 		var beatBlocks = A2(
@@ -8166,17 +8166,18 @@ var $author$project$Stave$buildNoteSubBeats = F4(
 		return A2(
 			$elm$core$List$concatMap,
 			function (nsb) {
-				return A3($author$project$Stave$renderNote, beat, beatsCount, nsb);
+				return A4($author$project$Stave$renderNote, barOffset, beat, beatsCount, nsb);
 			},
 			noteSubBeats);
 	});
-var $author$project$Stave$renderStaveBar = F2(
-	function (beats, bar) {
+var $author$project$Stave$renderStaveBar = F3(
+	function (barOffset, beats, bar) {
 		return A2(
 			$elm$core$List$concatMap,
 			function (beat) {
-				return A4(
+				return A5(
 					$author$project$Stave$buildNoteSubBeats,
+					barOffset,
 					beat,
 					$elm$core$List$length(beats),
 					bar.arrangement,
@@ -8186,21 +8187,34 @@ var $author$project$Stave$renderStaveBar = F2(
 	});
 var $author$project$Stave$staveLines = _List_fromArray(
 	[0, 2, 4, 6, 8]);
-var $author$project$Stave$stave = A2(
-	$elm$core$List$map,
-	function (n) {
-		return A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$d(
-					'M 0 ' + ($elm$core$String$fromFloat(n + $author$project$Stave$staveShiftY) + (' L 195 ' + $elm$core$String$fromFloat(n + $author$project$Stave$staveShiftY))))
-				]),
-			_List_Nil);
-	},
-	$author$project$Stave$staveLines);
+var $author$project$Stave$stave = function (staveNo) {
+	return A2(
+		$elm$core$List$map,
+		function (n) {
+			return A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$d(
+						'M 0 ' + ($elm$core$String$fromFloat((n + $author$project$Stave$staveShiftY) + (20 * staveNo)) + (' L 195 ' + $elm$core$String$fromFloat((n + $author$project$Stave$staveShiftY) + (20 * staveNo)))))
+					]),
+				_List_Nil);
+		},
+		$author$project$Stave$staveLines);
+};
+var $author$project$Stave$renderStaveBeat = F2(
+	function (beat, bar) {
+		return _Utils_ap(
+			$author$project$Stave$stave(1),
+			A3(
+				$author$project$Stave$renderStaveBar,
+				0,
+				_List_fromArray(
+					[beat]),
+				bar));
+	});
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
@@ -8254,13 +8268,7 @@ var $author$project$Main$buildBeatOptionsDialog = function (model) {
 									$elm$svg$Svg$Attributes$height('40'),
 									$elm$svg$Svg$Attributes$class('stave')
 								]),
-							_Utils_ap(
-								$author$project$Stave$stave,
-								A2(
-									$author$project$Stave$renderStaveBar,
-									_List_fromArray(
-										[params.beat]),
-									bar)))
+							A2($author$project$Stave$renderStaveBeat, params.beat, bar))
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -8736,19 +8744,21 @@ var $author$project$Stave$percussionClef = _List_fromArray(
 			]),
 		_List_Nil)
 	]);
-var $author$project$Stave$singleBarLine = _List_fromArray(
-	[
-		A2(
-		$elm$svg$Svg$path,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$d(
-				'M 195 ' + ($elm$core$String$fromFloat($author$project$Stave$staveShiftY) + (' L 195 ' + $elm$core$String$fromFloat(12 + $author$project$Stave$staveShiftY))))
-			]),
-		_List_Nil)
-	]);
+var $author$project$Stave$singleBarLine = function (xOffset) {
+	return _List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+					$elm$svg$Svg$Attributes$stroke('black'),
+					$elm$svg$Svg$Attributes$d(
+					'M ' + ($elm$core$String$fromInt(103 + (92 * xOffset)) + (' ' + ($elm$core$String$fromFloat($author$project$Stave$staveShiftY) + (' L ' + ($elm$core$String$fromInt(103 + (92 * xOffset)) + (' ' + $elm$core$String$fromFloat(8 + $author$project$Stave$staveShiftY))))))))
+				]),
+			_List_Nil)
+		]);
+};
 var $author$project$Stave$staveTimeSignature = function (bar) {
 	var _v0 = bar.timeSignature;
 	if (_v0 === '4/4') {
@@ -8770,38 +8780,43 @@ var $author$project$Stave$staveTimeSignature = function (bar) {
 		return _List_Nil;
 	}
 };
-var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Main$renderStaveBars = function (model) {
+var $author$project$Stave$renderStaveBars = function (bars) {
 	return A2(
-		$elm$core$List$map,
+		$elm$core$List$concatMap,
 		function (bar) {
-			return A2(
-				$elm$html$Html$div,
-				_List_Nil,
+			return _Utils_ap(
+				(A2($elm$core$Basics$modBy, 2, bar.a) === 1) ? $author$project$Stave$stave((bar.a / 2) | 0) : _List_Nil,
+				_Utils_ap(
+					(bar.a === 1) ? _Utils_ap(
+						$author$project$Stave$percussionClef,
+						$author$project$Stave$staveTimeSignature(bar.b)) : _List_Nil,
+					_Utils_ap(
+						A3(
+							$author$project$Stave$renderStaveBar,
+							(bar.a / 2) | 0,
+							A2($elm$core$List$range, 1, 4),
+							bar.b),
+						$author$project$Stave$singleBarLine(
+							A2($elm$core$Basics$modBy, 2, bar.a)))));
+		},
+		$elm$core$Dict$toList(bars));
+};
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $author$project$Main$renderStave = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$svg,
 				_List_fromArray(
 					[
-						A2(
-						$elm$svg$Svg$svg,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$viewBox('0 0 200 20'),
-								$elm$svg$Svg$Attributes$class('stave')
-							]),
-						_Utils_ap(
-							$author$project$Stave$stave,
-							_Utils_ap(
-								$author$project$Stave$percussionClef,
-								_Utils_ap(
-									$author$project$Stave$staveTimeSignature(bar.b),
-									_Utils_ap(
-										$author$project$Stave$singleBarLine,
-										A2(
-											$author$project$Stave$renderStaveBar,
-											A2($elm$core$List$range, 1, 4),
-											bar.b))))))
-					]));
-		},
-		$elm$core$Dict$toList(model.bars));
+						$elm$svg$Svg$Attributes$viewBox('0 0 200 20'),
+						$elm$svg$Svg$Attributes$class('stave')
+					]),
+				$author$project$Stave$renderStaveBars(model.bars))
+			]));
 };
 var $elm$html$Html$Attributes$rowspan = function (n) {
 	return A2(
@@ -8863,135 +8878,136 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$Attributes$id('main')
 							]),
-						A2(
-							$elm$core$List$cons,
-							A2(
-								$elm$html$Html$table,
-								_List_Nil,
-								A2(
-									$elm$core$List$cons,
+						_Utils_ap(
+							_List_fromArray(
+								[
 									A2(
-										$elm$html$Html$tr,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('instrumentTableHeaderRow')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$th,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('instrumentTableHeaderCell')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Instrument')
-													])),
-												A2(
-												$elm$html$Html$td,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$rowspan(
-														$elm$core$List$length(
-															$author$project$Main$getIncludedInstrumentNames(model.bars)) + 1)
-													]),
-												_List_fromArray(
-													[
-														$author$project$Main$displayBars(model.bars)
-													]))
-											])),
-									_Utils_ap(
-										$author$project$Main$displayInstruments(model.bars),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$tr,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('instrumentTableRow')
-													]),
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$td,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$class('instrumentTableCell')
-															]),
-														_List_fromArray(
-															[
-																A2(
-																$elm$html$Html$select,
-																_List_fromArray(
-																	[
-																		$author$project$CommonEvents$onInputSelectChange($author$project$CommonModel$AddInstrumentSelectedChange),
-																		$elm$html$Html$Attributes$alt('Add New Instrument'),
-																		$elm$html$Html$Attributes$title('Add New Instrument'),
-																		$elm$html$Html$Attributes$class('addInstrumentTableCell')
-																	]),
-																A2(
-																	$elm$core$List$cons,
-																	A2(
-																		$elm$html$Html$option,
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$Attributes$selected(true)
-																			]),
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$text('Add Instrument')
-																			])),
-																	$author$project$Main$getAvailableInstruments(model)))
-															]))
-													]))
-											])))),
-							_Utils_ap(
-								$author$project$Main$renderStaveBars(model),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.debugText),
+									$elm$html$Html$table,
+									_List_Nil,
+									A2(
+										$elm$core$List$cons,
 										A2(
-										$author$project$Main$beatOptionsDialog,
-										'beat-options-dialog',
-										_Utils_ap(
-											$author$project$Main$buildBeatOptionsDialog(model),
+											$elm$html$Html$tr,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('instrumentTableHeaderRow')
+												]),
 											_List_fromArray(
 												[
 													A2(
-													$elm$html$Html$div,
+													$elm$html$Html$th,
 													_List_fromArray(
 														[
-															$elm$html$Html$Attributes$class('subBeatOptionsDialogButtons')
+															$elm$html$Html$Attributes$class('instrumentTableHeaderCell')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Instrument')
+														])),
+													A2(
+													$elm$html$Html$td,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$rowspan(
+															$elm$core$List$length(
+																$author$project$Main$getIncludedInstrumentNames(model.bars)) + 1)
+														]),
+													_List_fromArray(
+														[
+															$author$project$Main$displayBars(model.bars)
+														]))
+												])),
+										_Utils_ap(
+											$author$project$Main$displayInstruments(model.bars),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$tr,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('instrumentTableRow')
 														]),
 													_List_fromArray(
 														[
 															A2(
-															$elm$html$Html$button,
+															$elm$html$Html$td,
 															_List_fromArray(
 																[
-																	$elm$html$Html$Events$onClick($author$project$CommonModel$BeatOptionsDialogSave),
-																	$elm$html$Html$Attributes$class('subBeatOptionsDialogButton'),
-																	$elm$html$Html$Attributes$id('bb')
+																	$elm$html$Html$Attributes$class('instrumentTableCell')
 																]),
 															_List_fromArray(
 																[
-																	$elm$html$Html$text('Save')
-																])),
-															A2(
-															$elm$html$Html$button,
-															_List_fromArray(
-																[
-																	$elm$html$Html$Events$onClick($author$project$CommonModel$BeatOptionsDialogCancel),
-																	$elm$html$Html$Attributes$class('subBeatOptionsDialogButton')
-																]),
-															_List_fromArray(
-																[
-																	$elm$html$Html$text('Cancel')
+																	A2(
+																	$elm$html$Html$select,
+																	_List_fromArray(
+																		[
+																			$author$project$CommonEvents$onInputSelectChange($author$project$CommonModel$AddInstrumentSelectedChange),
+																			$elm$html$Html$Attributes$alt('Add New Instrument'),
+																			$elm$html$Html$Attributes$title('Add New Instrument'),
+																			$elm$html$Html$Attributes$class('addInstrumentTableCell')
+																		]),
+																	A2(
+																		$elm$core$List$cons,
+																		A2(
+																			$elm$html$Html$option,
+																			_List_fromArray(
+																				[
+																					$elm$html$Html$Attributes$selected(true)
+																				]),
+																			_List_fromArray(
+																				[
+																					$elm$html$Html$text('Add Instrument')
+																				])),
+																		$author$project$Main$getAvailableInstruments(model)))
 																]))
 														]))
-												])))
-									]))))
+												])))),
+									$author$project$Main$renderStave(model)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(model.debugText),
+									A2(
+									$author$project$Main$beatOptionsDialog,
+									'beat-options-dialog',
+									_Utils_ap(
+										$author$project$Main$buildBeatOptionsDialog(model),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('subBeatOptionsDialogButtons')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$button,
+														_List_fromArray(
+															[
+																$elm$html$Html$Events$onClick($author$project$CommonModel$BeatOptionsDialogSave),
+																$elm$html$Html$Attributes$class('subBeatOptionsDialogButton'),
+																$elm$html$Html$Attributes$id('bb')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Save')
+															])),
+														A2(
+														$elm$html$Html$button,
+														_List_fromArray(
+															[
+																$elm$html$Html$Events$onClick($author$project$CommonModel$BeatOptionsDialogCancel),
+																$elm$html$Html$Attributes$class('subBeatOptionsDialogButton')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Cancel')
+															]))
+													]))
+											])))
+								])))
 					]))
 			]),
 		title: 'Drum Blocks'

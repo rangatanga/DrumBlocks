@@ -1,4 +1,4 @@
-module Stave exposing (stave, renderStaveBar, singleBarLine, staveTimeSignature, percussionClef)
+module Stave exposing (stave, renderStaveBeat, renderStaveBars, singleBarLine, staveTimeSignature, percussionClef)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -39,15 +39,16 @@ staveShiftY : Float
 staveShiftY = 10
 
 
-stave : List (Svg Msg)
-stave =
+stave : Int -> List (Svg Msg)
+stave staveNo =
     (staveLines)
         |> List.map
             (\n ->
                 Svg.path
                     [ strokeWidth "0.3"
                     , stroke "black"
-                    , d ("M 0 " ++ String.fromFloat (n + staveShiftY) ++ " L 195 " ++ String.fromFloat (n + staveShiftY))
+                    , d ("M 0 " ++ String.fromFloat (n + staveShiftY + (toFloat (20 * staveNo))) 
+                         ++ " L 195 " ++ String.fromFloat (n + staveShiftY + (toFloat (20 * staveNo))))
                     ]
                     []
             )
@@ -78,12 +79,13 @@ percussionClef =
       []
   ]
 
-singleBarLine : List(Svg Msg)
-singleBarLine =
+singleBarLine : Int -> List(Svg Msg)
+singleBarLine xOffset =
   [Svg.path
       [ strokeWidth "0.2"
       , stroke "black"
-      , d ("M 195 " ++ String.fromFloat (staveShiftY) ++ " L 195 " ++ String.fromFloat (12 + staveShiftY))
+      , d ("M " ++ String.fromInt (103 + (92 * xOffset)) ++ " " ++ String.fromFloat (staveShiftY) 
+           ++ " L " ++ String.fromInt (103 + (92 * xOffset)) ++ " " ++ String.fromFloat (8 + staveShiftY))
       ]
       [] 
   ]
@@ -99,16 +101,33 @@ One         E           And         A
 
 Iterate through all 12 spaces and all items in the arrangement, and draw a note if required.
 -}
+renderStaveBeat : Int -> Bar -> List(Svg Msg)
+renderStaveBeat beat bar = 
+  (stave 1) ++ (renderStaveBar 0 [beat] bar)
 
-renderStaveBar : List Int -> Bar -> List(Svg Msg)
-renderStaveBar beats bar = 
+renderStaveBars : BarDict -> List(Svg Msg)
+renderStaveBars bars = 
+  (Dict.toList bars) |> List.concatMap (\bar -> (if modBy 2 (Tuple.first bar) == 1 then
+                                                  stave ((Tuple.first bar) // 2)
+                                                 else [])
+                                                 ++ (if (Tuple.first bar) == 1 then
+                                                      percussionClef
+                                                      ++ staveTimeSignature (Tuple.second bar)
+                                                     else [])
+                                                 ++ (renderStaveBar ((Tuple.first bar) // 2) (List.range 1 4) (Tuple.second bar))
+                                                 ++ (singleBarLine (modBy 2 (Tuple.first bar))))
+
+--(stave ++ percussionClef ++ (staveTimeSignature (Tuple.second bar)) ++ (singleBarLine 8) ++ 
+
+renderStaveBar : Int -> List Int -> Bar -> List(Svg Msg)
+renderStaveBar barOffset beats bar = 
   --loop through each beat of the bar (this can be limited to a single beat for the Beat Options dialog)
-  (beats) |> List.concatMap (\beat -> buildNoteSubBeats beat (List.length beats) bar.arrangement (Dict.get beat bar.beatOptions))
+  (beats) |> List.concatMap (\beat -> buildNoteSubBeats barOffset beat (List.length beats) bar.arrangement (Dict.get beat bar.beatOptions))
               --|> Debug.toString
 
 
-buildNoteSubBeats : Int -> Int -> InstrumentBlocksDict -> Maybe BeatOptions -> List(Svg Msg)
-buildNoteSubBeats beat beatsCount instrumentBlocks beatOptions = 
+buildNoteSubBeats : Int -> Int -> Int -> InstrumentBlocksDict -> Maybe BeatOptions -> List(Svg Msg)
+buildNoteSubBeats barOffset beat beatsCount instrumentBlocks beatOptions = 
   let
       subBeats = [1, 4, 5, 7, 9, 10]
       --get alll instruments & blocks for the current beat
@@ -117,7 +136,7 @@ buildNoteSubBeats beat beatsCount instrumentBlocks beatOptions =
                                 |> updateNoteSubBeats
  
   in
-  (noteSubBeats) |> List.concatMap (\nsb -> renderNote beat beatsCount nsb)
+  (noteSubBeats) |> List.concatMap (\nsb -> renderNote barOffset beat beatsCount nsb)
   --(Debug.toString noteSubBeats) ++ " BEAT " ++ String.fromInt beat
 
 
@@ -167,13 +186,6 @@ getNoteSubBeats subBeat beatBlocks beatOptions =
                                     []
                     )
 
-
-processNoteSubBeats : Int -> List NoteSubBeat ->List(Svg Msg)
-processNoteSubBeats beat noteSubBeats = 
-  List.append ((noteSubBeats) |> List.concatMap (\nsb -> renderNote beat 4 nsb)) 
-              []
-
-
 {-
 For each note, update NoteDuration, isDotted, isRest, etc, - for each note we need to look forward (i.e. > subBeat) to the other
 notes within the beat. 
@@ -201,7 +213,7 @@ updateStalkHeight noteSubBeats =
                          
     justStalkHeight = (case stalkHeight of
                         Just sHeight -> sHeight
-                        _ -> 20) - 8
+                        _ -> 20) - 7
   in
   (noteSubBeats) |> List.map (\nsb -> NoteSubBeat nsb.subBeat 
                                                   nsb.instrumentName 
@@ -276,12 +288,12 @@ getNoteDuration currNoteSubBeat allNoteSubBeats =
            else if currNoteSubBeat.subBeat == 7 then NoteDurationParam Quaver False currNoteSubBeat.nextSubBeat prevSubBeat
            else NoteDurationParam SemiQuaver False currNoteSubBeat.nextSubBeat prevSubBeat
 
-renderNote : Int -> Int -> NoteSubBeat -> List (Svg Msg)
-renderNote beat beatsCount noteSubBeat = 
+renderNote : Int -> Int -> Int -> NoteSubBeat -> List (Svg Msg)
+renderNote barOffset beat beatsCount noteSubBeat = 
   let
     instrument = Dict.get noteSubBeat.instrumentName instrumentDict
-    noteCenterX = 20.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1))) * 1.8)
-    nextNoteCenterX = 20.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1))) * 1.8)
+    noteCenterX = (toFloat (barOffset * 92)) + 17.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1))) * 1.8)
+    nextNoteCenterX = (toFloat (barOffset * 92)) + 17.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1))) * 1.8)
     crossNoteOffset = 1.0
     noteCenterY = case instrument of
                     Just instr -> instr.stavePosition + staveShiftY
@@ -307,7 +319,7 @@ renderNote beat beatsCount noteSubBeat =
                   []]
     dot = if noteSubBeat.isDotted then
             [Svg.circle 
-              [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 3.1 else 2.6)))
+              [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
                , cy (String.fromFloat noteCenterY)
                , r "0.4"
               ] []]
@@ -316,9 +328,9 @@ renderNote beat beatsCount noteSubBeat =
     topBeam = if noteSubBeat.subBeat == noteSubBeat.nextSubBeat 
                  || noteSubBeat.isRest then []
               else [Svg.path 
-                      [ strokeWidth "0.8"
+                      [ strokeWidth "0.6"
                       , stroke "black"
-                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
+                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.35)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY)))
                       ] []]
     
     semiQuaverBeam =  if noteSubBeat.subdivision == "4-16" then
@@ -328,9 +340,9 @@ renderNote beat beatsCount noteSubBeat =
                             if noteSubBeat.subBeat == 10 then --last subBeat position 
                               if noteSubBeat.prevSubBeat /= noteSubBeat.subBeat then --short semi quaver bar goes to the left
                                 [Svg.path 
-                                  [ strokeWidth "0.8"
+                                  [ strokeWidth "0.6"
                                   , stroke "black"
-                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX - 0.4)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)) ++ " L " ++ (String.fromFloat (noteCenterX - 0.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)))
                                   ] []
                                 ]
                               else  --single semiquaver, no beam
@@ -341,16 +353,16 @@ renderNote beat beatsCount noteSubBeat =
                                             , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 0.6))] []]
                             else --short semi quaver bar goes to the right
                                 [Svg.path 
-                                  [ strokeWidth "0.8"
+                                  [ strokeWidth "0.6"
                                   , stroke "black"
-                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                  , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.1)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)))
                                   ] []
                                 ]
                           else if noteSubBeat.nextSubBeatNoteDuration == SemiQuaver then --full semi quaver bar goes to next note
                                   [Svg.path 
-                                    [ strokeWidth "0.8"
+                                    [ strokeWidth "0.6"
                                     , stroke "black"
-                                    , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.8)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                    , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)) ++ " L " ++ (String.fromFloat (nextNoteCenterX + 1.35)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)))
                                     ] []
                                 ]
                               else --short semi quaver bar goes to the right
@@ -359,9 +371,9 @@ renderNote beat beatsCount noteSubBeat =
                                       [] --this handles the K block issue
                                   else
                                     [Svg.path 
-                                      [ strokeWidth "0.8"
+                                      [ strokeWidth "0.6"
                                       , stroke "black"
-                                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.6)))
+                                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)) ++ " L " ++ (String.fromFloat (noteCenterX + 3.1)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY + 1.4)))
                                       ] []
                                     ]
                         else if noteSubBeat.noteDuration == Quaver 
@@ -379,19 +391,19 @@ renderNote beat beatsCount noteSubBeat =
                     [Svg.path 
                       [ strokeWidth "0.2"
                       , stroke "black"
-                      , d ("M " ++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY - 2.0)) 
-                                ++ "C "++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
-                                ++ " " ++ (String.fromFloat (noteCenterX - 2.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
-                                ++ " "++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY + 2.0)) 
+                      , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) 
+                                ++ "C "++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
+                                ++ " " ++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
+                                ++ " "++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) 
                                 )]
                       []
                     ,Svg.path 
                       [ strokeWidth "0.2"
                       , stroke "black"
-                      , d ("M " ++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY - 2.0)) 
-                                ++ " C "++ (String.fromFloat (noteCenterX + 2.7)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
-                                ++ " " ++ (String.fromFloat (noteCenterX + 2.7)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
-                                ++ " "++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY + 2.0)) 
+                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.7)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) 
+                                ++ " C "++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
+                                ++ " " ++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
+                                ++ " "++ (String.fromFloat (noteCenterX + 1.7)) ++ " " ++ (String.fromFloat (noteCenterY + 1.5)) 
                                 )]
                       []
                     ]
@@ -400,15 +412,15 @@ renderNote beat beatsCount noteSubBeat =
                     [Svg.path 
                       [ strokeWidth "0.3"
                       , stroke "black"
-                      , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 3.0)) 
-                                ++ " L "++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 2.0)) 
+                      , d ("M " ++ (String.fromFloat (noteCenterX - 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 3.0)) 
+                                ++ " L "++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 2.0)) 
                                 )]
                       []
                     ,Svg.path 
                       [ strokeWidth "0.3"
                       , stroke "black"
-                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 2.0)) 
-                                ++ " L "++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 1.0)) 
+                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 2.0)) 
+                                ++ " L "++ (String.fromFloat (noteCenterX - 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + staveShiftY - 1.0)) 
                                 )]
                       []
                     ]
@@ -485,9 +497,6 @@ renderNote beat beatsCount noteSubBeat =
       ++ accent
 
 
-renderBeams : Int -> List NoteSubBeat -> List (Svg Msg)
-renderBeams beat noteSubBeats = 
-  []
 
 {-
 isSubBeatMatch returns True if the block has a note that corresponds with the sub beat

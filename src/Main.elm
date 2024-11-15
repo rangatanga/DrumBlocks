@@ -315,7 +315,7 @@ view model =
                          [ Html.text "Load Pattern" ]
                 ]
             ,div [HA.id "main"]
-                ((Html.table
+                ([Html.table
                     [] 
                     (Html.tr  [HA.class "instrumentTableHeaderRow"] 
                               [th [HA.class "instrumentTableHeaderCell"] 
@@ -337,7 +337,7 @@ view model =
                                   ]
                               ]
                         ])
-                 ) :: (renderStaveBars model)
+                 ,(renderStave model)]
                   ++[ Html.text model.debugText
                       ,beatOptionsDialog "beat-options-dialog"
                             (buildBeatOptionsDialog model
@@ -472,7 +472,7 @@ buildBeatOptionsDialog model =
                                     , Svg.Attributes.height "40"
                                     , Svg.Attributes.class "stave"
                                     ]
-                                    (stave ++ (renderStaveBar [params.beat] bar))
+                                    (renderStaveBeat params.beat bar)
                                 ]
                       ,div  []
                             ((if isGhostable then 
@@ -584,15 +584,13 @@ displayInstruments bars =
                                                         [td [Html.Attributes.class "instrumentTableCell"] [Html.text a.instrName]
                                                               ])
 
-renderStaveBars : Model -> List (Html Msg)
-renderStaveBars model = 
-  (Dict.toList model.bars) 
-    |> List.map (\bar -> 
-                   div []
-                        [svg
-                            [ viewBox "0 0 200 20"
-                            , Svg.Attributes.class "stave"
-                            ]
-                            (stave ++ percussionClef ++ (staveTimeSignature (Tuple.second bar)) ++ singleBarLine ++ (renderStaveBar (List.range 1 4) (Tuple.second bar))
-                            )
-                        ])
+renderStave : Model -> Html Msg
+renderStave model = 
+      div []
+          [svg
+              [ viewBox "0 0 200 20"
+              , Svg.Attributes.class "stave"
+              ]
+              (renderStaveBars model.bars)
+              
+          ]

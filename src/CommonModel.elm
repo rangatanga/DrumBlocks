@@ -15,6 +15,9 @@ type Msg
   | BeatOptionsDialogOpen BeatOptionsParams
   | BeatOptionsDialogSave
   | BeatOptionsDialogCancel
+  | BarOptionsDialogOpen BarOptionsParams
+  | BarOptionsDialogSave
+  | BarOptionsDialogCancel
   | GhostCheckBoxChanged CheckboxIdChecked
   | AccentCheckBoxChanged CheckboxIdChecked
   | KeyPressedMsg KeyEventMsg
@@ -23,8 +26,7 @@ type Msg
   | PatternLoad
   | UploadSelected File
   | FileLoaded String
-  | BarAdd
-  | BarOptionsDialogOpen
+  | BarAdd Int
 
 type KeyEventMsg
     = KeyEventControl
@@ -44,6 +46,10 @@ type alias BeatOptionsParams =
   {barNo : Int
   , beat : Int
   , beatOptions : BeatOptions
+  }
+
+type alias BarOptionsParams = 
+  {barNo : Int
   }
 
 type alias SelectIdValue = 
@@ -80,7 +86,7 @@ type alias NoteDurationParam =
 type alias Model =
   { bars : BarDict
   , beatOptionsParams : Maybe BeatOptionsParams
-  , barOptionsParams : Maybe BeatOptionsParams
+  , barOptionsParams : Maybe BarOptionsParams
   , debugText : String
   }
 

@@ -10,9 +10,14 @@ header {
   color: white;
 }
 
-.flex-container {
+.flex-container-row {
   display: flex;
   flex-direction: row;
+}
+
+.flex-container-column {
+  display: flex;
+  flex-direction: column;
 }
 
 #main {
@@ -29,9 +34,43 @@ header {
   flex-basis: 100px;
 }
 
+#instruments {
+  order: 1;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 160px;
+
+}
+
+#bars {
+  order: 2;
+  flex-grow: 0;
+  flex-shrink: 0;
+  max-width: 1370px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.group-title {
+  min-height: 30;
+  font-size: 20;
+  font-weight: bold;
+}
+
+
+.sub-group-title1 {
+  min-height: 36;
+  font-size: 18;
+}
+
 .patternButton {
   padding: 5px;
   margin-top: 10px;
+}
+
+.bar-table {
+  border: 1px solid #e3000b;
 }
 
 #bar-text {
@@ -55,7 +94,9 @@ header {
   text-align: center;
 }
 
-.instrumentTableHeaderRow {
+
+#add-instrument-select {
+  width: 150px;
 }
 
 .instrumentTableHeaderCell {
@@ -63,9 +104,6 @@ header {
     font-size: 20;
 }
 
-.instrumentTableRow {
-
-}
 
 .instrumentTableCell {
     font-size: 18;

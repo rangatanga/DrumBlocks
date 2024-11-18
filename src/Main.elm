@@ -46,9 +46,10 @@ main =
 
 
 
-beatOptionsDialog : String -> List (Html msg) -> Html msg
-beatOptionsDialog dialogId content =
+optionsDialog : String -> List (Html msg) -> Html msg
+optionsDialog dialogId content =
     Html.node "dialog" [ HA.id dialogId ] content
+
 
 port toggleDialog : String -> Cmd msg
 
@@ -138,6 +139,7 @@ update msg model =
         PatternLoad -> ({model | debugText = ""}, Select.file ["application/json"] UploadSelected)
         UploadSelected file -> (model, Task.perform FileLoaded (File.toString file))
         FileLoaded param -> (updateModelFromFile model param, Cmd.none)
+        BarAdd barNo -> (addBar model barNo, Cmd.none)
         _ -> ({model | debugText = ""}, Cmd.none)
 
 updateModelFromFile : Model -> String -> Model
@@ -160,6 +162,26 @@ updateModelFromFile model param =
   {model | bars = barDict
            , debugText = Debug.toString ""}
 
+
+
+addBar : Model -> Int -> Model
+addBar model barNo = 
+  let
+    shiftedBars = (Dict.keys model.bars)   |> List.filter (\i -> i > barNo)
+                                           |> List.reverse
+                                           |> List.foldl (\key dic -> case Dict.get key model.bars of
+                                                                        Just bar -> Dict.insert (key + 1) bar dic
+                                                                        _ -> dic) model.bars
+    newBar = case Dict.get barNo model.bars of
+                Just bar -> bar
+                _ -> Bar (Dict.fromList [("Hi-Hat", (Dict.fromList [(1, aBlock), (2, aBlock), (3, aBlock), (4, aBlock)]))
+                                                 , ("Snare", (Dict.fromList [(1, pBlock), (2, aBlock), (3, pBlock), (4, aBlock)]))
+                                                 , ("Bass Drum", (Dict.fromList [(1, aBlock), (2, pBlock), (3, aBlock), (4, pBlock)]))
+                                                 ])
+                                  Dict.empty
+                                  "4/4"
+  in
+  {model | bars = (Dict.insert (barNo + 1) newBar shiftedBars)}
 
 buildBeatBlockDict : List BeatBlockJson -> BeatBlockDict
 buildBeatBlockDict beatBlocks = 
@@ -302,7 +324,7 @@ view model =
   { title = "Drum Blocks"
   , body =
       [header [][]
-       , section [HA.class "flex-container"]
+       , section [HA.class "flex-container-row"]
            [div [HA.id "sidebar_left"
                 , HA.style "order" "1"]
                 [button [ onClick PatternSave
@@ -315,40 +337,44 @@ view model =
                          [ Html.text "Load Pattern" ]
                 ]
             ,div [HA.id "main"]
-                ([Html.table
-                    [] 
-                    (Html.tr  [HA.class "instrumentTableHeaderRow"] 
-                              [th [HA.class "instrumentTableHeaderCell"] 
-                                  [Html.text "Instrument"]
-                              ,td [HA.rowspan ((List.length (getIncludedInstrumentNames model.bars))+1)]
-                                  [displayBars model.bars]
-                              ]
-                    :: (displayInstruments model.bars)
-                    ++ [Html.tr 
-                              [HA.class "instrumentTableRow"] 
-                              [td [HA.class "instrumentTableCell"] 
-                                  [Html.select  [onInputSelectChange AddInstrumentSelectedChange
-                                                , HA.alt "Add New Instrument"
-                                                , HA.title "Add New Instrument"
-                                                , HA.class "addInstrumentTableCell"
-                                                ]
-                                                (Html.option [selected True ] [Html.text "Add Instrument"]
-                                                :: (getAvailableInstruments model))
-                                  ]
-                              ]
-                        ])
-                 ,(renderStave model)]
-                  ++[ Html.text model.debugText
-                      ,beatOptionsDialog "beat-options-dialog"
-                            (buildBeatOptionsDialog model
-                            ++  [Html.div [HA.class "subBeatOptionsDialogButtons"] 
-                                          [button [ onClick BeatOptionsDialogSave, HA.class "subBeatOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
-                                          , button [ onClick BeatOptionsDialogCancel, HA.class "subBeatOptionsDialogButton" ] [ Html.text "Cancel" ]
-                                          ]
-                                ]
-                            )
+                 [(div [HA.class "flex-container-row"]
+                       [div
+                          [HA.id "instruments"]
+                          [div
+                              [] 
+                              (div [HA.class "group-title"] [Html.text "Instrument"]
+                              :: (displayInstruments model.bars)
+                              ++ [Html.select  [onInputSelectChange AddInstrumentSelectedChange
+                                                          , HA.alt "Add New Instrument"
+                                                          , HA.title "Add New Instrument"
+                                                          , HA.id "add-instrument-select"
+                                                          ]
+                                                          (Html.option [selected True ] [Html.text "Add Instrument"]
+                                                          :: (getAvailableInstruments model))]
+                              )
+                          ]
+                       ,div [HA.id "bars"] [displayBars model.bars]
+                      ]
+                  )
+                 ,renderStave model
+                 ,Html.text model.debugText
+                 ,optionsDialog "beat-options-dialog"
+                        (buildBeatOptionsDialog model
+                        ++  [Html.div [HA.class "subBeatOptionsDialogButtons"] 
+                                      [button [ onClick BeatOptionsDialogSave, HA.class "subBeatOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
+                                      , button [ onClick BeatOptionsDialogCancel, HA.class "subBeatOptionsDialogButton" ] [ Html.text "Cancel" ]
+                                      ]
+                            ]
+                        )
+                  ,optionsDialog "bar-options-dialog"
+                        (buildBarOptionsDialog model
+                        ++  [Html.div [HA.class "subBeatOptionsDialogButtons"] 
+                                      [button [ onClick BarOptionsDialogSave, HA.class "subBeatOptionsDialogButton", HA.id "bb" ] [ Html.text "Save" ]
+                                      , button [ onClick BarOptionsDialogCancel, HA.class "subBeatOptionsDialogButton" ] [ Html.text "Cancel" ]
+                                      ]
+                            ]
+                        )
                   ]
-                )
            ]
       ]
   }
@@ -366,18 +392,18 @@ getIncludedInstrumentNames bars =
 
 displayBars : BarDict -> Html Msg
 displayBars bars = 
-  div [HA.id "bars", HA.class "flex-container"]
+  div [HA.id "bars-flex", HA.class "flex-container-row"]
       ((Dict.toList bars)
-          |> List.map (\bar -> table  []
+          |> List.map (\bar -> table  [HA.class "bar-table"]
                                       ((tr []
                                           [th [HA.class "instrumentTableHeaderCell"
                                               , colspan 4] 
-                                              [div [HA.class "flex-container", HA.id "bar-header"] 
+                                              [div [HA.class "flex-container-row", HA.id "bar-header"] 
                                                   [div[HA.id "bar-text"][Html.text ("Bar " ++ (String.fromInt (Tuple.first bar)))]
                                                   ,div [HA.id "bar-buttons"] 
                                                         [button [ onClick BeatOptionsDialogCancel, HA.class "barButton" ] 
                                                                 [ Html.img [HA.src "assets/images/settings.svg", HA.class "barButtonImg"] []]
-                                                        , button [ onClick BarAdd, HA.class "barButton" ] 
+                                                        , button [ onClick (BarAdd (Tuple.first bar)), HA.class "barButton" ] 
                                                                 [ Html.img [HA.src "assets/images/add.svg", HA.class "barButtonImg"] []]
                                                         ]
                                                   ]
@@ -498,6 +524,11 @@ buildBeatOptionsDialog model =
       _ -> []              
 
 
+buildBarOptionsDialog : Model -> List (Html Msg)
+buildBarOptionsDialog model =
+  []
+
+
 displayAccentCheckboxes : Bar -> BeatOptionsParams -> List (Html Msg)
 displayAccentCheckboxes bar params =
   let
@@ -580,15 +611,19 @@ displayInstruments bars =
                                                                   in
                                                                   {instrName = instrName, sortOrder = sortOrder})
                                   |> List.sortBy .sortOrder
-                                  |> List.map (\a -> tr [Html.Attributes.class "instrumentTableRow"]
-                                                        [td [Html.Attributes.class "instrumentTableCell"] [Html.text a.instrName]
-                                                              ])
+                                  |> List.map (\a -> div [HA.class "sub-group-title1"] [div [] 
+                                                                                            [Html.text a.instrName
+                                                                                            ,button [ onClick BeatOptionsDialogCancel, HA.class "barButton" ] 
+                                                                                                    [ Html.img [HA.src "assets/images/remove.svg"
+                                                                                                                , HA.class "barButtonImg"] []] ]
+                                                                                        ]
+                                              )
 
 renderStave : Model -> Html Msg
 renderStave model = 
       div []
           [svg
-              [ viewBox "0 0 200 20"
+              [ viewBox "0 0 200 120"
               , Svg.Attributes.class "stave"
               ]
               (renderStaveBars model.bars)

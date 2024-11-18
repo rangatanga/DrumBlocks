@@ -367,10 +367,10 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat =
                                 ]
                               else  --single semiquaver, no beam
                                 [Svg.image [xlinkHref "assets/images/semiquaver.svg"
-                                            , Svg.Attributes.width "6"
-                                            , Svg.Attributes.height "6"
-                                            , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.4))
-                                            , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 0.6))] []]
+                                            , Svg.Attributes.width "5"
+                                            , Svg.Attributes.height "7"
+                                            , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.25))
+                                            , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 0.5))] []]
                             else --short semi quaver bar goes to the right
                                 [Svg.path 
                                   [ strokeWidth "0.6"
@@ -404,10 +404,11 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat =
                                 && noteSubBeat.subBeat == noteSubBeat.prevSubBeat 
                                 && noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --single quaver, no beam
                                 [Svg.image [xlinkHref "assets/images/quaver.svg"
-                                            , Svg.Attributes.width "6"
-                                            , Svg.Attributes.height "6"
-                                            , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.4))
-                                            , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 0.6))] []]
+                                            , Svg.Attributes.width "5"
+                                            , Svg.Attributes.height "7"
+                                            , Svg.Attributes.x (String.fromFloat (noteCenterX - 0.25))
+                                            , Svg.Attributes.y (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 0.5))
+                                            ] []]
                             else []
                       else []
     ghostNote = if noteSubBeat.isGhostNote then
@@ -499,22 +500,25 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat =
           case noteSubBeat.noteDuration of
               Crotchet ->
                       [Svg.image [xlinkHref "assets/images/crotchet-rest.svg"
-                                  , Svg.Attributes.width "7"
-                                  , Svg.Attributes.height "7"
+                                  , Svg.Attributes.width "4%"
+                                  , Svg.Attributes.height "4%"
                                   , Svg.Attributes.x (String.fromFloat (noteCenterX - 4))
-                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
+                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 3))
+                                  ] [] ]
               Quaver ->
                       [Svg.image [xlinkHref "assets/images/quaver-rest.svg"
-                                  , Svg.Attributes.width "6"
-                                  , Svg.Attributes.height "6"
+                                  , Svg.Attributes.width "3%"
+                                  , Svg.Attributes.height "3%"
                                   , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
-                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
+                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 2.5))
+                                  ] [] ]
               SemiQuaver ->
-                      [Svg.image [xlinkHref "assets/images/semiquaver-rest.svg"
-                                  , Svg.Attributes.width "6"
-                                  , Svg.Attributes.height "6"
+                      [Svg.image [xlinkHref "assets/images/16th_rest.svg"
+                                  , Svg.Attributes.width "1.8%"
+                                  , Svg.Attributes.height "4.0%"
                                   , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
-                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))] [] ]
+                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 2.4))
+                                  ] [] ]
               _ -> []
           )                                    
       ++ stalk

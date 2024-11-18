@@ -140,6 +140,7 @@ update msg model =
         UploadSelected file -> (model, Task.perform FileLoaded (File.toString file))
         FileLoaded param -> (updateModelFromFile model param, Cmd.none)
         BarAdd barNo -> (addBar model barNo, Cmd.none)
+        InstrumentDelete instrName -> (deleteInstrument model instrName, Cmd.none)
         _ -> ({model | debugText = ""}, Cmd.none)
 
 updateModelFromFile : Model -> String -> Model
@@ -182,6 +183,20 @@ addBar model barNo =
                                   "4/4"
   in
   {model | bars = (Dict.insert (barNo + 1) newBar shiftedBars)}
+
+deleteInstrument : Model -> String -> Model
+deleteInstrument model instrName =
+  let
+    newBars = (Dict.toList model.bars) |> List.foldl (\x a -> let
+                                                                oldBar = (Tuple.second x)
+                                                                newBar = Bar (Dict.remove instrName oldBar.arrangement)
+                                                                             oldBar.beatOptions
+                                                                             oldBar.timeSignature
+                                                              in
+                                                              Dict.insert (Tuple.first x) newBar a) Dict.empty 
+  in
+  {model | bars = newBars}
+
 
 buildBeatBlockDict : List BeatBlockJson -> BeatBlockDict
 buildBeatBlockDict beatBlocks = 
@@ -402,9 +417,15 @@ displayBars bars =
                                                   [div[HA.id "bar-text"][Html.text ("Bar " ++ (String.fromInt (Tuple.first bar)))]
                                                   ,div [HA.id "bar-buttons"] 
                                                         [button [ onClick BeatOptionsDialogCancel, HA.class "barButton" ] 
-                                                                [ Html.img [HA.src "assets/images/settings.svg", HA.class "barButtonImg"] []]
+                                                                [ Html.img [HA.src "assets/images/settings.svg"
+                                                                            , HA.class "barButtonImg"
+                                                                            , HA.alt "Bar Settings"
+                                                                            , HA.title "Bar Settings"] []]
                                                         , button [ onClick (BarAdd (Tuple.first bar)), HA.class "barButton" ] 
-                                                                [ Html.img [HA.src "assets/images/add.svg", HA.class "barButtonImg"] []]
+                                                                [ Html.img [HA.src "assets/images/add.svg"
+                                                                            , HA.class "barButtonImg"
+                                                                            , HA.alt "Add Bar (after this one)"
+                                                                            , HA.title "Add Bar (after this one)"] []]
                                                         ]
                                                   ]
                                               ]
@@ -604,28 +625,39 @@ subdivisionOption subdiv =
 
 displayInstruments : BarDict -> List (Html Msg)
 displayInstruments bars = 
-  (getIncludedInstrumentNames bars) |> List.map (\instrName  ->   let
-                                                                    sortOrder = case Dict.get instrName instrumentDict of
-                                                                          Just instr -> instr.sortOrder
-                                                                          _ -> 100
-                                                                  in
-                                                                  {instrName = instrName, sortOrder = sortOrder})
-                                  |> List.sortBy .sortOrder
-                                  |> List.map (\a -> div [HA.class "sub-group-title1"] [div [] 
-                                                                                            [Html.text a.instrName
-                                                                                            ,button [ onClick BeatOptionsDialogCancel, HA.class "barButton" ] 
-                                                                                                    [ Html.img [HA.src "assets/images/remove.svg"
-                                                                                                                , HA.class "barButtonImg"] []] ]
-                                                                                        ]
-                                              )
+  let
+    instrs = getIncludedInstrumentNames bars
+  in
+  (instrs)  |> List.map (\instrName  ->   let
+                                              sortOrder = case Dict.get instrName instrumentDict of
+                                                    Just instr -> instr.sortOrder
+                                                    _ -> 100
+                                            in
+                                            {instrName = instrName, sortOrder = sortOrder})
+            |> List.sortBy .sortOrder
+            |> List.map (\a -> div [HA.class "sub-group-title1"] [div [HA.class "flex-container-row"] 
+                                                                      ((div [HA.style "flex-grow" "1"] [Html.text a.instrName])
+                                                                      :: if List.length instrs > 1 then
+                                                                           [button [ onClick (InstrumentDelete a.instrName)
+                                                                                     , HA.class "barButton" ] 
+                                                                                   [ Html.img [HA.src "assets/images/remove.svg"
+                                                                                              , HA.class "barButtonImg"
+                                                                                              , HA.alt "Delete Instrument"
+                                                                                              , HA.title "Delete Instrument"] []]]
+                                                                          else [] 
+                                                                      )
+                                                                  ]
+                        )
 
 renderStave : Model -> Html Msg
 renderStave model = 
-      div []
-          [svg
-              [ viewBox "0 0 200 120"
-              , Svg.Attributes.class "stave"
-              ]
-              (renderStaveBars model.bars)
-              
+      div [HA.id "stave-view"]
+          [div [HA.width 600
+               , HA.height (100 + (100 * ((Dict.size model.bars) - 1)))]
+               [svg
+                  [ Svg.Attributes.id "stave"
+                  , Svg.Attributes.viewBox "0 0 200 100"
+                  ]
+                  (renderStaveBars model.bars)
+               ]              
           ]

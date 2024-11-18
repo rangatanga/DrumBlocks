@@ -27,6 +27,7 @@ type Msg
   | UploadSelected File
   | FileLoaded String
   | BarAdd Int
+  | InstrumentDelete String
 
 type KeyEventMsg
     = KeyEventControl

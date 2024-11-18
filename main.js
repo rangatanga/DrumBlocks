@@ -6541,6 +6541,388 @@ var $author$project$Main$applyBlockSelectedChange = F2(
 				$elm$core$Platform$Cmd$none);
 		}
 	});
+var $elm$core$Dict$getMin = function (dict) {
+	getMin:
+	while (true) {
+		if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+			var left = dict.d;
+			var $temp$dict = left;
+			dict = $temp$dict;
+			continue getMin;
+		} else {
+			return dict;
+		}
+	}
+};
+var $elm$core$Dict$moveRedLeft = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.e.d.$ === 'RBNode_elm_builtin') && (dict.e.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var lLeft = _v1.d;
+			var lRight = _v1.e;
+			var _v2 = dict.e;
+			var rClr = _v2.a;
+			var rK = _v2.b;
+			var rV = _v2.c;
+			var rLeft = _v2.d;
+			var _v3 = rLeft.a;
+			var rlK = rLeft.b;
+			var rlV = rLeft.c;
+			var rlL = rLeft.d;
+			var rlR = rLeft.e;
+			var rRight = _v2.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				rlK,
+				rlV,
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					rlL),
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rlR, rRight));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v4 = dict.d;
+			var lClr = _v4.a;
+			var lK = _v4.b;
+			var lV = _v4.c;
+			var lLeft = _v4.d;
+			var lRight = _v4.e;
+			var _v5 = dict.e;
+			var rClr = _v5.a;
+			var rK = _v5.b;
+			var rV = _v5.c;
+			var rLeft = _v5.d;
+			var rRight = _v5.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$moveRedRight = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.d.d.$ === 'RBNode_elm_builtin') && (dict.d.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var _v2 = _v1.d;
+			var _v3 = _v2.a;
+			var llK = _v2.b;
+			var llV = _v2.c;
+			var llLeft = _v2.d;
+			var llRight = _v2.e;
+			var lRight = _v1.e;
+			var _v4 = dict.e;
+			var rClr = _v4.a;
+			var rK = _v4.b;
+			var rV = _v4.c;
+			var rLeft = _v4.d;
+			var rRight = _v4.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				lK,
+				lV,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					lRight,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight)));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v5 = dict.d;
+			var lClr = _v5.a;
+			var lK = _v5.b;
+			var lV = _v5.c;
+			var lLeft = _v5.d;
+			var lRight = _v5.e;
+			var _v6 = dict.e;
+			var rClr = _v6.a;
+			var rK = _v6.b;
+			var rV = _v6.c;
+			var rLeft = _v6.d;
+			var rRight = _v6.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$removeHelpPrepEQGT = F7(
+	function (targetKey, dict, color, key, value, left, right) {
+		if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+			var _v1 = left.a;
+			var lK = left.b;
+			var lV = left.c;
+			var lLeft = left.d;
+			var lRight = left.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				lK,
+				lV,
+				lLeft,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, lRight, right));
+		} else {
+			_v2$2:
+			while (true) {
+				if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Black')) {
+					if (right.d.$ === 'RBNode_elm_builtin') {
+						if (right.d.a.$ === 'Black') {
+							var _v3 = right.a;
+							var _v4 = right.d;
+							var _v5 = _v4.a;
+							return $elm$core$Dict$moveRedRight(dict);
+						} else {
+							break _v2$2;
+						}
+					} else {
+						var _v6 = right.a;
+						var _v7 = right.d;
+						return $elm$core$Dict$moveRedRight(dict);
+					}
+				} else {
+					break _v2$2;
+				}
+			}
+			return dict;
+		}
+	});
+var $elm$core$Dict$removeMin = function (dict) {
+	if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+		var color = dict.a;
+		var key = dict.b;
+		var value = dict.c;
+		var left = dict.d;
+		var lColor = left.a;
+		var lLeft = left.d;
+		var right = dict.e;
+		if (lColor.$ === 'Black') {
+			if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+				var _v3 = lLeft.a;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					key,
+					value,
+					$elm$core$Dict$removeMin(left),
+					right);
+			} else {
+				var _v4 = $elm$core$Dict$moveRedLeft(dict);
+				if (_v4.$ === 'RBNode_elm_builtin') {
+					var nColor = _v4.a;
+					var nKey = _v4.b;
+					var nValue = _v4.c;
+					var nLeft = _v4.d;
+					var nRight = _v4.e;
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						$elm$core$Dict$removeMin(nLeft),
+						nRight);
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			}
+		} else {
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				key,
+				value,
+				$elm$core$Dict$removeMin(left),
+				right);
+		}
+	} else {
+		return $elm$core$Dict$RBEmpty_elm_builtin;
+	}
+};
+var $elm$core$Dict$removeHelp = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_cmp(targetKey, key) < 0) {
+				if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Black')) {
+					var _v4 = left.a;
+					var lLeft = left.d;
+					if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+						var _v6 = lLeft.a;
+						return A5(
+							$elm$core$Dict$RBNode_elm_builtin,
+							color,
+							key,
+							value,
+							A2($elm$core$Dict$removeHelp, targetKey, left),
+							right);
+					} else {
+						var _v7 = $elm$core$Dict$moveRedLeft(dict);
+						if (_v7.$ === 'RBNode_elm_builtin') {
+							var nColor = _v7.a;
+							var nKey = _v7.b;
+							var nValue = _v7.c;
+							var nLeft = _v7.d;
+							var nRight = _v7.e;
+							return A5(
+								$elm$core$Dict$balance,
+								nColor,
+								nKey,
+								nValue,
+								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
+								nRight);
+						} else {
+							return $elm$core$Dict$RBEmpty_elm_builtin;
+						}
+					}
+				} else {
+					return A5(
+						$elm$core$Dict$RBNode_elm_builtin,
+						color,
+						key,
+						value,
+						A2($elm$core$Dict$removeHelp, targetKey, left),
+						right);
+				}
+			} else {
+				return A2(
+					$elm$core$Dict$removeHelpEQGT,
+					targetKey,
+					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
+			}
+		}
+	});
+var $elm$core$Dict$removeHelpEQGT = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBNode_elm_builtin') {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_eq(targetKey, key)) {
+				var _v1 = $elm$core$Dict$getMin(right);
+				if (_v1.$ === 'RBNode_elm_builtin') {
+					var minKey = _v1.b;
+					var minValue = _v1.c;
+					return A5(
+						$elm$core$Dict$balance,
+						color,
+						minKey,
+						minValue,
+						left,
+						$elm$core$Dict$removeMin(right));
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			} else {
+				return A5(
+					$elm$core$Dict$balance,
+					color,
+					key,
+					value,
+					left,
+					A2($elm$core$Dict$removeHelp, targetKey, right));
+			}
+		} else {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		}
+	});
+var $elm$core$Dict$remove = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $author$project$Main$deleteInstrument = F2(
+	function (model, instrName) {
+		var newBars = A3(
+			$elm$core$List$foldl,
+			F2(
+				function (x, a) {
+					var oldBar = x.b;
+					var newBar = A3(
+						$author$project$CommonModel$Bar,
+						A2($elm$core$Dict$remove, instrName, oldBar.arrangement),
+						oldBar.beatOptions,
+						oldBar.timeSignature);
+					return A3($elm$core$Dict$insert, x.a, newBar, a);
+				}),
+			$elm$core$Dict$empty,
+			$elm$core$Dict$toList(model.bars));
+		return _Utils_update(
+			model,
+			{bars: newBars});
+	});
 var $elm$time$Time$Posix = function (a) {
 	return {$: 'Posix', a: a};
 };
@@ -7132,6 +7514,11 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$addBar, model, barNo),
 					$elm$core$Platform$Cmd$none);
+			case 'InstrumentDelete':
+				var instrName = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$deleteInstrument, model, instrName),
+					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7712,12 +8099,12 @@ var $author$project$Stave$renderNote = F5(
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver.svg'),
-						$elm$svg$Svg$Attributes$width('6'),
-						$elm$svg$Svg$Attributes$height('6'),
+						$elm$svg$Svg$Attributes$width('5'),
+						$elm$svg$Svg$Attributes$height('7'),
 						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromFloat(noteCenterX - 0.4)),
+						$elm$core$String$fromFloat(noteCenterX - 0.25)),
 						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 0.6))
+						$elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 0.5))
 					]),
 				_List_Nil)
 			])) : _List_fromArray(
@@ -7763,12 +8150,12 @@ var $author$project$Stave$renderNote = F5(
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver.svg'),
-						$elm$svg$Svg$Attributes$width('6'),
-						$elm$svg$Svg$Attributes$height('6'),
+						$elm$svg$Svg$Attributes$width('5'),
+						$elm$svg$Svg$Attributes$height('7'),
 						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromFloat(noteCenterX - 0.4)),
+						$elm$core$String$fromFloat(noteCenterX - 0.25)),
 						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 0.6))
+						$elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 0.5))
 					]),
 				_List_Nil)
 			]) : _List_Nil)) : _List_Nil;
@@ -7994,12 +8381,12 @@ var $author$project$Stave$renderNote = F5(
 										_List_fromArray(
 											[
 												$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
-												$elm$svg$Svg$Attributes$width('7'),
-												$elm$svg$Svg$Attributes$height('7'),
+												$elm$svg$Svg$Attributes$width('4%'),
+												$elm$svg$Svg$Attributes$height('4%'),
 												$elm$svg$Svg$Attributes$x(
 												$elm$core$String$fromFloat(noteCenterX - 4)),
 												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 4))
+												$elm$core$String$fromFloat(noteCenterY - 3))
 											]),
 										_List_Nil)
 									]);
@@ -8011,12 +8398,12 @@ var $author$project$Stave$renderNote = F5(
 										_List_fromArray(
 											[
 												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
-												$elm$svg$Svg$Attributes$width('6'),
-												$elm$svg$Svg$Attributes$height('6'),
+												$elm$svg$Svg$Attributes$width('3%'),
+												$elm$svg$Svg$Attributes$height('3%'),
 												$elm$svg$Svg$Attributes$x(
 												$elm$core$String$fromFloat(noteCenterX - 3)),
 												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 4))
+												$elm$core$String$fromFloat(noteCenterY - 2.5))
 											]),
 										_List_Nil)
 									]);
@@ -8027,13 +8414,13 @@ var $author$project$Stave$renderNote = F5(
 										$elm$svg$Svg$image,
 										_List_fromArray(
 											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver-rest.svg'),
-												$elm$svg$Svg$Attributes$width('6'),
-												$elm$svg$Svg$Attributes$height('6'),
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/16th_rest.svg'),
+												$elm$svg$Svg$Attributes$width('1.8%'),
+												$elm$svg$Svg$Attributes$height('4.0%'),
 												$elm$svg$Svg$Attributes$x(
 												$elm$core$String$fromFloat(noteCenterX - 3)),
 												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 4))
+												$elm$core$String$fromFloat(noteCenterY - 2.4))
 											]),
 										_List_Nil)
 									]);
@@ -8639,7 +9026,9 @@ var $author$project$Main$displayBars = function (bars) {
 																	_List_fromArray(
 																		[
 																			$elm$html$Html$Attributes$src('assets/images/settings.svg'),
-																			$elm$html$Html$Attributes$class('barButtonImg')
+																			$elm$html$Html$Attributes$class('barButtonImg'),
+																			$elm$html$Html$Attributes$alt('Bar Settings'),
+																			$elm$html$Html$Attributes$title('Bar Settings')
 																		]),
 																	_List_Nil)
 																])),
@@ -8658,7 +9047,9 @@ var $author$project$Main$displayBars = function (bars) {
 																	_List_fromArray(
 																		[
 																			$elm$html$Html$Attributes$src('assets/images/add.svg'),
-																			$elm$html$Html$Attributes$class('barButtonImg')
+																			$elm$html$Html$Attributes$class('barButtonImg'),
+																			$elm$html$Html$Attributes$alt('Add Bar (after this one)'),
+																			$elm$html$Html$Attributes$title('Add Bar (after this one)')
 																		]),
 																	_List_Nil)
 																]))
@@ -8720,6 +9111,9 @@ var $author$project$Main$displayBars = function (bars) {
 			},
 			$elm$core$Dict$toList(bars)));
 };
+var $author$project$CommonModel$InstrumentDelete = function (a) {
+	return {$: 'InstrumentDelete', a: a};
+};
 var $author$project$Main$getIncludedInstrumentNames = function (bars) {
 	var _v0 = A2($elm$core$Dict$get, 1, bars);
 	if (_v0.$ === 'Just') {
@@ -8729,7 +9123,10 @@ var $author$project$Main$getIncludedInstrumentNames = function (bars) {
 		return _List_Nil;
 	}
 };
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Main$displayInstruments = function (bars) {
+	var instrs = $author$project$Main$getIncludedInstrumentNames(bars);
 	return A2(
 		$elm$core$List$map,
 		function (a) {
@@ -8743,29 +9140,46 @@ var $author$project$Main$displayInstruments = function (bars) {
 					[
 						A2(
 						$elm$html$Html$div,
-						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text(a.instrName),
-								A2(
-								$elm$html$Html$button,
+								$elm$html$Html$Attributes$class('flex-container-row')
+							]),
+						A2(
+							$elm$core$List$cons,
+							A2(
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Events$onClick($author$project$CommonModel$BeatOptionsDialogCancel),
-										$elm$html$Html$Attributes$class('barButton')
+										A2($elm$html$Html$Attributes$style, 'flex-grow', '1')
 									]),
 								_List_fromArray(
 									[
-										A2(
-										$elm$html$Html$img,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$src('assets/images/remove.svg'),
-												$elm$html$Html$Attributes$class('barButtonImg')
-											]),
-										_List_Nil)
-									]))
-							]))
+										$elm$html$Html$text(a.instrName)
+									])),
+							($elm$core$List$length(instrs) > 1) ? _List_fromArray(
+								[
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick(
+											$author$project$CommonModel$InstrumentDelete(a.instrName)),
+											$elm$html$Html$Attributes$class('barButton')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$img,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$src('assets/images/remove.svg'),
+													$elm$html$Html$Attributes$class('barButtonImg'),
+													$elm$html$Html$Attributes$alt('Delete Instrument'),
+													$elm$html$Html$Attributes$title('Delete Instrument')
+												]),
+											_List_Nil)
+										]))
+								]) : _List_Nil))
 					]));
 		},
 		A2(
@@ -8787,7 +9201,7 @@ var $author$project$Main$displayInstruments = function (bars) {
 					}();
 					return {instrName: instrName, sortOrder: sortOrder};
 				},
-				$author$project$Main$getIncludedInstrumentNames(bars))));
+				instrs)));
 };
 var $author$project$Main$getAvailableInstruments = function (model) {
 	return A2(
@@ -8828,6 +9242,13 @@ var $author$project$Main$optionsDialog = F2(
 				]),
 			content);
 	});
+var $elm$html$Html$Attributes$height = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'height',
+		$elm$core$String$fromInt(n));
+};
+var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $author$project$Stave$percussionClef = function (staveOffset) {
 	return _List_fromArray(
 		[
@@ -8924,26 +9345,64 @@ var $author$project$Stave$renderStaveBars = function (bars) {
 		},
 		$elm$core$Dict$toList(bars));
 };
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$html$Html$Attributes$width = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'width',
+		$elm$core$String$fromInt(n));
+};
 var $author$project$Main$renderStave = function (model) {
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$id('stave-view')
+			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$svg$Svg$svg,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$viewBox('0 0 200 120'),
-						$elm$svg$Svg$Attributes$class('stave')
+						$elm$html$Html$Attributes$width(600),
+						$elm$html$Html$Attributes$height(
+						100 + (100 * ($elm$core$Dict$size(model.bars) - 1)))
 					]),
-				$author$project$Stave$renderStaveBars(model.bars))
+				_List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$svg,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$id('stave'),
+								$elm$svg$Svg$Attributes$viewBox('0 0 200 100')
+							]),
+						$author$project$Stave$renderStaveBars(model.bars))
+					]))
 			]));
 };
 var $elm$html$Html$section = _VirtualDom_node('section');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(

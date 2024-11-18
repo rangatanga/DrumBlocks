@@ -46,21 +46,33 @@ header {
   order: 2;
   flex-grow: 0;
   flex-shrink: 0;
-  max-width: 1370px;
+  max-width: 1200px;
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
 }
 
+#stave-view {
+  width: 1440px;
+  height: 600px;
+  max-height: 600px;
+  overflow-y: auto;
+  white-space: nowrap;
+  position: relative;
+}
+
+#stave {
+}
+
 .group-title {
-  min-height: 30;
+  min-height: 36;
   font-size: 20;
   font-weight: bold;
 }
 
 
 .sub-group-title1 {
-  min-height: 36;
+  min-height: 35;
   font-size: 18;
 }
 
@@ -124,10 +136,7 @@ header {
 
 }
 
-.stave {
-    width: 90%;
-    height: 80%;
-}
+
 
 @font-face {
     font-family: 'icomoon';

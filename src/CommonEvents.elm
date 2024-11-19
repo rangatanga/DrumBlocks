@@ -18,6 +18,9 @@ onCheckboxChanged : (CheckboxIdChecked -> msg) -> Html.Attribute msg
 onCheckboxChanged tagger =
   on "change" (Json.map tagger checkboxDecoder)
 
+onScroll : (ScrollParams -> msg) -> Html.Attribute msg
+onScroll tagger =
+  on "scroll" (Json.map tagger scrollDecoder)
 
 selectDecoder : Json.Decoder SelectIdValue
 selectDecoder =
@@ -26,6 +29,10 @@ selectDecoder =
 checkboxDecoder : Json.Decoder CheckboxIdChecked
 checkboxDecoder =
   Json.map2 CheckboxIdChecked targetIdDecoder targetCheckedDecoder
+
+scrollDecoder : Json.Decoder ScrollParams
+scrollDecoder = 
+  Json.map ScrollParams targetIdDecoder
 
 targetIdDecoder : Json.Decoder String
 targetIdDecoder =

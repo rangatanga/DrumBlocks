@@ -64,6 +64,11 @@ header {
 #stave {
 }
 
+.stave-bar-number {
+  font: italic 2px serif;
+  font-weight: lighter;
+}
+
 .group-title {
   min-height: 36;
   font-size: 20;
@@ -85,18 +90,25 @@ header {
   border: 1px solid #e3000b;
 }
 
-#bar-text {
+#bar-delete {
   order: 1;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 40px;
+}
+
+#bar-text {
+  order: 2;
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: 100%;
 }
 
 #bar-buttons {
-  order: 2;
+  order: 3;
   flex-grow: 1;
   flex-shrink: 1;
-  flex-basis: 80px;
+  flex-basis: 90px;
 }
 
 .barButtonImg {
@@ -166,9 +178,9 @@ header {
 }
 
 
-.instrumentBlockOptsImg {
+.bar-settings {
   width: 10;
-  height: 31;
+  height: 15;
 }
 .subBeatOptionsDialogButtons {
   width: 100%;

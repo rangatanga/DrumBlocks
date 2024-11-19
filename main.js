@@ -6903,6 +6903,56 @@ var $elm$core$Dict$remove = F2(
 			return x;
 		}
 	});
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
+var $author$project$Main$deleteBar = F2(
+	function (model, barNo) {
+		var shiftedBars = A3(
+			$elm$core$List$foldl,
+			F2(
+				function (key, dic) {
+					var _v0 = A2($elm$core$Dict$get, key, model.bars);
+					if (_v0.$ === 'Just') {
+						var bar = _v0.a;
+						return A3($elm$core$Dict$insert, key - 1, bar, dic);
+					} else {
+						return dic;
+					}
+				}),
+			model.bars,
+			A2(
+				$elm$core$List$filter,
+				function (i) {
+					return _Utils_cmp(i, barNo) > 0;
+				},
+				$elm$core$Dict$keys(model.bars)));
+		return _Utils_update(
+			model,
+			{
+				bars: A2(
+					$elm$core$Dict$remove,
+					$elm$core$Dict$size(shiftedBars),
+					shiftedBars)
+			});
+	});
 var $author$project$Main$deleteInstrument = F2(
 	function (model, instrName) {
 		var newBars = A3(
@@ -7106,6 +7156,63 @@ var $author$project$Main$getPatternJson = function (model) {
 						bars))
 				])));
 };
+var $author$project$CommonModel$NoOp = {$: 'NoOp'};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2(
+					$elm$core$Task$onError,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Err),
+					A2(
+						$elm$core$Task$andThen,
+						A2(
+							$elm$core$Basics$composeL,
+							A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+							$elm$core$Result$Ok),
+						task))));
+	});
+var $elm$browser$Browser$Dom$getViewportOf = _Browser_getViewportOf;
+var $elm$browser$Browser$Dom$setViewportOf = _Browser_setViewportOf;
+var $author$project$Main$scrollTask = function (parentId) {
+	return A2(
+		$elm$core$Task$andThen,
+		function (parentVp) {
+			var childId = (parentId === 'bars') ? 'stave-view' : 'bars';
+			return A2(
+				$elm$core$Task$andThen,
+				function (childVp) {
+					var newY = (parentId === 'bars') ? ((parentVp.viewport.x / parentVp.scene.width) * childVp.scene.height) : childVp.viewport.y;
+					var newX = (parentId === 'bars') ? childVp.viewport.x : ((parentVp.viewport.y / parentVp.scene.height) * childVp.scene.width);
+					return A2(
+						$elm$core$Task$onError,
+						function (_v0) {
+							return $elm$core$Task$succeed(_Utils_Tuple0);
+						},
+						A3($elm$browser$Browser$Dom$setViewportOf, childId, newX, newY));
+				},
+				$elm$browser$Browser$Dom$getViewportOf(childId));
+		},
+		$elm$browser$Browser$Dom$getViewportOf(parentId));
+};
+var $author$project$Main$scrollBars = F2(
+	function (parentId, barCount) {
+		return (barCount < 7) ? $elm$core$Platform$Cmd$none : A2(
+			$elm$core$Task$attempt,
+			function (_v0) {
+				return $author$project$CommonModel$NoOp;
+			},
+			$author$project$Main$scrollTask(parentId));
+	});
 var $elm$file$File$Download$string = F3(
 	function (name, mime, content) {
 		return A2(
@@ -7378,10 +7485,7 @@ var $author$project$Main$updateModelFromFile = F2(
 		}();
 		return _Utils_update(
 			model,
-			{
-				bars: barDict,
-				debugText: $elm$core$Debug$toString('')
-			});
+			{bars: barDict});
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -7514,11 +7618,24 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$addBar, model, barNo),
 					$elm$core$Platform$Cmd$none);
+			case 'BarDelete':
+				var barNo = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$deleteBar, model, barNo),
+					$elm$core$Platform$Cmd$none);
 			case 'InstrumentDelete':
 				var instrName = msg.a;
 				return _Utils_Tuple2(
 					A2($author$project$Main$deleteInstrument, model, instrName),
 					$elm$core$Platform$Cmd$none);
+			case 'BarsScroll':
+				var params = msg.a;
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$author$project$Main$scrollBars,
+						params.id,
+						$elm$core$Dict$size(model.bars)));
 			default:
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7532,6 +7649,9 @@ var $author$project$CommonModel$AddInstrumentSelectedChange = function (a) {
 };
 var $author$project$CommonModel$BarOptionsDialogCancel = {$: 'BarOptionsDialogCancel'};
 var $author$project$CommonModel$BarOptionsDialogSave = {$: 'BarOptionsDialogSave'};
+var $author$project$CommonModel$BarsScroll = function (a) {
+	return {$: 'BarsScroll', a: a};
+};
 var $author$project$CommonModel$BeatOptionsDialogCancel = {$: 'BeatOptionsDialogCancel'};
 var $author$project$CommonModel$BeatOptionsDialogSave = {$: 'BeatOptionsDialogSave'};
 var $author$project$CommonModel$PatternLoad = {$: 'PatternLoad'};
@@ -8078,8 +8198,8 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Stave$renderNote = F5(
 	function (barOffset, staveOffset, beat, beatsCount, noteSubBeat) {
-		var noteCenterX = ((barOffset * 92) + 17.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 1.8);
-		var nextNoteCenterX = ((barOffset * 92) + 17.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 1.8);
+		var noteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 1.8);
+		var nextNoteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 1.8);
 		var semiQuaverBeam = (noteSubBeat.subdivision === '4-16') ? ((_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$SemiQuaver) && (!noteSubBeat.isRest)) ? (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat) ? ((noteSubBeat.subBeat === 10) ? ((!_Utils_eq(noteSubBeat.prevSubBeat, noteSubBeat.subBeat)) ? _List_fromArray(
 			[
 				A2(
@@ -8262,7 +8382,7 @@ var $author$project$Stave$renderNote = F5(
 						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 3.0) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 2.0))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 2.7) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7))))))))
 					]),
 				_List_Nil),
 				A2(
@@ -8272,7 +8392,7 @@ var $author$project$Stave$renderNote = F5(
 						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 2.0) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 1.0))))))))
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 0.7))))))))
 					]),
 				_List_Nil)
 			]) : _List_Nil;
@@ -8643,27 +8763,49 @@ var $author$project$Stave$renderStaveBar = F4(
 	});
 var $author$project$Stave$staveLines = _List_fromArray(
 	[8, 10, 12, 14, 16]);
-var $author$project$Stave$stave = function (staveOffset) {
-	return A2(
-		$elm$core$List$map,
-		function (n) {
-			return A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M 0 ' + ($elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L 195 ' + $elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)))))
-					]),
-				_List_Nil);
-		},
-		$author$project$Stave$staveLines);
-};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $author$project$Stave$stave = F2(
+	function (staveOffset, barNo) {
+		return _Utils_ap(
+			A2(
+				$elm$core$List$map,
+				function (n) {
+					return A2(
+						$elm$svg$Svg$path,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+								$elm$svg$Svg$Attributes$stroke('black'),
+								$elm$svg$Svg$Attributes$d(
+								'M 5 ' + ($elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L 200 ' + $elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)))))
+							]),
+						_List_Nil);
+				},
+				$author$project$Stave$staveLines),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$text_,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('2.5'),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromFloat(15.5 + ($author$project$Stave$staveShiftY * staveOffset))),
+							$elm$svg$Svg$Attributes$class('stave-bar-number')
+						]),
+					_List_fromArray(
+						[
+							$elm$svg$Svg$text(
+							$elm$core$String$fromInt(barNo))
+						]))
+				]));
+	});
 var $author$project$Stave$renderStaveBeat = F2(
 	function (beat, bar) {
 		return _Utils_ap(
-			$author$project$Stave$stave(1),
+			A2($author$project$Stave$stave, 1, 1),
 			A4(
 				$author$project$Stave$renderStaveBar,
 				0,
@@ -8673,7 +8815,6 @@ var $author$project$Stave$renderStaveBeat = F2(
 				bar));
 	});
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$buildBeatOptionsDialog = function (model) {
 	var _v0 = model.beatOptionsParams;
@@ -8782,6 +8923,9 @@ var $author$project$Main$buildBeatOptionsDialog = function (model) {
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $author$project$CommonModel$BarAdd = function (a) {
 	return {$: 'BarAdd', a: a};
+};
+var $author$project$CommonModel$BarDelete = function (a) {
+	return {$: 'BarDelete', a: a};
 };
 var $author$project$CommonModel$BeatOptionsDialogOpen = function (a) {
 	return {$: 'BeatOptionsDialogOpen', a: a};
@@ -8994,6 +9138,28 @@ var $author$project$Main$displayBars = function (bars) {
 											_List_fromArray(
 												[
 													A2(
+													$elm$html$Html$button,
+													_List_fromArray(
+														[
+															$elm$html$Html$Events$onClick(
+															$author$project$CommonModel$BarDelete(bar.a)),
+															$elm$html$Html$Attributes$class('barButton'),
+															$elm$html$Html$Attributes$id('bar-delete')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$img,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$src('assets/images/remove.svg'),
+																	$elm$html$Html$Attributes$class('barButtonImg'),
+																	$elm$html$Html$Attributes$alt('Delete Bar'),
+																	$elm$html$Html$Attributes$title('Delete Bar')
+																]),
+															_List_Nil)
+														])),
+													A2(
 													$elm$html$Html$div,
 													_List_fromArray(
 														[
@@ -9100,8 +9266,8 @@ var $author$project$Main$displayBars = function (bars) {
 														$elm$html$Html$img,
 														_List_fromArray(
 															[
-																$elm$html$Html$Attributes$src('assets/images/options-horizontal.svg'),
-																$elm$html$Html$Attributes$class('instrumentBlockOptsImg')
+																$elm$html$Html$Attributes$src('assets/images/settings.svg'),
+																$elm$html$Html$Attributes$class('bar-settings')
 															]),
 														_List_Nil)
 													]))
@@ -9226,6 +9392,16 @@ var $author$project$Main$getAvailableInstruments = function (model) {
 			$elm$core$Dict$keys($author$project$Common$instrumentDict)));
 };
 var $elm$html$Html$header = _VirtualDom_node('header');
+var $author$project$CommonModel$ScrollParams = function (id) {
+	return {id: id};
+};
+var $author$project$CommonEvents$scrollDecoder = A2($elm$json$Json$Decode$map, $author$project$CommonModel$ScrollParams, $author$project$CommonEvents$targetIdDecoder);
+var $author$project$CommonEvents$onScroll = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'scroll',
+		A2($elm$json$Json$Decode$map, tagger, $author$project$CommonEvents$scrollDecoder));
+};
 var $elm$virtual_dom$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));
@@ -9259,7 +9435,7 @@ var $author$project$Stave$percussionClef = function (staveOffset) {
 					$elm$svg$Svg$Attributes$strokeWidth('1.5'),
 					$elm$svg$Svg$Attributes$stroke('black'),
 					$elm$svg$Svg$Attributes$d(
-					'M 3 ' + ($elm$core$String$fromFloat(12.8 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L 3 ' + $elm$core$String$fromFloat(17.2 + ($author$project$Stave$staveShiftY * staveOffset)))))
+					'M 8 ' + ($elm$core$String$fromFloat(12.8 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L 8 ' + $elm$core$String$fromFloat(17.2 + ($author$project$Stave$staveShiftY * staveOffset)))))
 				]),
 			_List_Nil),
 			A2(
@@ -9269,7 +9445,7 @@ var $author$project$Stave$percussionClef = function (staveOffset) {
 					$elm$svg$Svg$Attributes$strokeWidth('1.5'),
 					$elm$svg$Svg$Attributes$stroke('black'),
 					$elm$svg$Svg$Attributes$d(
-					'M 5 ' + ($elm$core$String$fromFloat(12.8 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L 5 ' + $elm$core$String$fromFloat(17.2 + ($author$project$Stave$staveShiftY * staveOffset)))))
+					'M 10 ' + ($elm$core$String$fromFloat(12.8 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L 10 ' + $elm$core$String$fromFloat(17.2 + ($author$project$Stave$staveShiftY * staveOffset)))))
 				]),
 			_List_Nil)
 		]);
@@ -9284,7 +9460,7 @@ var $author$project$Stave$singleBarLines = function (staveOffset) {
 					$elm$svg$Svg$Attributes$strokeWidth('0.2'),
 					$elm$svg$Svg$Attributes$stroke('black'),
 					$elm$svg$Svg$Attributes$d(
-					'M ' + ($elm$core$String$fromInt(103) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(103) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+					'M ' + ($elm$core$String$fromInt(108) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(108) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
 				]),
 			_List_Nil),
 			A2(
@@ -9294,7 +9470,7 @@ var $author$project$Stave$singleBarLines = function (staveOffset) {
 					$elm$svg$Svg$Attributes$strokeWidth('0.2'),
 					$elm$svg$Svg$Attributes$stroke('black'),
 					$elm$svg$Svg$Attributes$d(
-					'M ' + ($elm$core$String$fromInt(195) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(195) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+					'M ' + ($elm$core$String$fromInt(200) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(200) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
 				]),
 			_List_Nil)
 		]);
@@ -9311,7 +9487,7 @@ var $author$project$Stave$staveTimeSignature = function (bar) {
 						$elm$svg$Svg$Attributes$xlinkHref('assets/images/Timesignature4-4.svg'),
 						$elm$svg$Svg$Attributes$width('9'),
 						$elm$svg$Svg$Attributes$height('11.5'),
-						$elm$svg$Svg$Attributes$x('4.5'),
+						$elm$svg$Svg$Attributes$x('9.5'),
 						$elm$svg$Svg$Attributes$y('9.6')
 					]),
 				_List_Nil)
@@ -9330,7 +9506,7 @@ var $author$project$Stave$renderStaveBars = function (bars) {
 			var bar = b.b;
 			return _Utils_ap(
 				(!barOffset) ? _Utils_ap(
-					$author$project$Stave$stave(staveOffset),
+					A2($author$project$Stave$stave, staveOffset, barNo),
 					_Utils_ap(
 						$author$project$Stave$percussionClef(staveOffset),
 						$author$project$Stave$singleBarLines(staveOffset))) : _List_Nil,
@@ -9344,26 +9520,6 @@ var $author$project$Stave$renderStaveBars = function (bars) {
 						bar)));
 		},
 		$elm$core$Dict$toList(bars));
-};
-var $elm$core$Dict$sizeHelp = F2(
-	function (n, dict) {
-		sizeHelp:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return n;
-			} else {
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
-					$temp$dict = left;
-				n = $temp$n;
-				dict = $temp$dict;
-				continue sizeHelp;
-			}
-		}
-	});
-var $elm$core$Dict$size = function (dict) {
-	return A2($elm$core$Dict$sizeHelp, 0, dict);
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$html$Html$Attributes$width = function (n) {
@@ -9387,7 +9543,7 @@ var $author$project$Main$renderStave = function (model) {
 					[
 						$elm$html$Html$Attributes$width(600),
 						$elm$html$Html$Attributes$height(
-						100 + (100 * ($elm$core$Dict$size(model.bars) - 1)))
+						20 + (15 * ($elm$core$Dict$size(model.bars) - 1)))
 					]),
 				_List_fromArray(
 					[
@@ -9396,7 +9552,9 @@ var $author$project$Main$renderStave = function (model) {
 						_List_fromArray(
 							[
 								$elm$svg$Svg$Attributes$id('stave'),
-								$elm$svg$Svg$Attributes$viewBox('0 0 200 100')
+								$elm$svg$Svg$Attributes$viewBox(
+								'0 0 200 ' + $elm$core$String$fromInt(
+									20 + (15 * ($elm$core$Dict$size(model.bars) - 1))))
 							]),
 						$author$project$Stave$renderStaveBars(model.bars))
 					]))
@@ -9519,7 +9677,8 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$id('bars')
+												$elm$html$Html$Attributes$id('bars'),
+												$author$project$CommonEvents$onScroll($author$project$CommonModel$BarsScroll)
 											]),
 										_List_fromArray(
 											[

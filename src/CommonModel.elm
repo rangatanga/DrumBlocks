@@ -27,7 +27,11 @@ type Msg
   | UploadSelected File
   | FileLoaded String
   | BarAdd Int
+  | BarDelete Int
   | InstrumentDelete String
+  | BarsScroll ScrollParams
+  | NoOp
+  --| Focus (Result Browser.DomError ())
 
 type KeyEventMsg
     = KeyEventControl
@@ -64,7 +68,11 @@ type alias CheckboxIdChecked =
     id : String
     ,checked : Bool
   }
-   
+
+type alias ScrollParams =
+  {  
+    id : String
+  }  
 
 type NoteDuration =
   Crotchet
@@ -130,14 +138,11 @@ type alias Instrument =
   , sortOrder : Int
   }
 
-
 type alias InstrumentBlocksDict = Dict String BeatBlockDict
 
 type alias BeatBlockDict = Dict Int Block
 
 type alias BeatOptionsDict = Dict Int BeatOptions
-
-
 
 type alias BarJson = 
   {barNo : Int

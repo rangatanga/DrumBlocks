@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Browser
+import Browser.Dom as Dom
 import Browser.Navigation as Nav
 import Browser.Events exposing (onKeyDown)
 import Html exposing (..)
@@ -25,6 +26,7 @@ import CommonEvents exposing (..)
 import Common exposing (..)
 import Stave exposing (..)
 import File.Download as Download
+import Browser.Dom as Dom
 
 -- MAIN
 
@@ -140,8 +142,45 @@ update msg model =
         UploadSelected file -> (model, Task.perform FileLoaded (File.toString file))
         FileLoaded param -> (updateModelFromFile model param, Cmd.none)
         BarAdd barNo -> (addBar model barNo, Cmd.none)
+        BarDelete barNo -> (deleteBar model barNo, Cmd.none)
         InstrumentDelete instrName -> (deleteInstrument model instrName, Cmd.none)
+        BarsScroll params -> (model, scrollBars params.id (Dict.size model.bars))
         _ -> ({model | debugText = ""}, Cmd.none)
+
+scrollBars : String -> Int -> Cmd Msg
+scrollBars parentId barCount =
+  if barCount < 7 then --not enough bars to need linked scrolling
+    Cmd.none
+  else
+    Task.attempt (\_ -> NoOp) (scrollTask parentId)
+
+
+scrollTask : String -> Task.Task Dom.Error ()
+scrollTask parentId =
+  Dom.getViewportOf parentId
+        |> Task.andThen
+            (\parentVp ->
+                let
+                    childId = if parentId == "bars" then "stave-view" else "bars"
+                in
+                Dom.getViewportOf childId
+                  |> Task.andThen
+                      (\childVp ->
+                        let
+                          newX = if parentId == "bars" then --child is stave and the x value does not change
+                                    childVp.viewport.x
+                                 else                       --child is bars and the x value changes
+                                    (parentVp.viewport.y / parentVp.scene.height) * childVp.scene.width
+                          newY = if parentId == "bars" then --child is stave and the y value changes
+                                    (parentVp.viewport.x / parentVp.scene.width) * childVp.scene.height
+                                 else 
+                                    childVp.viewport.y
+
+                        in
+                        Dom.setViewportOf childId newX newY
+                          |> Task.onError (\_ -> Task.succeed ())
+                      )
+            )
 
 updateModelFromFile : Model -> String -> Model
 updateModelFromFile model param = 
@@ -160,8 +199,7 @@ updateModelFromFile model param =
 
 
   in
-  {model | bars = barDict
-           , debugText = Debug.toString ""}
+  {model | bars = barDict}
 
 
 
@@ -183,6 +221,16 @@ addBar model barNo =
                                   "4/4"
   in
   {model | bars = (Dict.insert (barNo + 1) newBar shiftedBars)}
+
+deleteBar : Model -> Int -> Model
+deleteBar model barNo = 
+  let
+    shiftedBars = (Dict.keys model.bars)   |> List.filter (\i -> i > barNo)
+                                           |> List.foldl (\key dic -> case Dict.get key model.bars of
+                                                                        Just bar -> Dict.insert (key - 1) bar dic
+                                                                        _ -> dic) model.bars
+  in
+  {model | bars = Dict.remove (Dict.size shiftedBars) shiftedBars}
 
 deleteInstrument : Model -> String -> Model
 deleteInstrument model instrName =
@@ -368,7 +416,9 @@ view model =
                                                           :: (getAvailableInstruments model))]
                               )
                           ]
-                       ,div [HA.id "bars"] [displayBars model.bars]
+                       ,div [HA.id "bars"
+                            , onScroll BarsScroll] 
+                            [displayBars model.bars]
                       ]
                   )
                  ,renderStave model
@@ -414,8 +464,15 @@ displayBars bars =
                                           [th [HA.class "instrumentTableHeaderCell"
                                               , colspan 4] 
                                               [div [HA.class "flex-container-row", HA.id "bar-header"] 
-                                                  [div[HA.id "bar-text"][Html.text ("Bar " ++ (String.fromInt (Tuple.first bar)))]
-                                                  ,div [HA.id "bar-buttons"] 
+                                                   [button [ onClick (BarDelete (Tuple.first bar))
+                                                            , HA.class "barButton"
+                                                            , HA.id "bar-delete" ] 
+                                                           [ Html.img [HA.src "assets/images/remove.svg"
+                                                                      , HA.class "barButtonImg"
+                                                                      , HA.alt "Delete Bar"
+                                                                      , HA.title "Delete Bar"] []]
+                                                   ,div [HA.id "bar-text"][Html.text ("Bar " ++ (String.fromInt (Tuple.first bar)))]
+                                                   ,div [HA.id "bar-buttons"] 
                                                         [button [ onClick BeatOptionsDialogCancel, HA.class "barButton" ] 
                                                                 [ Html.img [HA.src "assets/images/settings.svg"
                                                                             , HA.class "barButtonImg"
@@ -427,7 +484,7 @@ displayBars bars =
                                                                             , HA.alt "Add Bar (after this one)"
                                                                             , HA.title "Add Bar (after this one)"] []]
                                                         ]
-                                                  ]
+                                                   ]
                                               ]
                                           ] 
                                        ) :: (instrumentView (Tuple.first bar) (Tuple.second bar))
@@ -441,8 +498,8 @@ displayBars bars =
                                                                                                                                     (case Dict.get beat (Tuple.second bar).beatOptions of
                                                                                                                                             Just beatOpts -> beatOpts
                                                                                                                                             _ -> BeatOptions Binary.empty Binary.empty)))
-                                                                                ] [Html.img [HA.src "assets/images/options-horizontal.svg"
-                                                                                              , HA.class "instrumentBlockOptsImg"] []]
+                                                                                ] [Html.img [HA.src "assets/images/settings.svg"
+                                                                                              , HA.class "bar-settings"] []]
                                                                     ]))                                     )
                       )
       )
@@ -653,10 +710,10 @@ renderStave : Model -> Html Msg
 renderStave model = 
       div [HA.id "stave-view"]
           [div [HA.width 600
-               , HA.height (100 + (100 * ((Dict.size model.bars) - 1)))]
+               , HA.height (20 + (15 * ((Dict.size model.bars) - 1)))]
                [svg
                   [ Svg.Attributes.id "stave"
-                  , Svg.Attributes.viewBox "0 0 200 100"
+                  , Svg.Attributes.viewBox ("0 0 200 " ++ String.fromInt (20 + (15 * ((Dict.size model.bars) - 1))))
                   ]
                   (renderStaveBars model.bars)
                ]              

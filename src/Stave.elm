@@ -39,19 +39,24 @@ staveShiftY : Float
 staveShiftY = 22
 
 
-stave : Float -> List (Svg Msg)
-stave staveOffset =
-    (staveLines)
+stave : Float -> Int -> List (Svg Msg)
+stave staveOffset barNo =
+  ((staveLines)
         |> List.map
             (\n ->
                 Svg.path
                     [ strokeWidth "0.3"
                     , stroke "black"
-                    , d ("M 0 " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset))
-                         ++ " L 195 " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset)))
+                    , d ("M 5 " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset))
+                         ++ " L 200 " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset)))
                     ]
                     []
             )
+  ) ++ [Svg.text_ [Svg.Attributes.x "2.5"
+                  ,Svg.Attributes.y (String.fromFloat (15.5 + (staveShiftY * staveOffset)))
+                  ,Svg.Attributes.class "stave-bar-number"
+                  ] 
+                  [Svg.text (String.fromInt barNo)]]
 
 staveTimeSignature : Bar -> List (Svg Msg)
 staveTimeSignature bar = 
@@ -59,7 +64,7 @@ staveTimeSignature bar =
       "4/4" ->  [Svg.image [xlinkHref "assets/images/Timesignature4-4.svg"
                         , Svg.Attributes.width "9"
                         , Svg.Attributes.height "11.5"
-                        , Svg.Attributes.x "4.5"
+                        , Svg.Attributes.x "9.5"
                         , Svg.Attributes.y "9.6"] [] ]
       _ -> []
   
@@ -68,13 +73,13 @@ percussionClef staveOffset =
   [Svg.path
       [ strokeWidth "1.5"
       , stroke "black"
-      , d ("M 3 " ++ String.fromFloat (12.8 + (staveShiftY * staveOffset)) ++ " L 3 " ++ String.fromFloat (17.2 + (staveShiftY * staveOffset)))
+      , d ("M 8 " ++ String.fromFloat (12.8 + (staveShiftY * staveOffset)) ++ " L 8 " ++ String.fromFloat (17.2 + (staveShiftY * staveOffset)))
       ]
       []
   ,Svg.path
       [ strokeWidth "1.5"
       , stroke "black"
-      , d ("M 5 " ++ String.fromFloat (12.8 + (staveShiftY * staveOffset)) ++ " L 5 " ++ String.fromFloat (17.2 + (staveShiftY * staveOffset)))
+      , d ("M 10 " ++ String.fromFloat (12.8 + (staveShiftY * staveOffset)) ++ " L 10 " ++ String.fromFloat (17.2 + (staveShiftY * staveOffset)))
       ]
       []
   ]
@@ -84,16 +89,16 @@ singleBarLines staveOffset =
   [Svg.path
       [ strokeWidth "0.2"
       , stroke "black"
-      , d ("M " ++ String.fromInt 103 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
-           ++ " L " ++ String.fromInt 103 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
+      , d ("M " ++ String.fromInt 108 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
+           ++ " L " ++ String.fromInt 108 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
           )
       ]
       [] 
   ,Svg.path
       [ strokeWidth "0.2"
       , stroke "black"
-      , d ("M " ++ String.fromInt 195 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
-           ++ " L " ++ String.fromInt 195 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
+      , d ("M " ++ String.fromInt 200 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
+           ++ " L " ++ String.fromInt 200 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
           )
       ]
       []   ]
@@ -111,7 +116,7 @@ Iterate through all 12 spaces and all items in the arrangement, and draw a note 
 -}
 renderStaveBeat : Int -> Bar -> List(Svg Msg)
 renderStaveBeat beat bar = 
-  (stave 1) ++ (renderStaveBar 0 0 [beat] bar)
+  (stave 1 1) ++ (renderStaveBar 0 0 [beat] bar)
 
 renderStaveBars : BarDict -> List(Svg Msg)
 renderStaveBars bars = 
@@ -122,7 +127,7 @@ renderStaveBars bars =
                                                   staveOffset = toFloat ((barNo-1) // 2)
                                                 in
                                                 (if barOffset == 0 then
-                                                  stave staveOffset
+                                                  stave staveOffset barNo
                                                   ++ percussionClef staveOffset
                                                   ++ (singleBarLines staveOffset)
                                                  else [])
@@ -308,8 +313,8 @@ renderNote : Int -> Float -> Int -> Int -> NoteSubBeat -> List (Svg Msg)
 renderNote barOffset staveOffset beat beatsCount noteSubBeat = 
   let
     instrument = Dict.get noteSubBeat.instrumentName instrumentDict
-    noteCenterX = (toFloat (barOffset * 92)) + 17.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1))) * 1.8)
-    nextNoteCenterX = (toFloat (barOffset * 92)) + 17.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1))) * 1.8)
+    noteCenterX = (toFloat (barOffset * 92)) + 22.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1))) * 1.8)
+    nextNoteCenterX = (toFloat (barOffset * 92)) + 22.0 + ((toFloat (((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1))) * 1.8)
     crossNoteOffset = 1.0
     noteCenterY = case instrument of
                     Just instr -> instr.stavePosition + (staveShiftY * staveOffset)
@@ -436,15 +441,15 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat =
                     [Svg.path 
                       [ strokeWidth "0.3"
                       , stroke "black"
-                      , d ("M " ++ (String.fromFloat (noteCenterX - 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 3.0)) 
-                                ++ " L "++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 2.0)) 
+                      , d ("M " ++ (String.fromFloat (noteCenterX - 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 2.7)) 
+                                ++ " L "++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 1.7)) 
                                 )]
                       []
                     ,Svg.path 
                       [ strokeWidth "0.3"
                       , stroke "black"
-                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 2.0)) 
-                                ++ " L "++ (String.fromFloat (noteCenterX - 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 1.0)) 
+                      , d ("M " ++ (String.fromFloat (noteCenterX + 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 1.7)) 
+                                ++ " L "++ (String.fromFloat (noteCenterX - 1.05)) ++ " " ++ (String.fromFloat (noteSubBeat.stalkHeight + (staveShiftY * staveOffset) - 0.7)) 
                                 )]
                       []
                     ]

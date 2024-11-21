@@ -24,15 +24,16 @@ D4  0       (hi-hat foot)
 
 instrumentDict : Dict String Instrument
 instrumentDict = Dict.fromList 
-    [("Hi-Hat", Instrument "G5" 10.0 Cross False True 10)
-    , ("Ride Cymbal", Instrument "F5" 11 CrossLedger False True 20)
-    , ("High Tom", Instrument "E5" 12.0 Ovoid False True 30)
-    , ("Mid Tom", Instrument "D5" 13 Ovoid False True 40)
-    , ("Snare", Instrument "C5" 14.0 Ovoid True True 50)
-    , ("Floor Tom", Instrument "A4" 16.0 Ovoid False True 60)
-    , ("Bass Drum", Instrument "F4" 18.0 Ovoid False False 70)      
-    , ("Hi-hat Foot", Instrument "D4" 20 Cross False False 80)
-    , ("Rest", Instrument "" 15.5 Rest False False 0)
+    [("Crash Cymbal", Instrument "A5" 9.0 CrossLedger False True False 0 Up)
+    , ("Hi-Hat", Instrument "G5" 10.0 Cross False True False 10 Up)
+    , ("Ride Cymbal", Instrument "F5" 11 CrossLedger False True False 20 Up)
+    , ("High Tom", Instrument "E5" 12.0 Ovoid False True False 30 Up)
+    , ("Mid Tom", Instrument "D5" 13 Ovoid False True False 40 Up)
+    , ("Snare", Instrument "C5" 14.0 Ovoid True True True 50 Up)
+    , ("Floor Tom", Instrument "A4" 16.0 Ovoid False True False 60 DownOrUp)
+    , ("Bass Drum", Instrument "F4" 18.0 Ovoid False False False 70 DownOrUp)      
+    , ("Hi-hat Foot", Instrument "D4" 20 Cross False False False 80 DownOrUp)
+    , ("Rest", Instrument "" 15.5 Rest False False False 0 NoStalk)
     ]
 
 subdivisions : List Subdivision

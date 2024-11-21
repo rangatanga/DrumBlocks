@@ -1,0 +1,1564 @@
+{
+ "bars": [
+  {
+   "barNo": 1,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "B"
+      },
+      {
+       "beat": 3,
+       "blockName": "C"
+      },
+      {
+       "beat": 4,
+       "blockName": "D"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 2,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "A"
+      },
+      {
+       "beat": 2,
+       "blockName": "B"
+      },
+      {
+       "beat": 3,
+       "blockName": "C"
+      },
+      {
+       "beat": 4,
+       "blockName": "D"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 3,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "A"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "D"
+      },
+      {
+       "beat": 2,
+       "blockName": "B"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "C"
+      },
+      {
+       "beat": 4,
+       "blockName": "D"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "A"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "C"
+      },
+      {
+       "beat": 3,
+       "blockName": "C"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 4,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "G"
+      },
+      {
+       "beat": 4,
+       "blockName": "D"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "F"
+      },
+      {
+       "beat": 3,
+       "blockName": "C"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "H"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "A"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "E"
+      },
+      {
+       "beat": 2,
+       "blockName": "B"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 5,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "I"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "A"
+      },
+      {
+       "beat": 2,
+       "blockName": "J"
+      },
+      {
+       "beat": 3,
+       "blockName": "A"
+      },
+      {
+       "beat": 4,
+       "blockName": "A"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "N"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "L"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "O"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "M"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "K"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 6,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "H"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "A"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "J"
+      },
+      {
+       "beat": 4,
+       "blockName": "M"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "G"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "B"
+      },
+      {
+       "beat": 2,
+       "blockName": "A"
+      },
+      {
+       "beat": 3,
+       "blockName": "K"
+      },
+      {
+       "beat": 4,
+       "blockName": "N"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "I"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "D"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "E"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "C"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "L"
+      },
+      {
+       "beat": 4,
+       "blockName": "O"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "F"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 7,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "X"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "Q"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "W"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "R"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "T"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "U"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "S"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "V"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 8,
+   "arrangement": [
+    {
+     "instrument": "Bass Drum",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Crash Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Floor Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-Hat",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "Q"
+      },
+      {
+       "beat": 2,
+       "blockName": "R"
+      },
+      {
+       "beat": 3,
+       "blockName": "S"
+      },
+      {
+       "beat": 4,
+       "blockName": "T"
+      }
+     ]
+    },
+    {
+     "instrument": "Hi-hat Foot",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "High Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Mid Tom",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Ride Cymbal",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    },
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "P"
+      },
+      {
+       "beat": 2,
+       "blockName": "P"
+      },
+      {
+       "beat": 3,
+       "blockName": "P"
+      },
+      {
+       "beat": 4,
+       "blockName": "P"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  }
+ ]
+}

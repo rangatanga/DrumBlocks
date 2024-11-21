@@ -69,6 +69,12 @@ header {
   font-weight: lighter;
 }
 
+.stave-bar-test {
+  font: italic 1px serif;
+  font-weight: lighter;
+}
+
+
 .group-title {
   min-height: 36;
   font-size: 20;

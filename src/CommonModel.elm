@@ -129,13 +129,21 @@ type NoteShape =
   | Ovoid
   | Rest
 
+type StalkDirection =
+  Up
+  | Down
+  | DownOrUp
+  | NoStalk
+
 type alias Instrument = 
   { staveLocation : String
   , stavePosition : Float 
   , noteShape : NoteShape
   , isGhostable : Bool
   , isAccentable : Bool
+  , isFlammable : Bool
   , sortOrder : Int
+  , stalkDirection : StalkDirection
   }
 
 type alias InstrumentBlocksDict = Dict String BeatBlockDict

@@ -37,7 +37,7 @@ staveLines =
     [8, 10, 12, 14, 16]
 
 staveShiftY : Float
-staveShiftY = 22
+staveShiftY = 23
 
 
 stave : Float -> Int -> List (Svg Msg)
@@ -220,8 +220,6 @@ getNoteSubBeats subBeat beatBlocks beatOptions =
                                     [NoteSubBeat subBeat instrumentName stalkDirection Crotchet False False subdivision 0 subBeat Crotchet subBeat False isAccented]
                                   else if isGhostNote && instrumentName == "Snare" then
                                     [NoteSubBeat subBeat instrumentName stalkDirection Crotchet False False subdivision 0 subBeat Crotchet subBeat isGhostNote False]
-                                  else if subdivision == "3-8" then
-                                    []--NoteSubBeat subBeat "Rest" instrumentName Quaver False True subdivision 0 subBeat Crotchet subBeat False False]
                                   else
                                     []
                     )
@@ -234,35 +232,31 @@ updateNoteSubBeats : Bool -> List NoteSubBeat -> List NoteSubBeat
 updateNoteSubBeats hasMixedDivisions noteSubBeats = 
   let
     updateStalks = updateStalkHeight noteSubBeats
-    firstSubBeat = case List.head (case List.minimum (List.map (\x -> x.subBeat) updateStalks) of
-                                      Just sb -> List.filter (\y -> y.subBeat == sb) updateStalks
+    firstSubBeatUp = case List.head (case List.minimum ((List.filter (\x -> x.stalkDirection == Up) updateStalks) |> List.map (\z -> z.subBeat)) of
+                                      Just sb -> List.filter (\y -> y.subBeat == sb && y.stalkDirection == Up) updateStalks
                                       _ -> []
                                   ) of
                       Just nsb -> nsb.subBeat
                       _ -> 99
+    firstSubBeatDownOrUp = case List.head (case List.minimum ((List.filter (\x -> x.stalkDirection == DownOrUp) updateStalks) |> List.map (\z -> z.subBeat)) of
+                                      Just sb -> List.filter (\y -> y.subBeat == sb && y.stalkDirection == DownOrUp) updateStalks
+                                      _ -> []
+                                  ) of
+                            Just nsb -> nsb.subBeat
+                            _ -> 99
     noteSubBeatsWithRests = updateStalks
-                            ++ (if firstSubBeat > 1 then
-                                  if hasMixedDivisions == False then
+                            ++ (if hasMixedDivisions == False then
+                                  if firstSubBeatUp > 1 && firstSubBeatDownOrUp > 1 then
                                     [NoteSubBeat 1 "Rest" Up Crotchet False True "4-16" 0 1 Crotchet 1 False False]
-                                  else
-                                    if List.any (\x -> x.subBeat == firstSubBeat
-                                                      && x.subdivision == "4-16"
-                                                      && x.stalkDirection == Up) updateStalks then
-                                      [NoteSubBeat 1 "Rest" Up Crotchet False True "4-16" 0 1 Crotchet 1 False False]
-                                    else if List.any (\x -> x.subBeat == firstSubBeat
-                                                      && x.subdivision == "4-16"
-                                                      && x.stalkDirection == DownOrUp) updateStalks then
-                                      [NoteSubBeat 1 "Rest" DownOrUp Crotchet False True "4-16" 0 1 Crotchet 1 False False]
-                                    else if List.any (\x -> x.subBeat == firstSubBeat
-                                                      && x.subdivision == "3-8"
-                                                      && x.stalkDirection == Up) updateStalks then
-                                      [NoteSubBeat 1 "Rest" Up Crotchet False True "3-8" 0 1 Crotchet 1 False False]
-                                    else if List.any (\x -> x.subBeat == firstSubBeat
-                                                      && x.subdivision == "3-8"
-                                                      && x.stalkDirection == DownOrUp) updateStalks then
-                                      [NoteSubBeat 1 "Rest" DownOrUp Crotchet False True "3-8" 0 1 Crotchet 1 False False]
-                                    else []
-                                else []
+                                  else []
+                                else
+                                  (if firstSubBeatUp > 1 then
+                                    [NoteSubBeat 1 "Rest" Up Crotchet False True "4-16" 0 firstSubBeatUp Crotchet 1 False False]
+                                  else [])
+                                  ++
+                                  (if firstSubBeatDownOrUp > 1 then
+                                    [NoteSubBeat 1 "Rest" DownOrUp Crotchet False True "4-16" 0 firstSubBeatDownOrUp Crotchet 1 False False]
+                                  else [])
                                )
   in
   updateNoteDuration noteSubBeatsWithRests hasMixedDivisions
@@ -353,7 +347,8 @@ updateNoteDuration noteSubBeats hasMixedDivisions =
                                                                     (Tuple.first x).isAccented)
   in
   (updNoteSubBeats) |> List.map (\nsb ->  let
-                                            nextNoteSubBeats = List.filter (\x -> x.subBeat == nsb.nextSubBeat) updNoteSubBeats
+                                            nextNoteSubBeats = List.filter (\x -> x.subBeat == nsb.nextSubBeat
+                                                                                  && (hasMixedDivisions == False || x.stalkDirection == nsb.stalkDirection)) updNoteSubBeats
                                             maxNoteDuration = List.foldl  (\n i -> if i == Crotchet || n.noteDuration == Crotchet then Crotchet
                                                                                    else if i == Quaver || n.noteDuration == Quaver then Quaver
                                                                                    else i
@@ -426,7 +421,7 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
     stalkDirection =  if hasMixedDivisions && noteSubBeat.stalkDirection == DownOrUp then Down 
                       else if noteSubBeat.stalkDirection == DownOrUp then Up
                       else noteSubBeat.stalkDirection
-    stalkY = if stalkDirection == Up then noteSubBeat.stalkHeight else 25
+    stalkY = if stalkDirection == Up then noteSubBeat.stalkHeight else 24
     nextSubBeatIsRest = List.filter (\sb -> sb.subBeat == (noteSubBeat.subBeat + 4)
                                             && sb.subdivision == "3-8"
                                             && (hasMixedDivisions == False || sb.stalkDirection == noteSubBeat.stalkDirection)) allNoteSubBeats
@@ -475,11 +470,32 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                 )
 
     dot = if noteSubBeat.isDotted then
-            [Svg.circle 
-              [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
-               , cy (String.fromFloat noteCenterY)
-               , r "0.4"
-              ] []]
+            if noteSubBeat.isRest then
+              if hasMixedDivisions == False then
+                [Svg.circle 
+                  [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
+                  , cy (String.fromFloat noteCenterY)
+                  , r "0.4"
+                  ] []]
+              else
+                if noteSubBeat.stalkDirection == Up then
+                  [Svg.circle 
+                    [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
+                    , cy (String.fromFloat (noteCenterY - 2))
+                    , r "0.3"
+                    ] []]
+                else
+                  [Svg.circle 
+                    [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
+                    , cy (String.fromFloat (noteCenterY + 3))
+                    , r "0.3"
+                    ] []]
+            else
+              [Svg.circle 
+                [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
+                , cy (String.fromFloat noteCenterY)
+                , r "0.4"
+                ] []]
           else []  
 
     tripletBeam = if noteSubBeat.subBeat == 5 then --middle note of triplet 
@@ -578,11 +594,11 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
 
     
     semiQuaverBeam =  let
-                        xyAdjuster = if stalkDirection == Up then 1 else -1
+                        yAdjuster = if stalkDirection == Up then 1 else -1
                       in
                       if noteSubBeat.subdivision == "4-16" then
                         if noteSubBeat.noteDuration == SemiQuaver 
-                          && Basics.not noteSubBeat.isRest then 
+                          && noteSubBeat.isRest == False then 
                           if noteSubBeat.subBeat == noteSubBeat.nextSubBeat then --last (or only) note in the beat
                             if noteSubBeat.subBeat == 10 then --last subBeat position 
                               if noteSubBeat.prevSubBeat /= noteSubBeat.subBeat then --short semi quaver bar goes to the left
@@ -593,8 +609,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                                 [Svg.path 
                                   [ strokeWidth "0.6"
                                   , stroke "black"
-                                  , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))) 
-                                    ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))))
+                                  , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))) 
+                                    ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))))
                                   ] []
                                 ]
                               else  --single semiquaver, no beam
@@ -618,8 +634,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                                 [Svg.path 
                                   [ strokeWidth "0.6"
                                   , stroke "black"
-                                  , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))) 
-                                      ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))))
+                                  , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))) 
+                                      ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))))
                                   ] []
                                 ]
                           else if noteSubBeat.nextSubBeatNoteDuration == SemiQuaver then --full semi quaver bar goes to next note
@@ -630,8 +646,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                                   [Svg.path 
                                     [ strokeWidth "0.6"
                                     , stroke "black"
-                                    , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))) 
-                                        ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))))
+                                    , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))) 
+                                        ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))))
                                     ] []
                                 ]
                               else --short semi quaver bar goes to the right
@@ -646,8 +662,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                                     [Svg.path 
                                       [ strokeWidth "0.6"
                                       , stroke "black"
-                                      , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))) 
-                                          ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * xyAdjuster))))
+                                      , d ("M " ++ (String.fromFloat beamStartX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))) 
+                                          ++ " L " ++ (String.fromFloat beamEndX) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset) + (1.4 * yAdjuster))))
                                       ] []
                                     ]
                         else if noteSubBeat.noteDuration == Quaver 
@@ -776,12 +792,28 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
       Rest ->
           case noteSubBeat.noteDuration of
               Crotchet ->
-                      [Svg.image [xlinkHref "assets/images/crotchet-rest.svg"
-                                  , Svg.Attributes.width "5"
-                                  , Svg.Attributes.height "7"
-                                  , Svg.Attributes.x (String.fromFloat (noteCenterX - 2))
-                                  , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))
-                                  ] [] ]
+                      if hasMixedDivisions == False then
+                        [Svg.image [xlinkHref "assets/images/crotchet-rest.svg"
+                                    , Svg.Attributes.width "5"
+                                    , Svg.Attributes.height "7"
+                                    , Svg.Attributes.x (String.fromFloat (noteCenterX - 2))
+                                    , Svg.Attributes.y (String.fromFloat (noteCenterY - 4))
+                                    ] [] ]
+                      else
+                        if noteSubBeat.stalkDirection == Up then
+                          [Svg.image [xlinkHref "assets/images/crotchet-rest.svg"
+                                      , Svg.Attributes.width "4"
+                                      , Svg.Attributes.height "6"
+                                      , Svg.Attributes.x (String.fromFloat (noteCenterX - 2))
+                                      , Svg.Attributes.y (String.fromFloat (noteCenterY - 6))
+                                      ] [] ]
+                        else
+                          [Svg.image [xlinkHref "assets/images/crotchet-rest.svg"
+                                      , Svg.Attributes.width "4"
+                                      , Svg.Attributes.height "6"
+                                      , Svg.Attributes.x (String.fromFloat (noteCenterX - 2))
+                                      , Svg.Attributes.y (String.fromFloat (noteCenterY - 1))
+                                      ] [] ]
               Quaver -> 
                       if hasMixedDivisions == False then
                         if noteSubBeat.subdivision == "3-8" then
@@ -825,16 +857,16 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                         if noteSubBeat.stalkDirection == Up then
                           [Svg.image [xlinkHref "assets/images/16th_rest.svg"
                                       , Svg.Attributes.width "3"
-                                      , Svg.Attributes.height "4"
-                                      , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
+                                      , Svg.Attributes.height "3.5"
+                                      , Svg.Attributes.x (String.fromFloat (noteCenterX - 1.5))
                                       , Svg.Attributes.y (String.fromFloat (noteCenterY - 4.5))
                                       ] [] ]
                         else
                           [Svg.image [xlinkHref "assets/images/16th_rest.svg"
                                       , Svg.Attributes.width "3"
-                                      , Svg.Attributes.height "4"
-                                      , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
-                                      , Svg.Attributes.y (String.fromFloat (noteCenterY - 0.5))
+                                      , Svg.Attributes.height "3.5"
+                                      , Svg.Attributes.x (String.fromFloat (noteCenterX - 1.5))
+                                      , Svg.Attributes.y (String.fromFloat (noteCenterY + 1.5))
                                       ] [] ]
               _ -> []
           )                                    

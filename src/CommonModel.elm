@@ -31,6 +31,7 @@ type Msg
   | InstrumentDelete String
   | BarsScroll ScrollParams
   | NoOp
+  | PrintWindowOpen
   --| Focus (Result Browser.DomError ())
 
 type KeyEventMsg
@@ -120,6 +121,7 @@ type alias Block =
   , imageName : String
   , notePlacement : Bits
   , subdivision : String
+  , displayText : String
   }
 
 type NoteShape = 

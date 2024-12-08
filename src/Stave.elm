@@ -40,24 +40,30 @@ staveShiftY : Float
 staveShiftY = 23
 
 
-stave : Float -> Int -> List (Svg Msg)
-stave staveOffset barNo =
+stave : Float -> Int -> Int -> List (Svg Msg)
+stave staveOffset barNo barOffset =
+  let
+    startX = String.fromInt (if barOffset == 0 then 5 else 108)
+    endX = String.fromInt (if barOffset == 0 then 108 else 200)
+  in
   ((staveLines)
         |> List.map
             (\n ->
                 Svg.path
                     [ strokeWidth "0.3"
                     , stroke "black"
-                    , d ("M 5 " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset))
-                         ++ " L 200 " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset)))
+                    , d ("M " ++ startX ++ " " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset))
+                         ++ " L " ++ endX ++ " " ++ String.fromFloat (n + 3.0 + (staveShiftY * staveOffset)))
                     ]
                     []
             )
-  ) ++ [Svg.text_ [Svg.Attributes.x "2.5"
-                  ,Svg.Attributes.y (String.fromFloat (15.5 + (staveShiftY * staveOffset)))
-                  ,Svg.Attributes.class "stave-bar-number"
-                  ] 
-                  [Svg.text (String.fromInt barNo)]]
+  ) ++  if barOffset == 0 then
+          [Svg.text_ [Svg.Attributes.x "2.5"
+                     ,Svg.Attributes.y (String.fromFloat (15.5 + (staveShiftY * staveOffset)))
+                     ,Svg.Attributes.class "stave-bar-number"
+                     ] 
+                     [Svg.text (String.fromInt barNo)]]
+        else []
 
 staveTimeSignature : Bar -> List (Svg Msg)
 staveTimeSignature bar = 
@@ -85,24 +91,26 @@ percussionClef staveOffset =
       []
   ]
 
-singleBarLines : Float -> List(Svg Msg)
-singleBarLines staveOffset =
-  [Svg.path
-      [ strokeWidth "0.2"
-      , stroke "black"
-      , d ("M " ++ String.fromInt 108 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
-           ++ " L " ++ String.fromInt 108 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
-          )
-      ]
-      [] 
-  ,Svg.path
-      [ strokeWidth "0.2"
-      , stroke "black"
-      , d ("M " ++ String.fromInt 200 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
-           ++ " L " ++ String.fromInt 200 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
-          )
-      ]
-      []   ]
+singleBarLines : Float -> Int -> List(Svg Msg)
+singleBarLines staveOffset barOffset =
+  if barOffset == 0 then
+    [Svg.path
+        [ strokeWidth "0.2"
+        , stroke "black"
+        , d ("M " ++ String.fromInt 108 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
+            ++ " L " ++ String.fromInt 108 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
+            )
+        ]
+        []]
+  else
+    [Svg.path
+        [ strokeWidth "0.2"
+        , stroke "black"
+        , d ("M " ++ String.fromInt 200 ++ " " ++ String.fromFloat (11 + (staveShiftY * staveOffset)) 
+            ++ " L " ++ String.fromInt 200 ++ " " ++ String.fromFloat (19.0 + (staveShiftY * staveOffset))
+            )
+        ]
+        []]
 {-
 Each beat in a bar is divided into 12 equal spaces because 12 is divisible by 3 and 4 meaning we can evenly space
 both triplets and 16ths, e.g.
@@ -117,7 +125,7 @@ Iterate through all 12 spaces and all items in the arrangement, and draw a note 
 -}
 renderStaveBeat : Int -> Bar -> List(Svg Msg)
 renderStaveBeat beat bar = 
-  (stave 1 1) ++ (renderStaveBar 0 0 [beat] bar False)
+  (stave 1 1 0) ++ (renderStaveBar 0 0 [beat] bar False)
 
 renderStaveBars : BarDict -> List(Svg Msg)
 renderStaveBars bars = 
@@ -140,11 +148,11 @@ renderStaveBars bars =
                                                   barOffset = modBy 2 (barNo-1)
                                                   staveOffset = toFloat ((barNo-1) // 2)
                                                 in
-                                                (if barOffset == 0 then
-                                                  stave staveOffset barNo
-                                                  ++ percussionClef staveOffset
-                                                  ++ (singleBarLines staveOffset)
-                                                 else [])
+                                                stave staveOffset barNo barOffset
+                                                ++ (if barOffset == 0 then
+                                                      percussionClef staveOffset
+                                                    else [])
+                                                ++ (singleBarLines staveOffset barOffset)
                                                 ++ (if barNo == 1 then
                                                       staveTimeSignature bar
                                                      else [])

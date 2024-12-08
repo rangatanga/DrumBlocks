@@ -5347,9 +5347,9 @@ var $author$project$CommonModel$Bar = F3(
 	function (arrangement, beatOptions, timeSignature) {
 		return {arrangement: arrangement, beatOptions: beatOptions, timeSignature: timeSignature};
 	});
-var $author$project$CommonModel$Block = F4(
-	function (blockName, imageName, notePlacement, subdivision) {
-		return {blockName: blockName, imageName: imageName, notePlacement: notePlacement, subdivision: subdivision};
+var $author$project$CommonModel$Block = F5(
+	function (blockName, imageName, notePlacement, subdivision, displayText) {
+		return {blockName: blockName, displayText: displayText, imageName: imageName, notePlacement: notePlacement, subdivision: subdivision};
 	});
 var $icidasset$elm_binary$Binary$Bits = function (a) {
 	return {$: 'Bits', a: a};
@@ -5370,14 +5370,15 @@ var $icidasset$elm_binary$Binary$fromIntegers = A2(
 			return A3($icidasset$elm_binary$Binary$ifThenElse, i <= 0, false, true);
 		}),
 	$icidasset$elm_binary$Binary$Bits);
-var $author$project$Common$aBlock = A4(
+var $author$project$Common$aBlock = A5(
 	$author$project$CommonModel$Block,
 	'A',
 	'A.png',
 	$icidasset$elm_binary$Binary$fromIntegers(
 		_List_fromArray(
 			[1, 0, 0, 0])),
-	'4-16');
+	'4-16',
+	'\u23FA \u2500 \u2500 \u2500');
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -5501,14 +5502,15 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
-var $author$project$Common$pBlock = A4(
+var $author$project$Common$pBlock = A5(
 	$author$project$CommonModel$Block,
 	'P',
 	'P.png',
 	$icidasset$elm_binary$Binary$fromIntegers(
 		_List_fromArray(
 			[0, 0, 0, 0])),
-	'4-16');
+	'4-16',
+	'\u2500 \u2500 \u2500 \u2500');
 var $author$project$Main$initialModel = {
 	barOptionsParams: $elm$core$Maybe$Nothing,
 	bars: $elm$core$Dict$fromList(
@@ -6213,228 +6215,275 @@ var $author$project$Common$blockDict = $elm$core$Dict$fromList(
 			_Utils_Tuple2('A', $author$project$Common$aBlock),
 			_Utils_Tuple2(
 			'B',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'B',
 				'B.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 1, 0, 0])),
-				'4-16')),
+				'4-16',
+				'\u2500 \u23FA \u2500 \u2500')),
 			_Utils_Tuple2(
 			'C',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'C',
 				'C.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 0, 1, 0])),
-				'4-16')),
+				'4-16',
+				'\u2500 \u2500 \u23FA \u2500')),
 			_Utils_Tuple2(
 			'D',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'D',
 				'D.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 0, 0, 1])),
-				'4-16')),
+				'4-16',
+				'\u2500 \u2500 \u2500 \u23FA')),
 			_Utils_Tuple2(
 			'E',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'E',
 				'E.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 1, 0, 0])),
-				'4-16')),
+				'4-16',
+				'\u23FA \u23FA \u2500 \u2500')),
 			_Utils_Tuple2(
 			'F',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'F',
 				'F.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 1, 1, 0])),
-				'4-16')),
+				'4-16',
+				'\u2500 \u23FA \u23FA \u2500')),
 			_Utils_Tuple2(
 			'G',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'G',
 				'G.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 0, 1, 1])),
-				'4-16')),
+				'4-16',
+				'\u2500 \u2500 \u23FA \u23FA')),
 			_Utils_Tuple2(
 			'H',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'H',
 				'H.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 0, 0, 1])),
-				'4-16')),
+				'4-16',
+				'\u23FA \u2500 \u2500 \u23FA')),
 			_Utils_Tuple2(
 			'I',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'I',
 				'I.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 0, 1, 0])),
-				'4-16')),
+				'4-16',
+				'\u23FA \u2500 \u23FA \u2500')),
 			_Utils_Tuple2(
 			'J',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'J',
 				'J.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 1, 0, 1])),
-				'4-16')),
+				'4-16',
+				'\u2500 \u23FA \u2500 \u23FA')),
 			_Utils_Tuple2(
 			'K',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'K',
 				'K.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 1, 1, 0])),
-				'4-16')),
+				'4-16',
+				'\u23FA \u23FA \u23FA \u2500')),
 			_Utils_Tuple2(
 			'L',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'L',
 				'L.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 1, 1, 1])),
-				'4-16')),
+				'4-16',
+				'\u2500 \u23FA \u23FA \u23FA')),
 			_Utils_Tuple2(
 			'M',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'M',
 				'M.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 0, 1, 1])),
-				'4-16')),
+				'4-16',
+				'\u23FA \u2500 \u23FA \u23FA')),
 			_Utils_Tuple2(
 			'N',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'N',
 				'N.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 1, 0, 1])),
-				'4-16')),
+				'4-16',
+				'\u23FA \u23FA \u2500 \u23FA')),
 			_Utils_Tuple2(
 			'O',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'O',
 				'O.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 1, 1, 1])),
-				'4-16')),
+				'4-16',
+				'\u23FA \u23FA \u23FA \u23FA')),
 			_Utils_Tuple2('P', $author$project$Common$pBlock),
 			_Utils_Tuple2(
 			'Q',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'Q',
 				'Q.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 0, 0])),
-				'3-8')),
+				'3-8',
+				'\u23FA \u2500 \u2500')),
 			_Utils_Tuple2(
 			'R',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'R',
 				'R.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 1, 0])),
-				'3-8')),
+				'3-8',
+				'\u2500 \u23FA \u2500')),
 			_Utils_Tuple2(
 			'S',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'S',
 				'S.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 0, 1])),
-				'3-8')),
+				'3-8',
+				'\u2500 \u2500 \u23FA')),
 			_Utils_Tuple2(
 			'T',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'T',
 				'T.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 1, 0])),
-				'3-8')),
+				'3-8',
+				'\u23FA \u23FA \u2500')),
 			_Utils_Tuple2(
 			'U',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'U',
 				'U.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 1, 1])),
-				'3-8')),
+				'3-8',
+				'\u2500 \u23FA \u23FA')),
 			_Utils_Tuple2(
 			'V',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'V',
 				'V.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 0, 1])),
-				'3-8')),
+				'3-8',
+				'\u23FA \u2500 \u23FA')),
 			_Utils_Tuple2(
 			'W',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'W',
 				'W.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[1, 1, 1])),
-				'3-8')),
+				'3-8',
+				'\u23FA \u23FA \u23FA')),
 			_Utils_Tuple2(
 			'X',
-			A4(
+			A5(
 				$author$project$CommonModel$Block,
 				'X',
 				'X.png',
 				$icidasset$elm_binary$Binary$fromIntegers(
 					_List_fromArray(
 						[0, 0, 0])),
-				'3-8'))
+				'3-8',
+				'\u2500 \u2500 \u2500'))
 		]));
+var $elm$core$Dict$values = function (dict) {
+	return A3(
+		$elm$core$Dict$foldr,
+		F3(
+			function (key, value, valueList) {
+				return A2($elm$core$List$cons, value, valueList);
+			}),
+		_List_Nil,
+		dict);
+};
 var $author$project$Main$updateBarArrangement = F4(
-	function (instrName, blockIndex, newBlockName, currBar) {
+	function (instrName, blockIndex, newBlockDisplayText, currBar) {
+		var newBlockName = function () {
+			var _v2 = $elm$core$List$head(
+				A2(
+					$elm$core$List$filter,
+					function (d) {
+						return _Utils_eq(d.displayText, newBlockDisplayText);
+					},
+					$elm$core$Dict$values($author$project$Common$blockDict)));
+			if (_v2.$ === 'Just') {
+				var blk = _v2.a;
+				return blk.blockName;
+			} else {
+				return '';
+			}
+		}();
 		var newBlock = A2($elm$core$Dict$get, newBlockName, $author$project$Common$blockDict);
 		var currArrangement = currBar.arrangement;
 		if (newBlock.$ === 'Just') {
@@ -7162,6 +7211,7 @@ var $author$project$Main$getPatternJson = function (model) {
 						bars))
 				])));
 };
+var $author$project$Main$printWindow = _Platform_outgoingPort('printWindow', $elm$json$Json$Encode$string);
 var $author$project$CommonModel$NoOp = {$: 'NoOp'};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
@@ -7642,6 +7692,10 @@ var $author$project$Main$update = F2(
 						$author$project$Main$scrollBars,
 						params.id,
 						$elm$core$Dict$size(model.bars)));
+			case 'PrintWindowOpen':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$printWindow('stave-view'));
 			default:
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7662,6 +7716,7 @@ var $author$project$CommonModel$BeatOptionsDialogCancel = {$: 'BeatOptionsDialog
 var $author$project$CommonModel$BeatOptionsDialogSave = {$: 'BeatOptionsDialogSave'};
 var $author$project$CommonModel$PatternLoad = {$: 'PatternLoad'};
 var $author$project$CommonModel$PatternSave = {$: 'PatternSave'};
+var $author$project$CommonModel$PrintWindowOpen = {$: 'PrintWindowOpen'};
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $author$project$Main$buildBarOptionsDialog = function (model) {
 	return _List_Nil;
@@ -9419,8 +9474,12 @@ var $author$project$Stave$renderStaveBar = F5(
 	});
 var $author$project$Stave$staveLines = _List_fromArray(
 	[8, 10, 12, 14, 16]);
-var $author$project$Stave$stave = F2(
-	function (staveOffset, barNo) {
+var $author$project$Stave$stave = F3(
+	function (staveOffset, barNo, barOffset) {
+		var startX = $elm$core$String$fromInt(
+			(!barOffset) ? 5 : 108);
+		var endX = $elm$core$String$fromInt(
+			(!barOffset) ? 108 : 200);
 		return _Utils_ap(
 			A2(
 				$elm$core$List$map,
@@ -9432,12 +9491,12 @@ var $author$project$Stave$stave = F2(
 								$elm$svg$Svg$Attributes$strokeWidth('0.3'),
 								$elm$svg$Svg$Attributes$stroke('black'),
 								$elm$svg$Svg$Attributes$d(
-								'M 5 ' + ($elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L 200 ' + $elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)))))
+								'M ' + (startX + (' ' + ($elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + (endX + (' ' + $elm$core$String$fromFloat((n + 3.0) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
 							]),
 						_List_Nil);
 				},
 				$author$project$Stave$staveLines),
-			_List_fromArray(
+			(!barOffset) ? _List_fromArray(
 				[
 					A2(
 					$elm$svg$Svg$text_,
@@ -9453,12 +9512,12 @@ var $author$project$Stave$stave = F2(
 							$elm$svg$Svg$text(
 							$elm$core$String$fromInt(barNo))
 						]))
-				]));
+				]) : _List_Nil);
 	});
 var $author$project$Stave$renderStaveBeat = F2(
 	function (beat, bar) {
 		return _Utils_ap(
-			A2($author$project$Stave$stave, 1, 1),
+			A3($author$project$Stave$stave, 1, 1, 0),
 			A5(
 				$author$project$Stave$renderStaveBar,
 				0,
@@ -9614,6 +9673,15 @@ var $author$project$Main$getBlockOptions = function (blockName) {
 		A2(
 			$elm$core$List$map,
 			function (k) {
+				var displayText = function () {
+					var _v0 = A2($elm$core$Dict$get, k, $author$project$Common$blockDict);
+					if (_v0.$ === 'Just') {
+						var block = _v0.a;
+						return block.displayText;
+					} else {
+						return k;
+					}
+				}();
 				return A2(
 					$elm$html$Html$option,
 					_List_fromArray(
@@ -9623,22 +9691,32 @@ var $author$project$Main$getBlockOptions = function (blockName) {
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(k)
+							$elm$html$Html$text(displayText)
 						]));
 			},
 			quarterBlocks),
 		A2(
 			$elm$core$List$map,
 			function (k) {
+				var displayText = function () {
+					var _v1 = A2($elm$core$Dict$get, k, $author$project$Common$blockDict);
+					if (_v1.$ === 'Just') {
+						var block = _v1.a;
+						return block.displayText;
+					} else {
+						return k;
+					}
+				}();
 				return A2(
 					$elm$html$Html$option,
 					_List_fromArray(
 						[
-							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false)
+							_Utils_eq(blockName, k) ? $elm$html$Html$Attributes$selected(true) : $elm$html$Html$Attributes$selected(false),
+							$elm$html$Html$Attributes$class('blockSelect')
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(k)
+							$elm$html$Html$text(displayText)
 						]));
 			},
 			tripletBlocks));
@@ -9798,7 +9876,9 @@ var $author$project$Main$displayBars = function (bars) {
 															$elm$html$Html$Events$onClick(
 															$author$project$CommonModel$BarDelete(bar.a)),
 															$elm$html$Html$Attributes$class('barButton'),
-															$elm$html$Html$Attributes$id('bar-delete')
+															$elm$html$Html$Attributes$id('bar-delete'),
+															$elm$html$Html$Attributes$disabled(
+															($elm$core$Dict$size(bars) > 1) ? false : true)
 														]),
 													_List_fromArray(
 														[
@@ -10104,31 +10184,34 @@ var $author$project$Stave$percussionClef = function (staveOffset) {
 			_List_Nil)
 		]);
 };
-var $author$project$Stave$singleBarLines = function (staveOffset) {
-	return _List_fromArray(
-		[
-			A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$d(
-					'M ' + ($elm$core$String$fromInt(108) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(108) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-				]),
-			_List_Nil),
-			A2(
-			$elm$svg$Svg$path,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$d(
-					'M ' + ($elm$core$String$fromInt(200) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(200) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-				]),
-			_List_Nil)
-		]);
-};
+var $author$project$Stave$singleBarLines = F2(
+	function (staveOffset, barOffset) {
+		return (!barOffset) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromInt(108) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(108) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+					]),
+				_List_Nil)
+			]) : _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromInt(200) + (' ' + ($elm$core$String$fromFloat(11 + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromInt(200) + (' ' + $elm$core$String$fromFloat(19.0 + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+					]),
+				_List_Nil)
+			]);
+	});
 var $author$project$Stave$staveTimeSignature = function (bar) {
 	var _v0 = bar.timeSignature;
 	if (_v0 === '4/4') {
@@ -10196,20 +10279,20 @@ var $author$project$Stave$renderStaveBars = function (bars) {
 			var staveOffset = ((barNo - 1) / 2) | 0;
 			var bar = b.b;
 			return _Utils_ap(
-				(!barOffset) ? _Utils_ap(
-					A2($author$project$Stave$stave, staveOffset, barNo),
-					_Utils_ap(
-						$author$project$Stave$percussionClef(staveOffset),
-						$author$project$Stave$singleBarLines(staveOffset))) : _List_Nil,
+				A3($author$project$Stave$stave, staveOffset, barNo, barOffset),
 				_Utils_ap(
-					(barNo === 1) ? $author$project$Stave$staveTimeSignature(bar) : _List_Nil,
-					A5(
-						$author$project$Stave$renderStaveBar,
-						barOffset,
-						staveOffset,
-						A2($elm$core$List$range, 1, 4),
-						bar,
-						hasMixedDivisions)));
+					(!barOffset) ? $author$project$Stave$percussionClef(staveOffset) : _List_Nil,
+					_Utils_ap(
+						A2($author$project$Stave$singleBarLines, staveOffset, barOffset),
+						_Utils_ap(
+							(barNo === 1) ? $author$project$Stave$staveTimeSignature(bar) : _List_Nil,
+							A5(
+								$author$project$Stave$renderStaveBar,
+								barOffset,
+								staveOffset,
+								A2($elm$core$List$range, 1, 4),
+								bar,
+								hasMixedDivisions)))));
 		},
 		$elm$core$Dict$toList(bars));
 };
@@ -10296,6 +10379,17 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Load Pattern')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$CommonModel$PrintWindowOpen),
+										$elm$html$Html$Attributes$class('patternButton')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Print Pattern')
 									]))
 							])),
 						A2(

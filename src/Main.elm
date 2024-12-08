@@ -55,6 +55,7 @@ optionsDialog dialogId content =
 
 port toggleDialog : String -> Cmd msg
 
+port printWindow : String -> Cmd msg
 
 
 -- INIT
@@ -145,6 +146,7 @@ update msg model =
         BarDelete barNo -> (deleteBar model barNo, Cmd.none)
         InstrumentDelete instrName -> (deleteInstrument model instrName, Cmd.none)
         BarsScroll params -> (model, scrollBars params.id (Dict.size model.bars))
+        PrintWindowOpen -> (model, printWindow "stave-view")
         _ -> ({model | debugText = ""}, Cmd.none)
 
 scrollBars : String -> Int -> Cmd Msg
@@ -313,8 +315,11 @@ applyBlockSelectedChange model param =
 
 
 updateBarArrangement : String -> Int -> String -> Bar -> Bar
-updateBarArrangement instrName blockIndex newBlockName currBar =
+updateBarArrangement instrName blockIndex newBlockDisplayText currBar =
   let
+    newBlockName = case List.head (List.filter (\d -> d.displayText == newBlockDisplayText) (Dict.values blockDict)) of
+                    Just blk -> blk.blockName
+                    _ -> ""
     newBlock = Dict.get newBlockName blockDict
     currArrangement = currBar.arrangement
   in
@@ -398,6 +403,10 @@ view model =
                          , HA.class "patternButton" 
                          ] 
                          [ Html.text "Load Pattern" ]
+                , button [ onClick PrintWindowOpen
+                         , HA.class "patternButton" 
+                         ] 
+                         [ Html.text "Print Pattern" ]
                 ]
             ,div [HA.id "main"]
                  [(div [HA.class "flex-container-row"]
@@ -466,7 +475,9 @@ displayBars bars =
                                               [div [HA.class "flex-container-row", HA.id "bar-header"] 
                                                    [button [ onClick (BarDelete (Tuple.first bar))
                                                             , HA.class "barButton"
-                                                            , HA.id "bar-delete" ] 
+                                                            , HA.id "bar-delete" 
+                                                            , HA.disabled (if Dict.size bars > 1 then False else True)
+                                                           ] 
                                                            [ Html.img [HA.src "assets/images/remove.svg"
                                                                       , HA.class "barButtonImg"
                                                                       , HA.alt "Delete Bar"
@@ -551,9 +562,20 @@ getBlockOptions blockName =
 --  quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k]))
   --Html.optgroup [HA.class "quarterBlocksOptGroup"] (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
   --:: [Html.optgroup [HA.class "tripletBlocksOptGroup"] ((tripletBlocks) |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))]
-  (quarterBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False
-                                                  , HA.class "blockSelect"] [Html.text k])))
-  ++ (tripletBlocks |> List.map (\k -> (Html.option [if blockName == k then selected True else selected False] [Html.text k])))
+  (quarterBlocks |> List.map (\k -> let
+                                      displayText = case Dict.get k blockDict of
+                                                      Just block -> block.displayText
+                                                      _ -> k
+                                    in
+                                    (Html.option [if blockName == k then selected True else selected False
+                                                  , HA.class "blockSelect"] [Html.text displayText])))
+  ++ (tripletBlocks |> List.map (\k ->  let
+                                          displayText = case Dict.get k blockDict of
+                                                          Just block -> block.displayText
+                                                          _ -> k
+                                        in
+                                    (Html.option [if blockName == k then selected True else selected False
+                                                  , HA.class "blockSelect"] [Html.text displayText])))
 
 
 buildBeatOptionsDialog : Model -> List (Html Msg)

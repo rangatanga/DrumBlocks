@@ -14,14 +14,22 @@
   });
 
   app.ports.toggleDialog.subscribe(id => {
-  const dialog = document.querySelector(`#${id}`)
+    const dialog = document.querySelector(`#${id}`)
 
-  if (dialog.open) {
-      dialog.close();
-  } else {
-      dialog.showModal();
-  }
+    if (dialog.open) {
+        dialog.close();
+    } else {
+        dialog.showModal();
+    }
   });
-  </script>
+
+  app.ports.printWindow.subscribe(function(docId)  {
+    var win = window.open("", "DrumBlocksPrint");
+    win.document.body.innerHTML = "<head><link rel=\"stylesheet\" href=\"main.css\"></head>"
+    win.document.body.innerHTML += "<title>Drum Blocks Print</title>\n";
+    win.document.body.innerHTML += document.getElementById(docId).innerHTML;
+    win.print();
+  });
+</script>
 </body>
 </html>

@@ -87,6 +87,7 @@ initialModel =
                           ]
     , barOptionsParams = Nothing
     , beatOptionsParams = Nothing
+    , includeStickings = False
     , debugText = ""
     }   
 
@@ -138,6 +139,7 @@ update msg model =
                                               _ -> Nothing
                                         in
                                         ({model | beatOptionsParams = opts}, Cmd.none)
+        StickingsCheckBoxChanged param -> ({model | includeStickings = param.checked}, Cmd.none)
         PatternSave -> ({model | debugText = ""}, Download.string "drum_pattern.json" "application/json" (getPatternJson model))
         PatternLoad -> ({model | debugText = ""}, Select.file ["application/json"] UploadSelected)
         UploadSelected file -> (model, Task.perform FileLoaded (File.toString file))
@@ -407,6 +409,17 @@ view model =
                          , HA.class "patternButton" 
                          ] 
                          [ Html.text "Print Pattern" ]
+                , div [HA.id "div-stickings"] 
+                      [Html.input [HA.type_ "checkbox"
+                              , HA.id "cb-include-stickings"
+                              , onCheckboxChanged StickingsCheckBoxChanged
+                              , checked model.includeStickings][]
+                      ,Html.text "Stickings" 
+                      ,Html.select [HA.disabled (model.includeStickings == False)] 
+                                   [Html.option [][Html.text "Single Stroke RH Lead"]
+                                   --,Html.option [][Html.text "Double Stroke"]
+                                   ]
+                      ]
                 ]
             ,div [HA.id "main"]
                  [(div [HA.class "flex-container-row"]

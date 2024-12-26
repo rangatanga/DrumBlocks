@@ -1,35 +1,35 @@
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Main</title>
-  <script src="main.js"></script>
-  <link rel="stylesheet" href="main.css">
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <script src="main.js"></script>
+    <link rel="stylesheet" href="main.css">
+  </head>
 
-<body>
-  <div id="drumBlocksApp"></div>
-  <script>
-  var app = Elm.Main.init({
-    node: document.getElementById('drumBlocksApp')
-  });
+  <body>
+    <div id="drumBlocksApp"></div>
+    <script>
+      var app = Elm.Main.init({
+        node: document.getElementById('drumBlocksApp')
+      });
 
-  app.ports.toggleDialog.subscribe(id => {
-    const dialog = document.querySelector(`#${id}`)
+      app.ports.toggleDialog.subscribe(id => {
+        const dialog = document.querySelector(`#${id}`)
 
-    if (dialog.open) {
-        dialog.close();
-    } else {
-        dialog.showModal();
-    }
-  });
+        if (dialog.open) {
+            dialog.close();
+        } else {
+            dialog.showModal();
+        }
+      });
 
-  app.ports.printWindow.subscribe(function(docId)  {
-    var win = window.open("", "DrumBlocksPrint");
-    win.document.body.innerHTML = "<head><link rel=\"stylesheet\" href=\"main.css\"></head>"
-    win.document.body.innerHTML += "<title>Drum Blocks Print</title>\n";
-    win.document.body.innerHTML += document.getElementById(docId).innerHTML;
-    win.print();
-  });
-</script>
-</body>
+      app.ports.printWindow.subscribe(function(docId)  {
+        var win = window.open("", "DrumBlocksPrint");
+        win.document.body.innerHTML = "<head><link rel=\"stylesheet\" href=\"main.css\"></head>"
+        win.document.body.innerHTML += "<title>Drum Blocks Print</title>\n";
+        win.document.body.innerHTML += document.getElementById(docId).innerHTML;
+        win.print();
+      });
+    </script>
+  </body>
 </html>

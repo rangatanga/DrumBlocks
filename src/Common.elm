@@ -79,3 +79,16 @@ blockDict = Dict.fromList
               , ("W", Block "W" "W.png" (Binary.fromIntegers [1,1,1]) "3-8" "\u{23FA} \u{23FA} \u{23FA}")
               , ("X", Block "X" "X.png" (Binary.fromIntegers [0,0,0]) "3-8" "\u{2500} \u{2500} \u{2500}")
               ]
+
+unique : List a -> List a
+unique list =
+    List.foldl
+        (\a uniques ->
+            if List.member a uniques then
+                uniques
+
+            else
+                uniques ++ [ a ]
+        )
+        []
+        list

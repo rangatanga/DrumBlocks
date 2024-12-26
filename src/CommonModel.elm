@@ -20,6 +20,7 @@ type Msg
   | BarOptionsDialogCancel
   | GhostCheckBoxChanged CheckboxIdChecked
   | AccentCheckBoxChanged CheckboxIdChecked
+  | StickingsCheckBoxChanged CheckboxIdChecked
   | KeyPressedMsg KeyEventMsg
   | KeyReleasedMsg KeyEventMsg
   | PatternSave
@@ -97,6 +98,7 @@ type alias Model =
   { bars : BarDict
   , beatOptionsParams : Maybe BeatOptionsParams
   , barOptionsParams : Maybe BarOptionsParams
+  , includeStickings : Bool
   , debugText : String
   }
 

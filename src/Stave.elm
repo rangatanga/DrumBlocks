@@ -15,8 +15,10 @@ import CommonEvents exposing (..)
 
 
 
+
 type alias NoteSubBeat = 
   {subBeat : Int
+  , beat : Int
   , instrumentName : String --this gives stave position and note shape
   , stalkDirection : StalkDirection
   , noteDuration : NoteDuration
@@ -29,6 +31,14 @@ type alias NoteSubBeat =
   , prevSubBeat : Int
   , isGhostNote : Bool
   , isAccented : Bool
+  }
+type alias BarNoteSubBeats =
+  {
+    barNo : Int
+    ,bar : Bar
+    ,barOffset : Int
+    ,staveOffset : Float
+    ,noteSubBeats : List NoteSubBeat
   }
 
 
@@ -125,7 +135,7 @@ Iterate through all 12 spaces and all items in the arrangement, and draw a note 
 -}
 renderStaveBeat : Int -> Bar -> List(Svg Msg)
 renderStaveBeat beat bar = 
-  (stave 1 1 0) ++ (renderStaveBar 0 0 [beat] bar False)
+  (stave 1 1 0) --++ (renderStaveBar 0 0 [beat] bar False)
 
 renderStaveBars : BarDict -> List(Svg Msg)
 renderStaveBars bars = 
@@ -141,50 +151,72 @@ renderStaveBars bars =
                                            
     hasMixedDivisions = List.any (\x -> x == "3-8") divisions 
                         && List.any (\x -> x == "4-16") divisions 
+    barNoteSubBeats = (Dict.toList bars) |> List.map(\b ->  let
+                                                              barNo = (Tuple.first b)
+                                                              bar = (Tuple.second b)
+                                                              barOffset = modBy 2 (barNo-1)
+                                                              staveOffset = toFloat ((barNo-1) // 2)
+                                                            in
+                                                            BarNoteSubBeats barNo
+                                                                            bar
+                                                                            barOffset
+                                                                            staveOffset
+                                                                            (processStaveBar (List.range 1 4) bar hasMixedDivisions)
+                                      )
+  
   in
-  (Dict.toList bars) |> List.concatMap (\b ->   let
-                                                  barNo = (Tuple.first b)
-                                                  bar = (Tuple.second b)
-                                                  barOffset = modBy 2 (barNo-1)
-                                                  staveOffset = toFloat ((barNo-1) // 2)
-                                                in
-                                                stave staveOffset barNo barOffset
-                                                ++ (if barOffset == 0 then
-                                                      percussionClef staveOffset
-                                                    else [])
-                                                ++ (singleBarLines staveOffset barOffset)
-                                                ++ (if barNo == 1 then
-                                                      staveTimeSignature bar
-                                                     else [])
-                                                ++ (renderStaveBar barOffset staveOffset (List.range 1 4) bar hasMixedDivisions)
+  (List.sortBy .barNo barNoteSubBeats) |> List.concatMap (\b ->  stave b.staveOffset b.barNo b.barOffset
+                                              ++ (if b.barOffset == 0 then
+                                                    percussionClef b.staveOffset
+                                                  else [])
+                                              ++ (singleBarLines b.staveOffset b.barOffset)
+                                              ++ (if b.barNo == 1 then
+                                                    staveTimeSignature b.bar
+                                                  else [])
+                                              ++ (renderStaveBar b hasMixedDivisions)
                                         )
 
 --(stave ++ percussionClef ++ (staveTimeSignature (Tuple.second bar)) ++ (singleBarLine 8) ++ 
+renderNoteSubBeats : Int -> Float -> Bool -> List NoteSubBeat -> List(Svg Msg)
+renderNoteSubBeats barOffset staveOffset hasMixedDivisions noteSubBeats =
+  (noteSubBeats) |> List.concatMap (\nsb -> renderNote barOffset staveOffset nsb.beat 4 nsb noteSubBeats hasMixedDivisions)
 
-renderStaveBar : Int -> Float -> List Int -> Bar -> Bool -> List(Svg Msg)
-renderStaveBar barOffset staveOffset beats bar hasMixedDivisions = 
-  --loop through each beat of the bar (this can be limited to a single beat for the Beat Options dialog)
-  (beats) |> List.concatMap (\beat -> buildNoteSubBeats barOffset staveOffset beat (List.length beats) bar.arrangement (Dict.get beat bar.beatOptions) hasMixedDivisions)
+renderStaveBar : BarNoteSubBeats -> Bool -> List(Svg Msg)
+renderStaveBar barNoteSubBeats hasMixedDivisions = 
+  let
+    beats = barNoteSubBeats.noteSubBeats |> List.map (\nsb -> nsb.beat)
+                                         |> unique 
+  in
+  (List.sort beats) |> List.concatMap (\b -> renderNoteSubBeats 
+                                          barNoteSubBeats.barOffset 
+                                          barNoteSubBeats.staveOffset 
+                                          hasMixedDivisions 
+                                          (List.filter (\nsb -> nsb.beat == b) barNoteSubBeats.noteSubBeats)
+                                      )
+  --(beats) |> List.concatMap (\beat -> buildNoteSubBeats barOffset staveOffset beat (List.length beats) bar.arrangement (Dict.get beat bar.beatOptions) hasMixedDivisions)
               --|> Debug.toString
 
+processStaveBar : List Int -> Bar -> Bool -> List NoteSubBeat
+processStaveBar  beats bar hasMixedDivisions = 
+  (beats) |> List.concatMap (\beat -> buildNoteSubBeats beat bar.arrangement (Dict.get beat bar.beatOptions) hasMixedDivisions)
 
-buildNoteSubBeats : Int -> Float -> Int -> Int -> InstrumentBlocksDict -> Maybe BeatOptions -> Bool -> List(Svg Msg)
-buildNoteSubBeats barOffset staveOffset beat beatsCount instrumentBlocks beatOptions hasMixedDivisions = 
+
+buildNoteSubBeats :  Int -> InstrumentBlocksDict -> Maybe BeatOptions -> Bool -> List NoteSubBeat
+buildNoteSubBeats  beat instrumentBlocks beatOptions hasMixedDivisions = 
   let
       subBeats = [1, 4, 5, 7, 9, 10]
       --get alll instruments & blocks for the current beat
       beatBlocks = (Dict.toList instrumentBlocks) |> List.map (\ib -> Tuple.pair (Tuple.first ib) (Dict.get beat (Tuple.second ib)))
-      noteSubBeats = (subBeats) |> List.concatMap  (\sb ->  getNoteSubBeats sb beatBlocks beatOptions)
-                                |> updateTripletNoteSubBeats hasMixedDivisions
-                                |> updateNoteSubBeats hasMixedDivisions
+      noteSubBeats = (subBeats) |> List.concatMap  (\sb ->  getNoteSubBeats beat sb beatBlocks beatOptions)
+                                |> updateTripletNoteSubBeats beat hasMixedDivisions
+                                |> updateNoteSubBeats beat hasMixedDivisions
  
   in
-  (noteSubBeats) |> List.concatMap (\nsb -> renderNote barOffset staveOffset beat beatsCount nsb noteSubBeats hasMixedDivisions)
-  --(Debug.toString noteSubBeats) ++ " BEAT " ++ String.fromInt beat
+  (noteSubBeats) --|> List.concatMap (\nsb -> renderNote barOffset staveOffset beat beatsCount nsb noteSubBeats hasMixedDivisions)
 
 
-getNoteSubBeats : Int -> List (String, Maybe Block) -> Maybe BeatOptions -> List NoteSubBeat
-getNoteSubBeats subBeat beatBlocks beatOptions = 
+getNoteSubBeats : Int -> Int -> List (String, Maybe Block) -> Maybe BeatOptions -> List NoteSubBeat
+getNoteSubBeats beat subBeat beatBlocks beatOptions = 
   (beatBlocks) |> List.concatMap (\bb -> let
                                             instrumentName = (Tuple.first bb)
                                             stalkDirection = case Dict.get instrumentName instrumentDict of
@@ -225,9 +257,9 @@ getNoteSubBeats subBeat beatBlocks beatOptions =
                                                             _ -> False
                                         in
                                   if isPlayed == True then 
-                                    [NoteSubBeat subBeat instrumentName stalkDirection Crotchet False False subdivision 0 subBeat Crotchet subBeat False isAccented]
+                                    [NoteSubBeat subBeat beat instrumentName stalkDirection Crotchet False False subdivision 0 subBeat Crotchet subBeat False isAccented]
                                   else if isGhostNote && instrumentName == "Snare" then
-                                    [NoteSubBeat subBeat instrumentName stalkDirection Crotchet False False subdivision 0 subBeat Crotchet subBeat isGhostNote False]
+                                    [NoteSubBeat subBeat beat instrumentName stalkDirection Crotchet False False subdivision 0 subBeat Crotchet subBeat isGhostNote False]
                                   else
                                     []
                     )
@@ -236,8 +268,8 @@ getNoteSubBeats subBeat beatBlocks beatOptions =
 For each note, update NoteDuration, isDotted, isRest, etc, - for each note we need to look forward (i.e. > subBeat) to the other
 notes within the beat. 
 -}
-updateNoteSubBeats : Bool -> List NoteSubBeat -> List NoteSubBeat
-updateNoteSubBeats hasMixedDivisions noteSubBeats = 
+updateNoteSubBeats : Int -> Bool -> List NoteSubBeat -> List NoteSubBeat
+updateNoteSubBeats beat hasMixedDivisions noteSubBeats = 
   let
     updateStalks = updateStalkHeight noteSubBeats
     firstSubBeatUp = case List.head (case List.minimum ((List.filter (\x -> x.stalkDirection == Up) updateStalks) |> List.map (\z -> z.subBeat)) of
@@ -255,15 +287,15 @@ updateNoteSubBeats hasMixedDivisions noteSubBeats =
     noteSubBeatsWithRests = updateStalks
                             ++ (if hasMixedDivisions == False then
                                   if firstSubBeatUp > 1 && firstSubBeatDownOrUp > 1 then
-                                    [NoteSubBeat 1 "Rest" Up Crotchet False True "4-16" 0 1 Crotchet 1 False False]
+                                    [NoteSubBeat 1 beat "Rest" Up Crotchet False True "4-16" 0 1 Crotchet 1 False False]
                                   else []
                                 else
                                   (if firstSubBeatUp > 1 then
-                                    [NoteSubBeat 1 "Rest" Up Crotchet False True "4-16" 0 firstSubBeatUp Crotchet 1 False False]
+                                    [NoteSubBeat 1 beat "Rest" Up Crotchet False True "4-16" 0 firstSubBeatUp Crotchet 1 False False]
                                   else [])
                                   ++
                                   (if firstSubBeatDownOrUp > 1 then
-                                    [NoteSubBeat 1 "Rest" DownOrUp Crotchet False True "4-16" 0 firstSubBeatDownOrUp Crotchet 1 False False]
+                                    [NoteSubBeat 1 beat "Rest" DownOrUp Crotchet False True "4-16" 0 firstSubBeatDownOrUp Crotchet 1 False False]
                                   else [])
                                )
   in
@@ -271,8 +303,8 @@ updateNoteSubBeats hasMixedDivisions noteSubBeats =
 {-
   For triplet blocks, add rest notes, as necessary, to ensure we get the correct beams and triplet beams.
 -}
-addTripletRest : Int -> Int -> Int -> List NoteSubBeat -> Bool -> List NoteSubBeat
-addTripletRest x y z noteSubBeats hasMixedDivisions =
+addTripletRest : Int -> Int -> Int -> Int -> List NoteSubBeat -> Bool -> List NoteSubBeat
+addTripletRest beat x y z noteSubBeats hasMixedDivisions =
   let
     nextSubBeat = if z == 1 then 5 else 9
     prevSubBeat = if z == 9 then 5 else 1
@@ -281,14 +313,14 @@ addTripletRest x y z noteSubBeats hasMixedDivisions =
     if List.any (\a -> a.subBeat == x && a.subdivision == "3-8") noteSubBeats
       && List.any (\a -> a.subBeat == y && a.subdivision == "3-8") noteSubBeats
       && Basics.not (List.any (\a -> a.subBeat == z && a.subdivision == "3-8") noteSubBeats) then
-      [NoteSubBeat z "Rest" Up Quaver False True "3-8" 0 nextSubBeat Crotchet prevSubBeat False False]
+      [NoteSubBeat z beat "Rest" Up Quaver False True "3-8" 0 nextSubBeat Crotchet prevSubBeat False False]
     else
       []
   else
     (if List.any (\a -> a.subBeat == x && a.subdivision == "3-8" && a.stalkDirection == Up) noteSubBeats
       && List.any (\a -> a.subBeat == y && a.subdivision == "3-8" && a.stalkDirection == Up) noteSubBeats
       && Basics.not (List.any (\a -> a.subBeat == z && a.subdivision == "3-8" && a.stalkDirection == Up) noteSubBeats) then
-      [NoteSubBeat z "Rest" Up Quaver False True "3-8" 0 nextSubBeat Crotchet prevSubBeat False False]
+      [NoteSubBeat z beat "Rest" Up Quaver False True "3-8" 0 nextSubBeat Crotchet prevSubBeat False False]
     else
       []
     )
@@ -296,20 +328,20 @@ addTripletRest x y z noteSubBeats hasMixedDivisions =
     (if List.any (\a -> a.subBeat == x && a.subdivision == "3-8" && a.stalkDirection == DownOrUp) noteSubBeats
       && List.any (\a -> a.subBeat == y && a.subdivision == "3-8" && a.stalkDirection == DownOrUp) noteSubBeats
       && Basics.not (List.any (\a -> a.subBeat == z && a.subdivision == "3-8" && a.stalkDirection == DownOrUp) noteSubBeats) then
-      [NoteSubBeat z "Rest" DownOrUp Quaver False True "3-8" 0 nextSubBeat Crotchet prevSubBeat False False]
+      [NoteSubBeat z beat "Rest" DownOrUp Quaver False True "3-8" 0 nextSubBeat Crotchet prevSubBeat False False]
     else
       []
     )
 
-updateTripletNoteSubBeats : Bool -> List NoteSubBeat -> List NoteSubBeat
-updateTripletNoteSubBeats hasMixedDivisions noteSubBeats = 
+updateTripletNoteSubBeats : Int -> Bool -> List NoteSubBeat -> List NoteSubBeat
+updateTripletNoteSubBeats beat hasMixedDivisions noteSubBeats = 
   noteSubBeats
-  ++ (addTripletRest 1 9 5 noteSubBeats hasMixedDivisions)
-  ++ (addTripletRest 1 5 9 noteSubBeats hasMixedDivisions)
-  ++ (addTripletRest 5 5 1 noteSubBeats hasMixedDivisions)
-  ++ (addTripletRest 5 5 9 noteSubBeats hasMixedDivisions)
-  ++ (addTripletRest 9 9 1 noteSubBeats hasMixedDivisions)
-  ++ (addTripletRest 9 9 5 noteSubBeats hasMixedDivisions)
+  ++ (addTripletRest beat 1 9 5 noteSubBeats hasMixedDivisions)
+  ++ (addTripletRest beat 1 5 9 noteSubBeats hasMixedDivisions)
+  ++ (addTripletRest beat 5 5 1 noteSubBeats hasMixedDivisions)
+  ++ (addTripletRest beat 5 5 9 noteSubBeats hasMixedDivisions)
+  ++ (addTripletRest beat 9 9 1 noteSubBeats hasMixedDivisions)
+  ++ (addTripletRest beat 9 9 5 noteSubBeats hasMixedDivisions)
   
 updateStalkHeight : List NoteSubBeat -> List NoteSubBeat
 updateStalkHeight noteSubBeats =
@@ -323,6 +355,7 @@ updateStalkHeight noteSubBeats =
                         _ -> 20) - 6
   in
   (noteSubBeats) |> List.map (\nsb -> NoteSubBeat nsb.subBeat 
+                                                  nsb.beat 
                                                   nsb.instrumentName 
                                                   nsb.stalkDirection 
                                                   nsb.noteDuration 
@@ -341,6 +374,7 @@ updateNoteDuration noteSubBeats hasMixedDivisions =
   let
     updNoteSubBeats = (noteSubBeats) |> List.map (\nsb -> Tuple.pair nsb (getNoteDuration nsb noteSubBeats hasMixedDivisions))
                                      |> List.map (\x -> NoteSubBeat (Tuple.first x).subBeat 
+                                                                    (Tuple.first x).beat 
                                                                     (Tuple.first x).instrumentName 
                                                                     (Tuple.first x).stalkDirection 
                                                                     (Tuple.second x).noteDuration
@@ -363,6 +397,7 @@ updateNoteDuration noteSubBeats hasMixedDivisions =
                                                                           ) SemiQuaver nextNoteSubBeats    
                                           in
                                           NoteSubBeat nsb.subBeat 
+                                                      nsb.beat 
                                                       nsb.instrumentName 
                                                       nsb.stalkDirection 
                                                       nsb.noteDuration
@@ -444,7 +479,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                 (if noteShape == Cross || noteShape == CrossLedger then
                   [Svg.path
                     [ strokeWidth "0.3"
-                    , stroke "black"
+                    , stroke (if noteSubBeat.isGhostNote then "#565656" else "black")
+                    , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                     , d ("M " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset)))
                         ++ " L " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ String.fromFloat (noteCenterY + 1.2 ))
                     ]
@@ -452,7 +488,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                 else
                   [Svg.path
                     [ strokeWidth "0.3"
-                    , stroke "black"
+                    , stroke (if noteSubBeat.isGhostNote then "#565656" else "black")
+                    , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                     , d ("M " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset)))
                     ++ " L " ++ (String.fromFloat (noteCenterX + 1.2)) ++ " " ++ (String.fromFloat (noteCenterY )))
                     ]
@@ -462,7 +499,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                 (if noteShape == Cross || noteShape == CrossLedger then
                   [Svg.path
                     [ strokeWidth "0.3"
-                    , stroke "black"
+                    , stroke (if noteSubBeat.isGhostNote then "#565656" else "black")
+                    , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                     , d ("M " ++ (String.fromFloat (noteCenterX - 1.0)) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset)))
                         ++ " L " ++ (String.fromFloat (noteCenterX - 1.0)) ++ " " ++ String.fromFloat (noteCenterY - 1.2 ))
                     ]
@@ -470,7 +508,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                 else
                   [Svg.path
                     [ strokeWidth "0.3"
-                    , stroke "black"
+                    , stroke (if noteSubBeat.isGhostNote then "#565656" else "black")
+                    , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                     , d ("M " ++ (String.fromFloat (noteCenterX - 1.0)) ++ " " ++ (String.fromFloat (stalkY + (staveShiftY * staveOffset)))
                     ++ " L " ++ (String.fromFloat (noteCenterX - 1.0)) ++ " " ++ (String.fromFloat (noteCenterY )))
                     ]
@@ -484,6 +523,7 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                   [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
                   , cy (String.fromFloat noteCenterY)
                   , r "0.4"
+                  , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                   ] []]
               else
                 if noteSubBeat.stalkDirection == Up then
@@ -491,18 +531,21 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                     [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
                     , cy (String.fromFloat (noteCenterY - 2))
                     , r "0.3"
+                    , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                     ] []]
                 else
                   [Svg.circle 
                     [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
                     , cy (String.fromFloat (noteCenterY + 3))
                     , r "0.3"
+                    , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                     ] []]
             else
               [Svg.circle 
                 [cx (String.fromFloat (noteCenterX + (if noteSubBeat.isGhostNote then 2.9 else 2.4)))
                 , cy (String.fromFloat noteCenterY)
                 , r "0.4"
+                , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
                 ] []]
           else []  
 
@@ -715,7 +758,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
     ghostNote = if noteSubBeat.isGhostNote then
                     [Svg.path 
                       [ strokeWidth "0.2"
-                      , stroke "black"
+                      , stroke "#565656"
+                      , fill "#565656"
                       , d ("M " ++ (String.fromFloat (noteCenterX - 1.5)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) 
                                 ++ "C "++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
                                 ++ " " ++ (String.fromFloat (noteCenterX - 2.0)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
@@ -724,7 +768,8 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                       []
                     ,Svg.path 
                       [ strokeWidth "0.2"
-                      , stroke "black"
+                      , fill "#565656"
+                      , stroke "#565656"
                       , d ("M " ++ (String.fromFloat (noteCenterX + 1.7)) ++ " " ++ (String.fromFloat (noteCenterY - 1.5)) 
                                 ++ " C "++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY - 1.0)) 
                                 ++ " " ++ (String.fromFloat (noteCenterX + 2.2)) ++ " " ++ (String.fromFloat (noteCenterY + 1.0)) 
@@ -759,6 +804,7 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
               , rx "1.3"
               , ry "0.95"
               , transform ("rotate(-20, " ++ (String.fromFloat noteCenterX) ++ ", " ++ (String.fromFloat noteCenterY) ++ ")")
+              , fill (if noteSubBeat.isGhostNote then "#565656" else "black")
             ] []
           ]
       Cross ->
@@ -858,7 +904,7 @@ renderNote barOffset staveOffset beat beatsCount noteSubBeat allNoteSubBeats has
                         [Svg.image [xlinkHref "assets/images/16th_rest.svg"
                                     , Svg.Attributes.width "4"
                                     , Svg.Attributes.height "6"
-                                    , Svg.Attributes.x (String.fromFloat (noteCenterX - 3))
+                                    , Svg.Attributes.x (String.fromFloat (noteCenterX - 2.5))
                                     , Svg.Attributes.y (String.fromFloat (noteCenterY - 2.5))
                                     ] [] ]
                       else

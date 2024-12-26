@@ -1,0 +1,328 @@
+{
+ "bars": [
+  {
+   "barNo": 1,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "G"
+      },
+      {
+       "beat": 2,
+       "blockName": "D"
+      },
+      {
+       "beat": 3,
+       "blockName": "D"
+      },
+      {
+       "beat": 4,
+       "blockName": "C"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 2,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "D"
+      },
+      {
+       "beat": 2,
+       "blockName": "D"
+      },
+      {
+       "beat": 3,
+       "blockName": "D"
+      },
+      {
+       "beat": 4,
+       "blockName": "F"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 3,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "D"
+      },
+      {
+       "beat": 2,
+       "blockName": "I"
+      },
+      {
+       "beat": 3,
+       "blockName": "J"
+      },
+      {
+       "beat": 4,
+       "blockName": "C"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 4,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "C"
+      },
+      {
+       "beat": 2,
+       "blockName": "A"
+      },
+      {
+       "beat": 3,
+       "blockName": "C"
+      },
+      {
+       "beat": 4,
+       "blockName": "C"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 5,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "D"
+      },
+      {
+       "beat": 2,
+       "blockName": "A"
+      },
+      {
+       "beat": 3,
+       "blockName": "I"
+      },
+      {
+       "beat": 4,
+       "blockName": "E"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 6,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "D"
+      },
+      {
+       "beat": 2,
+       "blockName": "C"
+      },
+      {
+       "beat": 3,
+       "blockName": "I"
+      },
+      {
+       "beat": 4,
+       "blockName": "J"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 7,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "K"
+      },
+      {
+       "beat": 2,
+       "blockName": "C"
+      },
+      {
+       "beat": 3,
+       "blockName": "B"
+      },
+      {
+       "beat": 4,
+       "blockName": "J"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 8,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "A"
+      },
+      {
+       "beat": 2,
+       "blockName": "J"
+      },
+      {
+       "beat": 3,
+       "blockName": "N"
+      },
+      {
+       "beat": 4,
+       "blockName": "H"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 9,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "K"
+      },
+      {
+       "beat": 2,
+       "blockName": "I"
+      },
+      {
+       "beat": 3,
+       "blockName": "J"
+      },
+      {
+       "beat": 4,
+       "blockName": "C"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 10,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "M"
+      },
+      {
+       "beat": 2,
+       "blockName": "I"
+      },
+      {
+       "beat": 3,
+       "blockName": "I"
+      },
+      {
+       "beat": 4,
+       "blockName": "D"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 11,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "C"
+      },
+      {
+       "beat": 2,
+       "blockName": "K"
+      },
+      {
+       "beat": 3,
+       "blockName": "H"
+      },
+      {
+       "beat": 4,
+       "blockName": "I"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  },
+  {
+   "barNo": 12,
+   "arrangement": [
+    {
+     "instrument": "Snare",
+     "blocks": [
+      {
+       "beat": 1,
+       "blockName": "J"
+      },
+      {
+       "beat": 2,
+       "blockName": "E"
+      },
+      {
+       "beat": 3,
+       "blockName": "I"
+      },
+      {
+       "beat": 4,
+       "blockName": "N"
+      }
+     ]
+    }
+   ],
+   "beatOptions": []
+  }
+ ]
+}

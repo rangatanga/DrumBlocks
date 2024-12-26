@@ -5598,7 +5598,8 @@ var $author$project$Main$initialModel = {
 					'4/4'))
 			])),
 	beatOptionsParams: $elm$core$Maybe$Nothing,
-	debugText: ''
+	debugText: '',
+	includeStickings: false
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -7636,6 +7637,13 @@ var $author$project$Main$update = F2(
 						model,
 						{beatOptionsParams: opts}),
 					$elm$core$Platform$Cmd$none);
+			case 'StickingsCheckBoxChanged':
+				var param = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{includeStickings: param.checked}),
+					$elm$core$Platform$Cmd$none);
 			case 'PatternSave':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7717,6 +7725,9 @@ var $author$project$CommonModel$BeatOptionsDialogSave = {$: 'BeatOptionsDialogSa
 var $author$project$CommonModel$PatternLoad = {$: 'PatternLoad'};
 var $author$project$CommonModel$PatternSave = {$: 'PatternSave'};
 var $author$project$CommonModel$PrintWindowOpen = {$: 'PrintWindowOpen'};
+var $author$project$CommonModel$StickingsCheckBoxChanged = function (a) {
+	return {$: 'StickingsCheckBoxChanged', a: a};
+};
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $author$project$Main$buildBarOptionsDialog = function (model) {
 	return _List_Nil;
@@ -8024,1456 +8035,20 @@ var $author$project$Main$displayGhostCheckboxes = F2(
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $author$project$CommonModel$Crotchet = {$: 'Crotchet'};
-var $author$project$Stave$NoteSubBeat = function (subBeat) {
-	return function (instrumentName) {
-		return function (stalkDirection) {
-			return function (noteDuration) {
-				return function (isDotted) {
-					return function (isRest) {
-						return function (subdivision) {
-							return function (stalkHeight) {
-								return function (nextSubBeat) {
-									return function (nextSubBeatNoteDuration) {
-										return function (prevSubBeat) {
-											return function (isGhostNote) {
-												return function (isAccented) {
-													return {instrumentName: instrumentName, isAccented: isAccented, isDotted: isDotted, isGhostNote: isGhostNote, isRest: isRest, nextSubBeat: nextSubBeat, nextSubBeatNoteDuration: nextSubBeatNoteDuration, noteDuration: noteDuration, prevSubBeat: prevSubBeat, stalkDirection: stalkDirection, stalkHeight: stalkHeight, subBeat: subBeat, subdivision: subdivision};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var $author$project$Stave$isSubBeatMatch = F2(
-	function (subBeat, block) {
-		var _v0 = block.subdivision;
-		switch (_v0) {
-			case '4-16':
-				return (((subBeat === 1) && ($icidasset$elm_binary$Binary$toDecimal(
-					A2(
-						$icidasset$elm_binary$Binary$and,
-						block.notePlacement,
-						$icidasset$elm_binary$Binary$fromIntegers(
-							_List_fromArray(
-								[1, 0, 0, 0])))) > 0)) || (((subBeat === 4) && ($icidasset$elm_binary$Binary$toDecimal(
-					A2(
-						$icidasset$elm_binary$Binary$and,
-						block.notePlacement,
-						$icidasset$elm_binary$Binary$fromIntegers(
-							_List_fromArray(
-								[0, 1, 0, 0])))) > 0)) || (((subBeat === 7) && ($icidasset$elm_binary$Binary$toDecimal(
-					A2(
-						$icidasset$elm_binary$Binary$and,
-						block.notePlacement,
-						$icidasset$elm_binary$Binary$fromIntegers(
-							_List_fromArray(
-								[0, 0, 1, 0])))) > 0)) || ((subBeat === 10) && ($icidasset$elm_binary$Binary$toDecimal(
-					A2(
-						$icidasset$elm_binary$Binary$and,
-						block.notePlacement,
-						$icidasset$elm_binary$Binary$fromIntegers(
-							_List_fromArray(
-								[0, 0, 0, 1])))) > 0))))) ? true : false;
-			case '3-8':
-				return (((subBeat === 1) && ($icidasset$elm_binary$Binary$toDecimal(
-					A2(
-						$icidasset$elm_binary$Binary$and,
-						block.notePlacement,
-						$icidasset$elm_binary$Binary$fromIntegers(
-							_List_fromArray(
-								[1, 0, 0])))) > 0)) || (((subBeat === 5) && ($icidasset$elm_binary$Binary$toDecimal(
-					A2(
-						$icidasset$elm_binary$Binary$and,
-						block.notePlacement,
-						$icidasset$elm_binary$Binary$fromIntegers(
-							_List_fromArray(
-								[0, 1, 0])))) > 0)) || ((subBeat === 9) && ($icidasset$elm_binary$Binary$toDecimal(
-					A2(
-						$icidasset$elm_binary$Binary$and,
-						block.notePlacement,
-						$icidasset$elm_binary$Binary$fromIntegers(
-							_List_fromArray(
-								[0, 0, 1])))) > 0)))) ? true : false;
-			default:
-				return false;
-		}
-	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $author$project$Stave$getNoteSubBeats = F3(
-	function (subBeat, beatBlocks, beatOptions) {
-		return A2(
-			$elm$core$List$concatMap,
-			function (bb) {
-				var subdivision = function () {
-					var _v4 = bb.b;
-					if (_v4.$ === 'Just') {
-						var block = _v4.a;
-						return block.subdivision;
-					} else {
-						return '4-16';
-					}
-				}();
-				var isPlayed = function () {
-					var _v3 = bb.b;
-					if (_v3.$ === 'Just') {
-						var block = _v3.a;
-						return A2($author$project$Stave$isSubBeatMatch, subBeat, block);
-					} else {
-						return false;
-					}
-				}();
-				var instrumentName = bb.a;
-				var stalkDirection = function () {
-					var _v2 = A2($elm$core$Dict$get, instrumentName, $author$project$Common$instrumentDict);
-					if (_v2.$ === 'Just') {
-						var i = _v2.a;
-						return i.stalkDirection;
-					} else {
-						return $author$project$CommonModel$Up;
-					}
-				}();
-				var adjSubBeat = (subdivision === '4-16') ? (((subBeat + 2) / 3) | 0) : (((subBeat + 3) / 4) | 0);
-				var isAccented = function () {
-					if (beatOptions.$ === 'Just') {
-						var beatOpts = beatOptions.a;
-						return (subdivision === '4-16') ? (!(!$icidasset$elm_binary$Binary$toDecimal(
-							A2(
-								$icidasset$elm_binary$Binary$and,
-								beatOpts.accents,
-								$icidasset$elm_binary$Binary$fromDecimal(
-									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))))) : (!(!$icidasset$elm_binary$Binary$toDecimal(
-							A2(
-								$icidasset$elm_binary$Binary$and,
-								beatOpts.accents,
-								$icidasset$elm_binary$Binary$fromDecimal(
-									A2($elm$core$Basics$pow, 2, 3 - adjSubBeat))))));
-					} else {
-						return false;
-					}
-				}();
-				var isGhostNote = function () {
-					if (beatOptions.$ === 'Just') {
-						var beatOpts = beatOptions.a;
-						return (subdivision === '4-16') ? ((!(!$icidasset$elm_binary$Binary$toDecimal(
-							A2(
-								$icidasset$elm_binary$Binary$and,
-								beatOpts.ghostNotes,
-								$icidasset$elm_binary$Binary$fromDecimal(
-									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))))) && A2(
-							$elm$core$List$member,
-							subBeat,
-							_List_fromArray(
-								[1, 4, 7, 10]))) : ((!(!$icidasset$elm_binary$Binary$toDecimal(
-							A2(
-								$icidasset$elm_binary$Binary$and,
-								beatOpts.ghostNotes,
-								$icidasset$elm_binary$Binary$fromDecimal(
-									A2($elm$core$Basics$pow, 2, 3 - adjSubBeat)))))) && A2(
-							$elm$core$List$member,
-							subBeat,
-							_List_fromArray(
-								[1, 5, 9])));
-					} else {
-						return false;
-					}
-				}();
-				return isPlayed ? _List_fromArray(
-					[
-						$author$project$Stave$NoteSubBeat(subBeat)(instrumentName)(stalkDirection)($author$project$CommonModel$Crotchet)(false)(false)(subdivision)(0)(subBeat)($author$project$CommonModel$Crotchet)(subBeat)(false)(isAccented)
-					]) : ((isGhostNote && (instrumentName === 'Snare')) ? _List_fromArray(
-					[
-						$author$project$Stave$NoteSubBeat(subBeat)(instrumentName)(stalkDirection)($author$project$CommonModel$Crotchet)(false)(false)(subdivision)(0)(subBeat)($author$project$CommonModel$Crotchet)(subBeat)(isGhostNote)(false)
-					]) : _List_Nil);
-			},
-			beatBlocks);
-	});
-var $author$project$CommonModel$Down = {$: 'Down'};
-var $author$project$CommonModel$Quaver = {$: 'Quaver'};
-var $author$project$CommonModel$SemiQuaver = {$: 'SemiQuaver'};
-var $elm$core$List$all = F2(
-	function (isOkay, list) {
-		return !A2(
-			$elm$core$List$any,
-			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
-			list);
-	});
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
 var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
-var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $author$project$Stave$staveLines = _List_fromArray(
+	[8, 10, 12, 14, 16]);
 var $author$project$Stave$staveShiftY = 23;
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
-	return A3(
-		_VirtualDom_attributeNS,
-		'http://www.w3.org/1999/xlink',
-		'xlink:href',
-		_VirtualDom_noJavaScriptUri(value));
-};
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Stave$renderNote = F7(
-	function (barOffset, staveOffset, beat, beatsCount, noteSubBeat, allNoteSubBeats, hasMixedDivisions) {
-		var stalkDirection = (hasMixedDivisions && _Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$DownOrUp)) ? $author$project$CommonModel$Down : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$DownOrUp) ? $author$project$CommonModel$Up : noteSubBeat.stalkDirection);
-		var stalkY = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? noteSubBeat.stalkHeight : 24;
-		var prevSubBeatIsRest = A2(
-			$elm$core$List$all,
-			function (x) {
-				return x.isRest;
-			},
-			A2(
-				$elm$core$List$filter,
-				function (sb) {
-					return _Utils_eq(sb.subBeat, noteSubBeat.subBeat - 4) && ((sb.subdivision === '3-8') && ((!hasMixedDivisions) || _Utils_eq(sb.stalkDirection, noteSubBeat.stalkDirection)));
-				},
-				allNoteSubBeats));
-		var prevNoteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.prevSubBeat - 1)) * 1.8);
-		var noteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 1.8);
-		var nextSubBeatIsRest = A2(
-			$elm$core$List$all,
-			function (x) {
-				return x.isRest;
-			},
-			A2(
-				$elm$core$List$filter,
-				function (sb) {
-					return _Utils_eq(sb.subBeat, noteSubBeat.subBeat + 4) && ((sb.subdivision === '3-8') && ((!hasMixedDivisions) || _Utils_eq(sb.stalkDirection, noteSubBeat.stalkDirection)));
-				},
-				allNoteSubBeats));
-		var nextNoteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 1.8);
-		var semiQuaverBeam = function () {
-			var yAdjuster = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1 : (-1);
-			if (noteSubBeat.subdivision === '4-16') {
-				if (_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$SemiQuaver) && (!noteSubBeat.isRest)) {
-					if (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) {
-						if (noteSubBeat.subBeat === 10) {
-							if (!_Utils_eq(noteSubBeat.prevSubBeat, noteSubBeat.subBeat)) {
-								var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
-								var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX - 0.8) : (noteCenterX - 2.95);
-								return _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$path,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$strokeWidth('0.6'),
-												$elm$svg$Svg$Attributes$stroke('black'),
-												$elm$svg$Svg$Attributes$d(
-												'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
-											]),
-										_List_Nil)
-									]);
-							} else {
-								if (_Utils_eq(stalkDirection, $author$project$CommonModel$Up)) {
-									return _List_fromArray(
-										[
-											A2(
-											$elm$svg$Svg$image,
-											_List_fromArray(
-												[
-													$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver.svg'),
-													$elm$svg$Svg$Attributes$width('2'),
-													$elm$svg$Svg$Attributes$height('8'),
-													$elm$svg$Svg$Attributes$x(
-													$elm$core$String$fromFloat(noteCenterX + 1.2)),
-													$elm$svg$Svg$Attributes$y(
-													$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7))
-												]),
-											_List_Nil)
-										]);
-								} else {
-									return _List_fromArray(
-										[
-											A2(
-											$elm$svg$Svg$image,
-											_List_fromArray(
-												[
-													$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver_up.svg'),
-													$elm$svg$Svg$Attributes$width('2.5'),
-													$elm$svg$Svg$Attributes$height('7.2'),
-													$elm$svg$Svg$Attributes$x(
-													$elm$core$String$fromFloat(noteCenterX - 1.0)),
-													$elm$svg$Svg$Attributes$y(
-													$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 6.7))
-												]),
-											_List_Nil)
-										]);
-								}
-							}
-						} else {
-							var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
-							var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 3.1) : (noteCenterX + 1.95);
-							return _List_fromArray(
-								[
-									A2(
-									$elm$svg$Svg$path,
-									_List_fromArray(
-										[
-											$elm$svg$Svg$Attributes$strokeWidth('0.6'),
-											$elm$svg$Svg$Attributes$stroke('black'),
-											$elm$svg$Svg$Attributes$d(
-											'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
-										]),
-									_List_Nil)
-								]);
-						}
-					} else {
-						if (_Utils_eq(noteSubBeat.nextSubBeatNoteDuration, $author$project$CommonModel$SemiQuaver)) {
-							var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
-							var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (nextNoteCenterX + 1.35) : (nextNoteCenterX - 1.0);
-							return _List_fromArray(
-								[
-									A2(
-									$elm$svg$Svg$path,
-									_List_fromArray(
-										[
-											$elm$svg$Svg$Attributes$strokeWidth('0.6'),
-											$elm$svg$Svg$Attributes$stroke('black'),
-											$elm$svg$Svg$Attributes$d(
-											'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
-										]),
-									_List_Nil)
-								]);
-						} else {
-							if ((!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) && (!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat))) {
-								return _List_Nil;
-							} else {
-								var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
-								var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 3.1) : (noteCenterX + 0.95);
-								return _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$path,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$strokeWidth('0.6'),
-												$elm$svg$Svg$Attributes$stroke('black'),
-												$elm$svg$Svg$Attributes$d(
-												'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
-											]),
-										_List_Nil)
-									]);
-							}
-						}
-					}
-				} else {
-					if (_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$Quaver) && ((!noteSubBeat.isRest) && (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat) && _Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)))) {
-						return _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$image,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver.svg'),
-										$elm$svg$Svg$Attributes$width('5'),
-										$elm$svg$Svg$Attributes$height('7'),
-										$elm$svg$Svg$Attributes$x(
-										$elm$core$String$fromFloat(noteCenterX - 0.25)),
-										$elm$svg$Svg$Attributes$y(
-										$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 0.5))
-									]),
-								_List_Nil)
-							]) : _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$image,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver_up.svg'),
-										$elm$svg$Svg$Attributes$width('3'),
-										$elm$svg$Svg$Attributes$height('9'),
-										$elm$svg$Svg$Attributes$x(
-										$elm$core$String$fromFloat(noteCenterX - 1.0)),
-										$elm$svg$Svg$Attributes$y(
-										$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 7.0))
-									]),
-								_List_Nil)
-							]);
-					} else {
-						return _List_Nil;
-					}
-				}
-			} else {
-				if (((noteSubBeat.subBeat === 5) && (prevSubBeatIsRest && nextSubBeatIsRest)) || ((noteSubBeat.subBeat === 9) && (prevSubBeatIsRest && A2(
-					$elm$core$List$all,
-					function (x) {
-						return x.isRest;
-					},
-					A2(
-						$elm$core$List$filter,
-						function (sb) {
-							return (sb.subBeat === 1) && (sb.subdivision === '3-8');
-						},
-						allNoteSubBeats))))) {
-					return _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
-						[
-							A2(
-							$elm$svg$Svg$image,
-							_List_fromArray(
-								[
-									$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver.svg'),
-									$elm$svg$Svg$Attributes$width('5'),
-									$elm$svg$Svg$Attributes$height('7'),
-									$elm$svg$Svg$Attributes$x(
-									$elm$core$String$fromFloat(noteCenterX - 0.1)),
-									$elm$svg$Svg$Attributes$y(
-									$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 0.45))
-								]),
-							_List_Nil)
-						]) : _List_fromArray(
-						[
-							A2(
-							$elm$svg$Svg$image,
-							_List_fromArray(
-								[
-									$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver_up.svg'),
-									$elm$svg$Svg$Attributes$width('3'),
-									$elm$svg$Svg$Attributes$height('9'),
-									$elm$svg$Svg$Attributes$x(
-									$elm$core$String$fromFloat(noteCenterX - 1.0)),
-									$elm$svg$Svg$Attributes$y(
-									$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 7.0))
-								]),
-							_List_Nil)
-						]);
-				} else {
-					return _List_Nil;
-				}
-			}
-		}();
-		var topBeam = function () {
-			var xAdjuster = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1 : (-1);
-			if (noteSubBeat.subdivision === '4-16') {
-				if (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) {
-					return _List_Nil;
-				} else {
-					if (noteSubBeat.isRest) {
-						return _List_Nil;
-					} else {
-						var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.1);
-						var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (nextNoteCenterX + 1.35) : (nextNoteCenterX - 0.9);
-						return _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.6'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-									]),
-								_List_Nil)
-							]);
-					}
-				}
-			} else {
-				if (noteSubBeat.subBeat === 5) {
-					return _Utils_ap(
-						function () {
-							if (prevSubBeatIsRest) {
-								return _List_Nil;
-							} else {
-								if (noteSubBeat.isRest && nextSubBeatIsRest) {
-									return _List_Nil;
-								} else {
-									var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.3) : (noteCenterX - 0.85);
-									var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (prevNoteCenterX + 1.05) : (prevNoteCenterX - 1.15);
-									return _List_fromArray(
-										[
-											A2(
-											$elm$svg$Svg$path,
-											_List_fromArray(
-												[
-													$elm$svg$Svg$Attributes$strokeWidth('0.6'),
-													$elm$svg$Svg$Attributes$stroke('black'),
-													$elm$svg$Svg$Attributes$d(
-													'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-												]),
-											_List_Nil)
-										]);
-								}
-							}
-						}(),
-						function () {
-							if (nextSubBeatIsRest) {
-								return _List_Nil;
-							} else {
-								if (noteSubBeat.isRest && prevSubBeatIsRest) {
-									return _List_Nil;
-								} else {
-									var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.1) : (noteCenterX - 1.0);
-									var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (nextNoteCenterX + 1.35) : (nextNoteCenterX - 0.85);
-									return _List_fromArray(
-										[
-											A2(
-											$elm$svg$Svg$path,
-											_List_fromArray(
-												[
-													$elm$svg$Svg$Attributes$strokeWidth('0.6'),
-													$elm$svg$Svg$Attributes$stroke('black'),
-													$elm$svg$Svg$Attributes$d(
-													'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-												]),
-											_List_Nil)
-										]);
-								}
-							}
-						}());
-				} else {
-					return _List_Nil;
-				}
-			}
-		}();
-		var tripletBeam = function () {
-			if (noteSubBeat.subBeat === 5) {
-				if (noteSubBeat.isRest && nextSubBeatIsRest) {
-					return _List_Nil;
-				} else {
-					var yAdjuster = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1 : (-1);
-					return A2(
-						$elm$core$List$cons,
-						A2(
-							$elm$svg$Svg$text_,
-							_List_fromArray(
-								[
-									$elm$svg$Svg$Attributes$x(
-									$elm$core$String$fromFloat(noteCenterX)),
-									$elm$svg$Svg$Attributes$y(
-									$elm$core$String$fromFloat(
-										(stalkY - (_Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1.3 : (-2.5))) + ($author$project$Stave$staveShiftY * staveOffset))),
-									$elm$svg$Svg$Attributes$class('stave-bar-number')
-								]),
-							_List_fromArray(
-								[
-									$elm$svg$Svg$text('3')
-								])),
-						(prevSubBeatIsRest || (nextSubBeatIsRest || noteSubBeat.isRest)) ? _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(prevNoteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat((stalkY - (1.5 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(prevNoteCenterX - 1.5) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-									]),
-								_List_Nil),
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(prevNoteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-									]),
-								_List_Nil),
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX + 2.0) + (' ' + ($elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 2.0) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-									]),
-								_List_Nil),
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(nextNoteCenterX + 2.0) + (' ' + ($elm$core$String$fromFloat((stalkY - (1.5 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 2.0) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
-									]),
-								_List_Nil)
-							]) : _List_Nil);
-				}
-			} else {
-				return _List_Nil;
-			}
-		}();
-		var instrument = A2($elm$core$Dict$get, noteSubBeat.instrumentName, $author$project$Common$instrumentDict);
-		var noteCenterY = function () {
-			if (instrument.$ === 'Just') {
-				var instr = instrument.a;
-				return instr.stavePosition + ($author$project$Stave$staveShiftY * staveOffset);
-			} else {
-				return 0;
-			}
-		}();
-		var noteShape = function () {
-			if (instrument.$ === 'Just') {
-				var instr = instrument.a;
-				return instr.noteShape;
-			} else {
-				return $author$project$CommonModel$Ovoid;
-			}
-		}();
-		var stalk = _Utils_eq(noteShape, $author$project$CommonModel$Rest) ? _List_Nil : (_Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? ((_Utils_eq(noteShape, $author$project$CommonModel$Cross) || _Utils_eq(noteShape, $author$project$CommonModel$CrossLedger)) ? _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.2))))))))
-					]),
-				_List_Nil)
-			]) : _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
-					]),
-				_List_Nil)
-			])) : ((_Utils_eq(noteShape, $author$project$CommonModel$Cross) || _Utils_eq(noteShape, $author$project$CommonModel$CrossLedger)) ? _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + $elm$core$String$fromFloat(noteCenterY - 1.2))))))))
-					]),
-				_List_Nil)
-			]) : _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
-					]),
-				_List_Nil)
-			])));
-		var ghostNote = noteSubBeat.isGhostNote ? _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + ('C ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))))))))))
-					]),
-				_List_Nil),
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.7) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + (' C ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 1.7) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))))))))))
-					]),
-				_List_Nil)
-			]) : _List_Nil;
-		var dot = noteSubBeat.isDotted ? (noteSubBeat.isRest ? ((!hasMixedDivisions) ? _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$circle,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat(
-							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
-						$elm$svg$Svg$Attributes$cy(
-						$elm$core$String$fromFloat(noteCenterY)),
-						$elm$svg$Svg$Attributes$r('0.4')
-					]),
-				_List_Nil)
-			]) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$circle,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat(
-							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
-						$elm$svg$Svg$Attributes$cy(
-						$elm$core$String$fromFloat(noteCenterY - 2)),
-						$elm$svg$Svg$Attributes$r('0.3')
-					]),
-				_List_Nil)
-			]) : _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$circle,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat(
-							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
-						$elm$svg$Svg$Attributes$cy(
-						$elm$core$String$fromFloat(noteCenterY + 3)),
-						$elm$svg$Svg$Attributes$r('0.3')
-					]),
-				_List_Nil)
-			]))) : _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$circle,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat(
-							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
-						$elm$svg$Svg$Attributes$cy(
-						$elm$core$String$fromFloat(noteCenterY)),
-						$elm$svg$Svg$Attributes$r('0.4')
-					]),
-				_List_Nil)
-			])) : _List_Nil;
-		var crossNoteOffset = 1.0;
-		var accent = noteSubBeat.isAccented ? _List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 2.7) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7))))))))
-					]),
-				_List_Nil),
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$d(
-						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 0.7))))))))
-					]),
-				_List_Nil)
-			]) : _List_Nil;
-		return _Utils_ap(
-			function () {
-				switch (noteShape.$) {
-					case 'Ovoid':
-						return _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$ellipse,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$cx(
-										$elm$core$String$fromFloat(noteCenterX)),
-										$elm$svg$Svg$Attributes$cy(
-										$elm$core$String$fromFloat(noteCenterY)),
-										$elm$svg$Svg$Attributes$rx('1.3'),
-										$elm$svg$Svg$Attributes$ry('0.95'),
-										$elm$svg$Svg$Attributes$transform(
-										'rotate(-20, ' + ($elm$core$String$fromFloat(noteCenterX) + (', ' + ($elm$core$String$fromFloat(noteCenterY) + ')'))))
-									]),
-								_List_Nil)
-							]);
-					case 'Cross':
-						return _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY - crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY + crossNoteOffset))))))))
-									]),
-								_List_Nil),
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY + crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY - crossNoteOffset))))))))
-									]),
-								_List_Nil)
-							]);
-					case 'CrossLedger':
-						return _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY - crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY + crossNoteOffset))))))))
-									]),
-								_List_Nil),
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY + crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY - crossNoteOffset))))))))
-									]),
-								_List_Nil),
-								A2(
-								$elm$svg$Svg$path,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$strokeWidth('0.3'),
-										$elm$svg$Svg$Attributes$stroke('black'),
-										$elm$svg$Svg$Attributes$d(
-										'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.4) + (' ' + ($elm$core$String$fromFloat(noteCenterY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.4) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
-									]),
-								_List_Nil)
-							]);
-					case 'Triangle':
-						return _List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$circle,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$cx(
-										$elm$core$String$fromFloat(noteCenterX)),
-										$elm$svg$Svg$Attributes$cy(
-										$elm$core$String$fromFloat(noteCenterY)),
-										$elm$svg$Svg$Attributes$r('1.5')
-									]),
-								_List_Nil)
-							]);
-					default:
-						var _v1 = noteSubBeat.noteDuration;
-						switch (_v1.$) {
-							case 'Crotchet':
-								return (!hasMixedDivisions) ? _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
-												$elm$svg$Svg$Attributes$width('5'),
-												$elm$svg$Svg$Attributes$height('7'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 2)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 4))
-											]),
-										_List_Nil)
-									]) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
-												$elm$svg$Svg$Attributes$width('4'),
-												$elm$svg$Svg$Attributes$height('6'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 2)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 6))
-											]),
-										_List_Nil)
-									]) : _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
-												$elm$svg$Svg$Attributes$width('4'),
-												$elm$svg$Svg$Attributes$height('6'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 2)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 1))
-											]),
-										_List_Nil)
-									]));
-							case 'Quaver':
-								return (!hasMixedDivisions) ? ((noteSubBeat.subdivision === '3-8') ? _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
-												$elm$svg$Svg$Attributes$width('3'),
-												$elm$svg$Svg$Attributes$height('5'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 1)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 4.0))
-											]),
-										_List_Nil)
-									]) : _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
-												$elm$svg$Svg$Attributes$width('4'),
-												$elm$svg$Svg$Attributes$height('6'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 3)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 3.5))
-											]),
-										_List_Nil)
-									])) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
-												$elm$svg$Svg$Attributes$width('3'),
-												$elm$svg$Svg$Attributes$height('5'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 1)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 5.2))
-											]),
-										_List_Nil)
-									]) : _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
-												$elm$svg$Svg$Attributes$width('3'),
-												$elm$svg$Svg$Attributes$height('5'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 1)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY + 1))
-											]),
-										_List_Nil)
-									]));
-							case 'SemiQuaver':
-								return (!hasMixedDivisions) ? _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/16th_rest.svg'),
-												$elm$svg$Svg$Attributes$width('4'),
-												$elm$svg$Svg$Attributes$height('6'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 3)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 2.5))
-											]),
-										_List_Nil)
-									]) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/16th_rest.svg'),
-												$elm$svg$Svg$Attributes$width('3'),
-												$elm$svg$Svg$Attributes$height('3.5'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 1.5)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY - 4.5))
-											]),
-										_List_Nil)
-									]) : _List_fromArray(
-									[
-										A2(
-										$elm$svg$Svg$image,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$xlinkHref('assets/images/16th_rest.svg'),
-												$elm$svg$Svg$Attributes$width('3'),
-												$elm$svg$Svg$Attributes$height('3.5'),
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromFloat(noteCenterX - 1.5)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(noteCenterY + 1.5))
-											]),
-										_List_Nil)
-									]));
-							default:
-								return _List_Nil;
-						}
-				}
-			}(),
-			_Utils_ap(
-				stalk,
-				_Utils_ap(
-					dot,
-					_Utils_ap(
-						tripletBeam,
-						_Utils_ap(
-							topBeam,
-							_Utils_ap(
-								semiQuaverBeam,
-								_Utils_ap(ghostNote, accent)))))));
-	});
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var $elm$core$List$minimum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$CommonModel$NoteDurationParam = F4(
-	function (noteDuration, isDotted, nextSubBeat, prevSubBeat) {
-		return {isDotted: isDotted, nextSubBeat: nextSubBeat, noteDuration: noteDuration, prevSubBeat: prevSubBeat};
-	});
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Stave$getNoteDuration = F3(
-	function (currNoteSubBeat, allNoteSubBeats, hasMixedDivisions) {
-		var prevSubBeatInclRest = function () {
-			var _v2 = $elm$core$List$maximum(
-				A2(
-					$elm$core$List$map,
-					function (nsb) {
-						return nsb.subBeat;
-					},
-					A2(
-						$elm$core$List$filter,
-						function (nsb) {
-							return (_Utils_cmp(nsb.subBeat, currNoteSubBeat.subBeat) < 0) && ((!hasMixedDivisions) || _Utils_eq(nsb.stalkDirection, currNoteSubBeat.stalkDirection));
-						},
-						allNoteSubBeats)));
-			if (_v2.$ === 'Just') {
-				var pSubBeat = _v2.a;
-				return pSubBeat;
-			} else {
-				return currNoteSubBeat.subBeat;
-			}
-		}();
-		var prevSubBeat = function () {
-			var _v1 = $elm$core$List$maximum(
-				A2(
-					$elm$core$List$map,
-					function (nsb) {
-						return nsb.subBeat;
-					},
-					A2(
-						$elm$core$List$filter,
-						function (nsb) {
-							return (_Utils_cmp(nsb.subBeat, currNoteSubBeat.subBeat) < 0) && ((!nsb.isRest) && (_Utils_eq(nsb.subdivision, currNoteSubBeat.subdivision) && ((!hasMixedDivisions) || _Utils_eq(nsb.stalkDirection, currNoteSubBeat.stalkDirection))));
-						},
-						allNoteSubBeats)));
-			if (_v1.$ === 'Just') {
-				var pSubBeat = _v1.a;
-				return pSubBeat;
-			} else {
-				return currNoteSubBeat.subBeat;
-			}
-		}();
-		var nextSubBeat = $elm$core$List$minimum(
-			A2(
-				$elm$core$List$map,
-				function (nsb) {
-					return nsb.subBeat;
-				},
-				A2(
-					$elm$core$List$filter,
-					function (nsb) {
-						return (_Utils_cmp(nsb.subBeat, currNoteSubBeat.subBeat) > 0) && (_Utils_eq(nsb.subdivision, currNoteSubBeat.subdivision) && ((!hasMixedDivisions) || _Utils_eq(nsb.stalkDirection, currNoteSubBeat.stalkDirection)));
-					},
-					allNoteSubBeats)));
-		if (nextSubBeat.$ === 'Just') {
-			var nxtSubBeat = nextSubBeat.a;
-			return ((nxtSubBeat - currNoteSubBeat.subBeat) === 3) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$SemiQuaver, false, nxtSubBeat, prevSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 6) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, nxtSubBeat, prevSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 9) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, true, nxtSubBeat, prevSubBeat) : ((currNoteSubBeat.subdivision === '3-8') ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, nxtSubBeat, prevSubBeatInclRest) : A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Crotchet, false, nxtSubBeat, prevSubBeat))));
-		} else {
-			return (currNoteSubBeat.subBeat === 1) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Crotchet, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subBeat === 4) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, true, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subBeat === 7) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subdivision === '3-8') ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$SemiQuaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat))));
-		}
-	});
-var $author$project$Stave$updateNoteDuration = F2(
-	function (noteSubBeats, hasMixedDivisions) {
-		var updNoteSubBeats = A2(
-			$elm$core$List$map,
-			function (x) {
-				return $author$project$Stave$NoteSubBeat(x.a.subBeat)(x.a.instrumentName)(x.a.stalkDirection)(x.b.noteDuration)(x.b.isDotted)(x.a.isRest)(x.a.subdivision)(x.a.stalkHeight)(x.b.nextSubBeat)(x.a.nextSubBeatNoteDuration)(x.b.prevSubBeat)(x.a.isGhostNote)(x.a.isAccented);
-			},
-			A2(
-				$elm$core$List$map,
-				function (nsb) {
-					return A2(
-						$elm$core$Tuple$pair,
-						nsb,
-						A3($author$project$Stave$getNoteDuration, nsb, noteSubBeats, hasMixedDivisions));
-				},
-				noteSubBeats));
-		return A2(
-			$elm$core$List$map,
-			function (nsb) {
-				var nextNoteSubBeats = A2(
-					$elm$core$List$filter,
-					function (x) {
-						return _Utils_eq(x.subBeat, nsb.nextSubBeat) && ((!hasMixedDivisions) || _Utils_eq(x.stalkDirection, nsb.stalkDirection));
-					},
-					updNoteSubBeats);
-				var maxNoteDuration = A3(
-					$elm$core$List$foldl,
-					F2(
-						function (n, i) {
-							return (_Utils_eq(i, $author$project$CommonModel$Crotchet) || _Utils_eq(n.noteDuration, $author$project$CommonModel$Crotchet)) ? $author$project$CommonModel$Crotchet : ((_Utils_eq(i, $author$project$CommonModel$Quaver) || _Utils_eq(n.noteDuration, $author$project$CommonModel$Quaver)) ? $author$project$CommonModel$Quaver : i);
-						}),
-					$author$project$CommonModel$SemiQuaver,
-					nextNoteSubBeats);
-				return $author$project$Stave$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.stalkDirection)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(nsb.stalkHeight)(nsb.nextSubBeat)(maxNoteDuration)(nsb.prevSubBeat)(nsb.isGhostNote)(nsb.isAccented);
-			},
-			updNoteSubBeats);
-	});
-var $author$project$Stave$updateStalkHeight = function (noteSubBeats) {
-	var stalkHeight = $elm$core$List$minimum(
-		A2(
-			$elm$core$List$map,
-			function (nsb) {
-				var _v1 = A2($elm$core$Dict$get, nsb.instrumentName, $author$project$Common$instrumentDict);
-				if (_v1.$ === 'Just') {
-					var instrument = _v1.a;
-					return instrument.stavePosition;
-				} else {
-					return 99.0;
-				}
-			},
-			noteSubBeats));
-	var justStalkHeight = function () {
-		if (stalkHeight.$ === 'Just') {
-			var sHeight = stalkHeight.a;
-			return sHeight;
-		} else {
-			return 20;
-		}
-	}() - 6;
-	return A2(
-		$elm$core$List$map,
-		function (nsb) {
-			return $author$project$Stave$NoteSubBeat(nsb.subBeat)(nsb.instrumentName)(nsb.stalkDirection)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(justStalkHeight)(nsb.nextSubBeat)(nsb.nextSubBeatNoteDuration)(nsb.prevSubBeat)(nsb.isGhostNote)(nsb.isAccented);
-		},
-		noteSubBeats);
-};
-var $author$project$Stave$updateNoteSubBeats = F2(
-	function (hasMixedDivisions, noteSubBeats) {
-		var updateStalks = $author$project$Stave$updateStalkHeight(noteSubBeats);
-		var firstSubBeatUp = function () {
-			var _v2 = $elm$core$List$head(
-				function () {
-					var _v3 = $elm$core$List$minimum(
-						A2(
-							$elm$core$List$map,
-							function (z) {
-								return z.subBeat;
-							},
-							A2(
-								$elm$core$List$filter,
-								function (x) {
-									return _Utils_eq(x.stalkDirection, $author$project$CommonModel$Up);
-								},
-								updateStalks)));
-					if (_v3.$ === 'Just') {
-						var sb = _v3.a;
-						return A2(
-							$elm$core$List$filter,
-							function (y) {
-								return _Utils_eq(y.subBeat, sb) && _Utils_eq(y.stalkDirection, $author$project$CommonModel$Up);
-							},
-							updateStalks);
-					} else {
-						return _List_Nil;
-					}
-				}());
-			if (_v2.$ === 'Just') {
-				var nsb = _v2.a;
-				return nsb.subBeat;
-			} else {
-				return 99;
-			}
-		}();
-		var firstSubBeatDownOrUp = function () {
-			var _v0 = $elm$core$List$head(
-				function () {
-					var _v1 = $elm$core$List$minimum(
-						A2(
-							$elm$core$List$map,
-							function (z) {
-								return z.subBeat;
-							},
-							A2(
-								$elm$core$List$filter,
-								function (x) {
-									return _Utils_eq(x.stalkDirection, $author$project$CommonModel$DownOrUp);
-								},
-								updateStalks)));
-					if (_v1.$ === 'Just') {
-						var sb = _v1.a;
-						return A2(
-							$elm$core$List$filter,
-							function (y) {
-								return _Utils_eq(y.subBeat, sb) && _Utils_eq(y.stalkDirection, $author$project$CommonModel$DownOrUp);
-							},
-							updateStalks);
-					} else {
-						return _List_Nil;
-					}
-				}());
-			if (_v0.$ === 'Just') {
-				var nsb = _v0.a;
-				return nsb.subBeat;
-			} else {
-				return 99;
-			}
-		}();
-		var noteSubBeatsWithRests = _Utils_ap(
-			updateStalks,
-			(!hasMixedDivisions) ? (((firstSubBeatUp > 1) && (firstSubBeatDownOrUp > 1)) ? _List_fromArray(
-				[
-					$author$project$Stave$NoteSubBeat(1)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Crotchet)(false)(true)('4-16')(0)(1)($author$project$CommonModel$Crotchet)(1)(false)(false)
-				]) : _List_Nil) : _Utils_ap(
-				(firstSubBeatUp > 1) ? _List_fromArray(
-					[
-						$author$project$Stave$NoteSubBeat(1)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Crotchet)(false)(true)('4-16')(0)(firstSubBeatUp)($author$project$CommonModel$Crotchet)(1)(false)(false)
-					]) : _List_Nil,
-				(firstSubBeatDownOrUp > 1) ? _List_fromArray(
-					[
-						$author$project$Stave$NoteSubBeat(1)('Rest')($author$project$CommonModel$DownOrUp)($author$project$CommonModel$Crotchet)(false)(true)('4-16')(0)(firstSubBeatDownOrUp)($author$project$CommonModel$Crotchet)(1)(false)(false)
-					]) : _List_Nil));
-		return A2($author$project$Stave$updateNoteDuration, noteSubBeatsWithRests, hasMixedDivisions);
-	});
-var $author$project$Stave$addTripletRest = F5(
-	function (x, y, z, noteSubBeats, hasMixedDivisions) {
-		var prevSubBeat = (z === 9) ? 5 : 1;
-		var nextSubBeat = (z === 1) ? 5 : 9;
-		return (!hasMixedDivisions) ? ((A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a.subBeat, x) && (a.subdivision === '3-8');
-			},
-			noteSubBeats) && (A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a.subBeat, y) && (a.subdivision === '3-8');
-			},
-			noteSubBeats) && (!A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a.subBeat, z) && (a.subdivision === '3-8');
-			},
-			noteSubBeats)))) ? _List_fromArray(
-			[
-				$author$project$Stave$NoteSubBeat(z)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Quaver)(false)(true)('3-8')(0)(nextSubBeat)($author$project$CommonModel$Crotchet)(prevSubBeat)(false)(false)
-			]) : _List_Nil) : _Utils_ap(
-			(A2(
-				$elm$core$List$any,
-				function (a) {
-					return _Utils_eq(a.subBeat, x) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$Up));
-				},
-				noteSubBeats) && (A2(
-				$elm$core$List$any,
-				function (a) {
-					return _Utils_eq(a.subBeat, y) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$Up));
-				},
-				noteSubBeats) && (!A2(
-				$elm$core$List$any,
-				function (a) {
-					return _Utils_eq(a.subBeat, z) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$Up));
-				},
-				noteSubBeats)))) ? _List_fromArray(
-				[
-					$author$project$Stave$NoteSubBeat(z)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Quaver)(false)(true)('3-8')(0)(nextSubBeat)($author$project$CommonModel$Crotchet)(prevSubBeat)(false)(false)
-				]) : _List_Nil,
-			(A2(
-				$elm$core$List$any,
-				function (a) {
-					return _Utils_eq(a.subBeat, x) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$DownOrUp));
-				},
-				noteSubBeats) && (A2(
-				$elm$core$List$any,
-				function (a) {
-					return _Utils_eq(a.subBeat, y) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$DownOrUp));
-				},
-				noteSubBeats) && (!A2(
-				$elm$core$List$any,
-				function (a) {
-					return _Utils_eq(a.subBeat, z) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$DownOrUp));
-				},
-				noteSubBeats)))) ? _List_fromArray(
-				[
-					$author$project$Stave$NoteSubBeat(z)('Rest')($author$project$CommonModel$DownOrUp)($author$project$CommonModel$Quaver)(false)(true)('3-8')(0)(nextSubBeat)($author$project$CommonModel$Crotchet)(prevSubBeat)(false)(false)
-				]) : _List_Nil);
-	});
-var $author$project$Stave$updateTripletNoteSubBeats = F2(
-	function (hasMixedDivisions, noteSubBeats) {
-		return _Utils_ap(
-			noteSubBeats,
-			_Utils_ap(
-				A5($author$project$Stave$addTripletRest, 1, 9, 5, noteSubBeats, hasMixedDivisions),
-				_Utils_ap(
-					A5($author$project$Stave$addTripletRest, 1, 5, 9, noteSubBeats, hasMixedDivisions),
-					_Utils_ap(
-						A5($author$project$Stave$addTripletRest, 5, 5, 1, noteSubBeats, hasMixedDivisions),
-						_Utils_ap(
-							A5($author$project$Stave$addTripletRest, 5, 5, 9, noteSubBeats, hasMixedDivisions),
-							_Utils_ap(
-								A5($author$project$Stave$addTripletRest, 9, 9, 1, noteSubBeats, hasMixedDivisions),
-								A5($author$project$Stave$addTripletRest, 9, 9, 5, noteSubBeats, hasMixedDivisions)))))));
-	});
-var $author$project$Stave$buildNoteSubBeats = F7(
-	function (barOffset, staveOffset, beat, beatsCount, instrumentBlocks, beatOptions, hasMixedDivisions) {
-		var subBeats = _List_fromArray(
-			[1, 4, 5, 7, 9, 10]);
-		var beatBlocks = A2(
-			$elm$core$List$map,
-			function (ib) {
-				return A2(
-					$elm$core$Tuple$pair,
-					ib.a,
-					A2($elm$core$Dict$get, beat, ib.b));
-			},
-			$elm$core$Dict$toList(instrumentBlocks));
-		var noteSubBeats = A2(
-			$author$project$Stave$updateNoteSubBeats,
-			hasMixedDivisions,
-			A2(
-				$author$project$Stave$updateTripletNoteSubBeats,
-				hasMixedDivisions,
-				A2(
-					$elm$core$List$concatMap,
-					function (sb) {
-						return A3($author$project$Stave$getNoteSubBeats, sb, beatBlocks, beatOptions);
-					},
-					subBeats)));
-		return A2(
-			$elm$core$List$concatMap,
-			function (nsb) {
-				return A7($author$project$Stave$renderNote, barOffset, staveOffset, beat, beatsCount, nsb, noteSubBeats, hasMixedDivisions);
-			},
-			noteSubBeats);
-	});
-var $author$project$Stave$renderStaveBar = F5(
-	function (barOffset, staveOffset, beats, bar, hasMixedDivisions) {
-		return A2(
-			$elm$core$List$concatMap,
-			function (beat) {
-				return A7(
-					$author$project$Stave$buildNoteSubBeats,
-					barOffset,
-					staveOffset,
-					beat,
-					$elm$core$List$length(beats),
-					bar.arrangement,
-					A2($elm$core$Dict$get, beat, bar.beatOptions),
-					hasMixedDivisions);
-			},
-			beats);
-	});
-var $author$project$Stave$staveLines = _List_fromArray(
-	[8, 10, 12, 14, 16]);
 var $author$project$Stave$stave = F3(
 	function (staveOffset, barNo, barOffset) {
 		var startX = $elm$core$String$fromInt(
@@ -9516,19 +8091,11 @@ var $author$project$Stave$stave = F3(
 	});
 var $author$project$Stave$renderStaveBeat = F2(
 	function (beat, bar) {
-		return _Utils_ap(
-			A3($author$project$Stave$stave, 1, 1, 0),
-			A5(
-				$author$project$Stave$renderStaveBar,
-				0,
-				0,
-				_List_fromArray(
-					[beat]),
-				bar,
-				false));
+		return A3($author$project$Stave$stave, 1, 1, 0);
 	});
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Main$buildBeatOptionsDialog = function (model) {
 	var _v0 = model.beatOptionsParams;
 	if (_v0.$ === 'Just') {
@@ -10103,6 +8670,36 @@ var $author$project$Main$displayInstruments = function (bars) {
 				},
 				instrs)));
 };
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
 var $author$project$Main$getAvailableInstruments = function (model) {
 	return A2(
 		$elm$core$List$map,
@@ -10159,6 +8756,26 @@ var $elm$html$Html$Attributes$height = function (n) {
 		$elm$core$String$fromInt(n));
 };
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
+var $author$project$Stave$BarNoteSubBeats = F5(
+	function (barNo, bar, barOffset, staveOffset, noteSubBeats) {
+		return {bar: bar, barNo: barNo, barOffset: barOffset, noteSubBeats: noteSubBeats, staveOffset: staveOffset};
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
 var $author$project$Stave$percussionClef = function (staveOffset) {
 	return _List_fromArray(
 		[
@@ -10184,6 +8801,1467 @@ var $author$project$Stave$percussionClef = function (staveOffset) {
 			_List_Nil)
 		]);
 };
+var $author$project$CommonModel$Crotchet = {$: 'Crotchet'};
+var $author$project$Stave$NoteSubBeat = function (subBeat) {
+	return function (beat) {
+		return function (instrumentName) {
+			return function (stalkDirection) {
+				return function (noteDuration) {
+					return function (isDotted) {
+						return function (isRest) {
+							return function (subdivision) {
+								return function (stalkHeight) {
+									return function (nextSubBeat) {
+										return function (nextSubBeatNoteDuration) {
+											return function (prevSubBeat) {
+												return function (isGhostNote) {
+													return function (isAccented) {
+														return {beat: beat, instrumentName: instrumentName, isAccented: isAccented, isDotted: isDotted, isGhostNote: isGhostNote, isRest: isRest, nextSubBeat: nextSubBeat, nextSubBeatNoteDuration: nextSubBeatNoteDuration, noteDuration: noteDuration, prevSubBeat: prevSubBeat, stalkDirection: stalkDirection, stalkHeight: stalkHeight, subBeat: subBeat, subdivision: subdivision};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $author$project$Stave$isSubBeatMatch = F2(
+	function (subBeat, block) {
+		var _v0 = block.subdivision;
+		switch (_v0) {
+			case '4-16':
+				return (((subBeat === 1) && ($icidasset$elm_binary$Binary$toDecimal(
+					A2(
+						$icidasset$elm_binary$Binary$and,
+						block.notePlacement,
+						$icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[1, 0, 0, 0])))) > 0)) || (((subBeat === 4) && ($icidasset$elm_binary$Binary$toDecimal(
+					A2(
+						$icidasset$elm_binary$Binary$and,
+						block.notePlacement,
+						$icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[0, 1, 0, 0])))) > 0)) || (((subBeat === 7) && ($icidasset$elm_binary$Binary$toDecimal(
+					A2(
+						$icidasset$elm_binary$Binary$and,
+						block.notePlacement,
+						$icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[0, 0, 1, 0])))) > 0)) || ((subBeat === 10) && ($icidasset$elm_binary$Binary$toDecimal(
+					A2(
+						$icidasset$elm_binary$Binary$and,
+						block.notePlacement,
+						$icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[0, 0, 0, 1])))) > 0))))) ? true : false;
+			case '3-8':
+				return (((subBeat === 1) && ($icidasset$elm_binary$Binary$toDecimal(
+					A2(
+						$icidasset$elm_binary$Binary$and,
+						block.notePlacement,
+						$icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[1, 0, 0])))) > 0)) || (((subBeat === 5) && ($icidasset$elm_binary$Binary$toDecimal(
+					A2(
+						$icidasset$elm_binary$Binary$and,
+						block.notePlacement,
+						$icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[0, 1, 0])))) > 0)) || ((subBeat === 9) && ($icidasset$elm_binary$Binary$toDecimal(
+					A2(
+						$icidasset$elm_binary$Binary$and,
+						block.notePlacement,
+						$icidasset$elm_binary$Binary$fromIntegers(
+							_List_fromArray(
+								[0, 0, 1])))) > 0)))) ? true : false;
+			default:
+				return false;
+		}
+	});
+var $author$project$Stave$getNoteSubBeats = F4(
+	function (beat, subBeat, beatBlocks, beatOptions) {
+		return A2(
+			$elm$core$List$concatMap,
+			function (bb) {
+				var subdivision = function () {
+					var _v4 = bb.b;
+					if (_v4.$ === 'Just') {
+						var block = _v4.a;
+						return block.subdivision;
+					} else {
+						return '4-16';
+					}
+				}();
+				var isPlayed = function () {
+					var _v3 = bb.b;
+					if (_v3.$ === 'Just') {
+						var block = _v3.a;
+						return A2($author$project$Stave$isSubBeatMatch, subBeat, block);
+					} else {
+						return false;
+					}
+				}();
+				var instrumentName = bb.a;
+				var stalkDirection = function () {
+					var _v2 = A2($elm$core$Dict$get, instrumentName, $author$project$Common$instrumentDict);
+					if (_v2.$ === 'Just') {
+						var i = _v2.a;
+						return i.stalkDirection;
+					} else {
+						return $author$project$CommonModel$Up;
+					}
+				}();
+				var adjSubBeat = (subdivision === '4-16') ? (((subBeat + 2) / 3) | 0) : (((subBeat + 3) / 4) | 0);
+				var isAccented = function () {
+					if (beatOptions.$ === 'Just') {
+						var beatOpts = beatOptions.a;
+						return (subdivision === '4-16') ? (!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.accents,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))))) : (!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.accents,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 3 - adjSubBeat))))));
+					} else {
+						return false;
+					}
+				}();
+				var isGhostNote = function () {
+					if (beatOptions.$ === 'Just') {
+						var beatOpts = beatOptions.a;
+						return (subdivision === '4-16') ? ((!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.ghostNotes,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 4 - adjSubBeat)))))) && A2(
+							$elm$core$List$member,
+							subBeat,
+							_List_fromArray(
+								[1, 4, 7, 10]))) : ((!(!$icidasset$elm_binary$Binary$toDecimal(
+							A2(
+								$icidasset$elm_binary$Binary$and,
+								beatOpts.ghostNotes,
+								$icidasset$elm_binary$Binary$fromDecimal(
+									A2($elm$core$Basics$pow, 2, 3 - adjSubBeat)))))) && A2(
+							$elm$core$List$member,
+							subBeat,
+							_List_fromArray(
+								[1, 5, 9])));
+					} else {
+						return false;
+					}
+				}();
+				return isPlayed ? _List_fromArray(
+					[
+						$author$project$Stave$NoteSubBeat(subBeat)(beat)(instrumentName)(stalkDirection)($author$project$CommonModel$Crotchet)(false)(false)(subdivision)(0)(subBeat)($author$project$CommonModel$Crotchet)(subBeat)(false)(isAccented)
+					]) : ((isGhostNote && (instrumentName === 'Snare')) ? _List_fromArray(
+					[
+						$author$project$Stave$NoteSubBeat(subBeat)(beat)(instrumentName)(stalkDirection)($author$project$CommonModel$Crotchet)(false)(false)(subdivision)(0)(subBeat)($author$project$CommonModel$Crotchet)(subBeat)(isGhostNote)(false)
+					]) : _List_Nil);
+			},
+			beatBlocks);
+	});
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$CommonModel$Quaver = {$: 'Quaver'};
+var $author$project$CommonModel$SemiQuaver = {$: 'SemiQuaver'};
+var $author$project$CommonModel$NoteDurationParam = F4(
+	function (noteDuration, isDotted, nextSubBeat, prevSubBeat) {
+		return {isDotted: isDotted, nextSubBeat: nextSubBeat, noteDuration: noteDuration, prevSubBeat: prevSubBeat};
+	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Stave$getNoteDuration = F3(
+	function (currNoteSubBeat, allNoteSubBeats, hasMixedDivisions) {
+		var prevSubBeatInclRest = function () {
+			var _v2 = $elm$core$List$maximum(
+				A2(
+					$elm$core$List$map,
+					function (nsb) {
+						return nsb.subBeat;
+					},
+					A2(
+						$elm$core$List$filter,
+						function (nsb) {
+							return (_Utils_cmp(nsb.subBeat, currNoteSubBeat.subBeat) < 0) && ((!hasMixedDivisions) || _Utils_eq(nsb.stalkDirection, currNoteSubBeat.stalkDirection));
+						},
+						allNoteSubBeats)));
+			if (_v2.$ === 'Just') {
+				var pSubBeat = _v2.a;
+				return pSubBeat;
+			} else {
+				return currNoteSubBeat.subBeat;
+			}
+		}();
+		var prevSubBeat = function () {
+			var _v1 = $elm$core$List$maximum(
+				A2(
+					$elm$core$List$map,
+					function (nsb) {
+						return nsb.subBeat;
+					},
+					A2(
+						$elm$core$List$filter,
+						function (nsb) {
+							return (_Utils_cmp(nsb.subBeat, currNoteSubBeat.subBeat) < 0) && ((!nsb.isRest) && (_Utils_eq(nsb.subdivision, currNoteSubBeat.subdivision) && ((!hasMixedDivisions) || _Utils_eq(nsb.stalkDirection, currNoteSubBeat.stalkDirection))));
+						},
+						allNoteSubBeats)));
+			if (_v1.$ === 'Just') {
+				var pSubBeat = _v1.a;
+				return pSubBeat;
+			} else {
+				return currNoteSubBeat.subBeat;
+			}
+		}();
+		var nextSubBeat = $elm$core$List$minimum(
+			A2(
+				$elm$core$List$map,
+				function (nsb) {
+					return nsb.subBeat;
+				},
+				A2(
+					$elm$core$List$filter,
+					function (nsb) {
+						return (_Utils_cmp(nsb.subBeat, currNoteSubBeat.subBeat) > 0) && (_Utils_eq(nsb.subdivision, currNoteSubBeat.subdivision) && ((!hasMixedDivisions) || _Utils_eq(nsb.stalkDirection, currNoteSubBeat.stalkDirection)));
+					},
+					allNoteSubBeats)));
+		if (nextSubBeat.$ === 'Just') {
+			var nxtSubBeat = nextSubBeat.a;
+			return ((nxtSubBeat - currNoteSubBeat.subBeat) === 3) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$SemiQuaver, false, nxtSubBeat, prevSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 6) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, nxtSubBeat, prevSubBeat) : (((nxtSubBeat - currNoteSubBeat.subBeat) === 9) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, true, nxtSubBeat, prevSubBeat) : ((currNoteSubBeat.subdivision === '3-8') ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, nxtSubBeat, prevSubBeatInclRest) : A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Crotchet, false, nxtSubBeat, prevSubBeat))));
+		} else {
+			return (currNoteSubBeat.subBeat === 1) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Crotchet, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subBeat === 4) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, true, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subBeat === 7) ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : ((currNoteSubBeat.subdivision === '3-8') ? A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$Quaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat) : A4($author$project$CommonModel$NoteDurationParam, $author$project$CommonModel$SemiQuaver, false, currNoteSubBeat.nextSubBeat, prevSubBeat))));
+		}
+	});
+var $author$project$Stave$updateNoteDuration = F2(
+	function (noteSubBeats, hasMixedDivisions) {
+		var updNoteSubBeats = A2(
+			$elm$core$List$map,
+			function (x) {
+				return $author$project$Stave$NoteSubBeat(x.a.subBeat)(x.a.beat)(x.a.instrumentName)(x.a.stalkDirection)(x.b.noteDuration)(x.b.isDotted)(x.a.isRest)(x.a.subdivision)(x.a.stalkHeight)(x.b.nextSubBeat)(x.a.nextSubBeatNoteDuration)(x.b.prevSubBeat)(x.a.isGhostNote)(x.a.isAccented);
+			},
+			A2(
+				$elm$core$List$map,
+				function (nsb) {
+					return A2(
+						$elm$core$Tuple$pair,
+						nsb,
+						A3($author$project$Stave$getNoteDuration, nsb, noteSubBeats, hasMixedDivisions));
+				},
+				noteSubBeats));
+		return A2(
+			$elm$core$List$map,
+			function (nsb) {
+				var nextNoteSubBeats = A2(
+					$elm$core$List$filter,
+					function (x) {
+						return _Utils_eq(x.subBeat, nsb.nextSubBeat) && ((!hasMixedDivisions) || _Utils_eq(x.stalkDirection, nsb.stalkDirection));
+					},
+					updNoteSubBeats);
+				var maxNoteDuration = A3(
+					$elm$core$List$foldl,
+					F2(
+						function (n, i) {
+							return (_Utils_eq(i, $author$project$CommonModel$Crotchet) || _Utils_eq(n.noteDuration, $author$project$CommonModel$Crotchet)) ? $author$project$CommonModel$Crotchet : ((_Utils_eq(i, $author$project$CommonModel$Quaver) || _Utils_eq(n.noteDuration, $author$project$CommonModel$Quaver)) ? $author$project$CommonModel$Quaver : i);
+						}),
+					$author$project$CommonModel$SemiQuaver,
+					nextNoteSubBeats);
+				return $author$project$Stave$NoteSubBeat(nsb.subBeat)(nsb.beat)(nsb.instrumentName)(nsb.stalkDirection)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(nsb.stalkHeight)(nsb.nextSubBeat)(maxNoteDuration)(nsb.prevSubBeat)(nsb.isGhostNote)(nsb.isAccented);
+			},
+			updNoteSubBeats);
+	});
+var $author$project$Stave$updateStalkHeight = function (noteSubBeats) {
+	var stalkHeight = $elm$core$List$minimum(
+		A2(
+			$elm$core$List$map,
+			function (nsb) {
+				var _v1 = A2($elm$core$Dict$get, nsb.instrumentName, $author$project$Common$instrumentDict);
+				if (_v1.$ === 'Just') {
+					var instrument = _v1.a;
+					return instrument.stavePosition;
+				} else {
+					return 99.0;
+				}
+			},
+			noteSubBeats));
+	var justStalkHeight = function () {
+		if (stalkHeight.$ === 'Just') {
+			var sHeight = stalkHeight.a;
+			return sHeight;
+		} else {
+			return 20;
+		}
+	}() - 6;
+	return A2(
+		$elm$core$List$map,
+		function (nsb) {
+			return $author$project$Stave$NoteSubBeat(nsb.subBeat)(nsb.beat)(nsb.instrumentName)(nsb.stalkDirection)(nsb.noteDuration)(nsb.isDotted)(nsb.isRest)(nsb.subdivision)(justStalkHeight)(nsb.nextSubBeat)(nsb.nextSubBeatNoteDuration)(nsb.prevSubBeat)(nsb.isGhostNote)(nsb.isAccented);
+		},
+		noteSubBeats);
+};
+var $author$project$Stave$updateNoteSubBeats = F3(
+	function (beat, hasMixedDivisions, noteSubBeats) {
+		var updateStalks = $author$project$Stave$updateStalkHeight(noteSubBeats);
+		var firstSubBeatUp = function () {
+			var _v2 = $elm$core$List$head(
+				function () {
+					var _v3 = $elm$core$List$minimum(
+						A2(
+							$elm$core$List$map,
+							function (z) {
+								return z.subBeat;
+							},
+							A2(
+								$elm$core$List$filter,
+								function (x) {
+									return _Utils_eq(x.stalkDirection, $author$project$CommonModel$Up);
+								},
+								updateStalks)));
+					if (_v3.$ === 'Just') {
+						var sb = _v3.a;
+						return A2(
+							$elm$core$List$filter,
+							function (y) {
+								return _Utils_eq(y.subBeat, sb) && _Utils_eq(y.stalkDirection, $author$project$CommonModel$Up);
+							},
+							updateStalks);
+					} else {
+						return _List_Nil;
+					}
+				}());
+			if (_v2.$ === 'Just') {
+				var nsb = _v2.a;
+				return nsb.subBeat;
+			} else {
+				return 99;
+			}
+		}();
+		var firstSubBeatDownOrUp = function () {
+			var _v0 = $elm$core$List$head(
+				function () {
+					var _v1 = $elm$core$List$minimum(
+						A2(
+							$elm$core$List$map,
+							function (z) {
+								return z.subBeat;
+							},
+							A2(
+								$elm$core$List$filter,
+								function (x) {
+									return _Utils_eq(x.stalkDirection, $author$project$CommonModel$DownOrUp);
+								},
+								updateStalks)));
+					if (_v1.$ === 'Just') {
+						var sb = _v1.a;
+						return A2(
+							$elm$core$List$filter,
+							function (y) {
+								return _Utils_eq(y.subBeat, sb) && _Utils_eq(y.stalkDirection, $author$project$CommonModel$DownOrUp);
+							},
+							updateStalks);
+					} else {
+						return _List_Nil;
+					}
+				}());
+			if (_v0.$ === 'Just') {
+				var nsb = _v0.a;
+				return nsb.subBeat;
+			} else {
+				return 99;
+			}
+		}();
+		var noteSubBeatsWithRests = _Utils_ap(
+			updateStalks,
+			(!hasMixedDivisions) ? (((firstSubBeatUp > 1) && (firstSubBeatDownOrUp > 1)) ? _List_fromArray(
+				[
+					$author$project$Stave$NoteSubBeat(1)(beat)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Crotchet)(false)(true)('4-16')(0)(1)($author$project$CommonModel$Crotchet)(1)(false)(false)
+				]) : _List_Nil) : _Utils_ap(
+				(firstSubBeatUp > 1) ? _List_fromArray(
+					[
+						$author$project$Stave$NoteSubBeat(1)(beat)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Crotchet)(false)(true)('4-16')(0)(firstSubBeatUp)($author$project$CommonModel$Crotchet)(1)(false)(false)
+					]) : _List_Nil,
+				(firstSubBeatDownOrUp > 1) ? _List_fromArray(
+					[
+						$author$project$Stave$NoteSubBeat(1)(beat)('Rest')($author$project$CommonModel$DownOrUp)($author$project$CommonModel$Crotchet)(false)(true)('4-16')(0)(firstSubBeatDownOrUp)($author$project$CommonModel$Crotchet)(1)(false)(false)
+					]) : _List_Nil));
+		return A2($author$project$Stave$updateNoteDuration, noteSubBeatsWithRests, hasMixedDivisions);
+	});
+var $author$project$Stave$addTripletRest = F6(
+	function (beat, x, y, z, noteSubBeats, hasMixedDivisions) {
+		var prevSubBeat = (z === 9) ? 5 : 1;
+		var nextSubBeat = (z === 1) ? 5 : 9;
+		return (!hasMixedDivisions) ? ((A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a.subBeat, x) && (a.subdivision === '3-8');
+			},
+			noteSubBeats) && (A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a.subBeat, y) && (a.subdivision === '3-8');
+			},
+			noteSubBeats) && (!A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a.subBeat, z) && (a.subdivision === '3-8');
+			},
+			noteSubBeats)))) ? _List_fromArray(
+			[
+				$author$project$Stave$NoteSubBeat(z)(beat)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Quaver)(false)(true)('3-8')(0)(nextSubBeat)($author$project$CommonModel$Crotchet)(prevSubBeat)(false)(false)
+			]) : _List_Nil) : _Utils_ap(
+			(A2(
+				$elm$core$List$any,
+				function (a) {
+					return _Utils_eq(a.subBeat, x) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$Up));
+				},
+				noteSubBeats) && (A2(
+				$elm$core$List$any,
+				function (a) {
+					return _Utils_eq(a.subBeat, y) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$Up));
+				},
+				noteSubBeats) && (!A2(
+				$elm$core$List$any,
+				function (a) {
+					return _Utils_eq(a.subBeat, z) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$Up));
+				},
+				noteSubBeats)))) ? _List_fromArray(
+				[
+					$author$project$Stave$NoteSubBeat(z)(beat)('Rest')($author$project$CommonModel$Up)($author$project$CommonModel$Quaver)(false)(true)('3-8')(0)(nextSubBeat)($author$project$CommonModel$Crotchet)(prevSubBeat)(false)(false)
+				]) : _List_Nil,
+			(A2(
+				$elm$core$List$any,
+				function (a) {
+					return _Utils_eq(a.subBeat, x) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$DownOrUp));
+				},
+				noteSubBeats) && (A2(
+				$elm$core$List$any,
+				function (a) {
+					return _Utils_eq(a.subBeat, y) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$DownOrUp));
+				},
+				noteSubBeats) && (!A2(
+				$elm$core$List$any,
+				function (a) {
+					return _Utils_eq(a.subBeat, z) && ((a.subdivision === '3-8') && _Utils_eq(a.stalkDirection, $author$project$CommonModel$DownOrUp));
+				},
+				noteSubBeats)))) ? _List_fromArray(
+				[
+					$author$project$Stave$NoteSubBeat(z)(beat)('Rest')($author$project$CommonModel$DownOrUp)($author$project$CommonModel$Quaver)(false)(true)('3-8')(0)(nextSubBeat)($author$project$CommonModel$Crotchet)(prevSubBeat)(false)(false)
+				]) : _List_Nil);
+	});
+var $author$project$Stave$updateTripletNoteSubBeats = F3(
+	function (beat, hasMixedDivisions, noteSubBeats) {
+		return _Utils_ap(
+			noteSubBeats,
+			_Utils_ap(
+				A6($author$project$Stave$addTripletRest, beat, 1, 9, 5, noteSubBeats, hasMixedDivisions),
+				_Utils_ap(
+					A6($author$project$Stave$addTripletRest, beat, 1, 5, 9, noteSubBeats, hasMixedDivisions),
+					_Utils_ap(
+						A6($author$project$Stave$addTripletRest, beat, 5, 5, 1, noteSubBeats, hasMixedDivisions),
+						_Utils_ap(
+							A6($author$project$Stave$addTripletRest, beat, 5, 5, 9, noteSubBeats, hasMixedDivisions),
+							_Utils_ap(
+								A6($author$project$Stave$addTripletRest, beat, 9, 9, 1, noteSubBeats, hasMixedDivisions),
+								A6($author$project$Stave$addTripletRest, beat, 9, 9, 5, noteSubBeats, hasMixedDivisions)))))));
+	});
+var $author$project$Stave$buildNoteSubBeats = F4(
+	function (beat, instrumentBlocks, beatOptions, hasMixedDivisions) {
+		var subBeats = _List_fromArray(
+			[1, 4, 5, 7, 9, 10]);
+		var beatBlocks = A2(
+			$elm$core$List$map,
+			function (ib) {
+				return A2(
+					$elm$core$Tuple$pair,
+					ib.a,
+					A2($elm$core$Dict$get, beat, ib.b));
+			},
+			$elm$core$Dict$toList(instrumentBlocks));
+		var noteSubBeats = A3(
+			$author$project$Stave$updateNoteSubBeats,
+			beat,
+			hasMixedDivisions,
+			A3(
+				$author$project$Stave$updateTripletNoteSubBeats,
+				beat,
+				hasMixedDivisions,
+				A2(
+					$elm$core$List$concatMap,
+					function (sb) {
+						return A4($author$project$Stave$getNoteSubBeats, beat, sb, beatBlocks, beatOptions);
+					},
+					subBeats)));
+		return noteSubBeats;
+	});
+var $author$project$Stave$processStaveBar = F3(
+	function (beats, bar, hasMixedDivisions) {
+		return A2(
+			$elm$core$List$concatMap,
+			function (beat) {
+				return A4(
+					$author$project$Stave$buildNoteSubBeats,
+					beat,
+					bar.arrangement,
+					A2($elm$core$Dict$get, beat, bar.beatOptions),
+					hasMixedDivisions);
+			},
+			beats);
+	});
+var $author$project$CommonModel$Down = {$: 'Down'};
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
+var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
+var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
+	return A3(
+		_VirtualDom_attributeNS,
+		'http://www.w3.org/1999/xlink',
+		'xlink:href',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var $author$project$Stave$renderNote = F7(
+	function (barOffset, staveOffset, beat, beatsCount, noteSubBeat, allNoteSubBeats, hasMixedDivisions) {
+		var stalkDirection = (hasMixedDivisions && _Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$DownOrUp)) ? $author$project$CommonModel$Down : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$DownOrUp) ? $author$project$CommonModel$Up : noteSubBeat.stalkDirection);
+		var stalkY = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? noteSubBeat.stalkHeight : 24;
+		var prevSubBeatIsRest = A2(
+			$elm$core$List$all,
+			function (x) {
+				return x.isRest;
+			},
+			A2(
+				$elm$core$List$filter,
+				function (sb) {
+					return _Utils_eq(sb.subBeat, noteSubBeat.subBeat - 4) && ((sb.subdivision === '3-8') && ((!hasMixedDivisions) || _Utils_eq(sb.stalkDirection, noteSubBeat.stalkDirection)));
+				},
+				allNoteSubBeats));
+		var prevNoteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.prevSubBeat - 1)) * 1.8);
+		var noteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.subBeat - 1)) * 1.8);
+		var nextSubBeatIsRest = A2(
+			$elm$core$List$all,
+			function (x) {
+				return x.isRest;
+			},
+			A2(
+				$elm$core$List$filter,
+				function (sb) {
+					return _Utils_eq(sb.subBeat, noteSubBeat.subBeat + 4) && ((sb.subdivision === '3-8') && ((!hasMixedDivisions) || _Utils_eq(sb.stalkDirection, noteSubBeat.stalkDirection)));
+				},
+				allNoteSubBeats));
+		var nextNoteCenterX = ((barOffset * 92) + 22.0) + ((((beat - 1) * (3 * beatsCount)) + (noteSubBeat.nextSubBeat - 1)) * 1.8);
+		var semiQuaverBeam = function () {
+			var yAdjuster = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1 : (-1);
+			if (noteSubBeat.subdivision === '4-16') {
+				if (_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$SemiQuaver) && (!noteSubBeat.isRest)) {
+					if (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) {
+						if (noteSubBeat.subBeat === 10) {
+							if (!_Utils_eq(noteSubBeat.prevSubBeat, noteSubBeat.subBeat)) {
+								var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
+								var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX - 0.8) : (noteCenterX - 2.95);
+								return _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$path,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$strokeWidth('0.6'),
+												$elm$svg$Svg$Attributes$stroke('black'),
+												$elm$svg$Svg$Attributes$d(
+												'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
+											]),
+										_List_Nil)
+									]);
+							} else {
+								if (_Utils_eq(stalkDirection, $author$project$CommonModel$Up)) {
+									return _List_fromArray(
+										[
+											A2(
+											$elm$svg$Svg$image,
+											_List_fromArray(
+												[
+													$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver.svg'),
+													$elm$svg$Svg$Attributes$width('2'),
+													$elm$svg$Svg$Attributes$height('8'),
+													$elm$svg$Svg$Attributes$x(
+													$elm$core$String$fromFloat(noteCenterX + 1.2)),
+													$elm$svg$Svg$Attributes$y(
+													$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7))
+												]),
+											_List_Nil)
+										]);
+								} else {
+									return _List_fromArray(
+										[
+											A2(
+											$elm$svg$Svg$image,
+											_List_fromArray(
+												[
+													$elm$svg$Svg$Attributes$xlinkHref('assets/images/semiquaver_up.svg'),
+													$elm$svg$Svg$Attributes$width('2.5'),
+													$elm$svg$Svg$Attributes$height('7.2'),
+													$elm$svg$Svg$Attributes$x(
+													$elm$core$String$fromFloat(noteCenterX - 1.0)),
+													$elm$svg$Svg$Attributes$y(
+													$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 6.7))
+												]),
+											_List_Nil)
+										]);
+								}
+							}
+						} else {
+							var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
+							var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 3.1) : (noteCenterX + 1.95);
+							return _List_fromArray(
+								[
+									A2(
+									$elm$svg$Svg$path,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$strokeWidth('0.6'),
+											$elm$svg$Svg$Attributes$stroke('black'),
+											$elm$svg$Svg$Attributes$d(
+											'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
+										]),
+									_List_Nil)
+								]);
+						}
+					} else {
+						if (_Utils_eq(noteSubBeat.nextSubBeatNoteDuration, $author$project$CommonModel$SemiQuaver)) {
+							var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
+							var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (nextNoteCenterX + 1.35) : (nextNoteCenterX - 1.0);
+							return _List_fromArray(
+								[
+									A2(
+									$elm$svg$Svg$path,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$strokeWidth('0.6'),
+											$elm$svg$Svg$Attributes$stroke('black'),
+											$elm$svg$Svg$Attributes$d(
+											'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
+										]),
+									_List_Nil)
+								]);
+						} else {
+							if ((!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) && (!_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat))) {
+								return _List_Nil;
+							} else {
+								var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.0);
+								var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 3.1) : (noteCenterX + 0.95);
+								return _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$path,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$strokeWidth('0.6'),
+												$elm$svg$Svg$Attributes$stroke('black'),
+												$elm$svg$Svg$Attributes$d(
+												'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (1.4 * yAdjuster)))))))))
+											]),
+										_List_Nil)
+									]);
+							}
+						}
+					}
+				} else {
+					if (_Utils_eq(noteSubBeat.noteDuration, $author$project$CommonModel$Quaver) && ((!noteSubBeat.isRest) && (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.prevSubBeat) && _Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)))) {
+						return _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$image,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver.svg'),
+										$elm$svg$Svg$Attributes$width('5'),
+										$elm$svg$Svg$Attributes$height('7'),
+										$elm$svg$Svg$Attributes$x(
+										$elm$core$String$fromFloat(noteCenterX - 0.25)),
+										$elm$svg$Svg$Attributes$y(
+										$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 0.5))
+									]),
+								_List_Nil)
+							]) : _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$image,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver_up.svg'),
+										$elm$svg$Svg$Attributes$width('3'),
+										$elm$svg$Svg$Attributes$height('9'),
+										$elm$svg$Svg$Attributes$x(
+										$elm$core$String$fromFloat(noteCenterX - 1.0)),
+										$elm$svg$Svg$Attributes$y(
+										$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 7.0))
+									]),
+								_List_Nil)
+							]);
+					} else {
+						return _List_Nil;
+					}
+				}
+			} else {
+				if (((noteSubBeat.subBeat === 5) && (prevSubBeatIsRest && nextSubBeatIsRest)) || ((noteSubBeat.subBeat === 9) && (prevSubBeatIsRest && A2(
+					$elm$core$List$all,
+					function (x) {
+						return x.isRest;
+					},
+					A2(
+						$elm$core$List$filter,
+						function (sb) {
+							return (sb.subBeat === 1) && (sb.subdivision === '3-8');
+						},
+						allNoteSubBeats))))) {
+					return _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$image,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver.svg'),
+									$elm$svg$Svg$Attributes$width('5'),
+									$elm$svg$Svg$Attributes$height('7'),
+									$elm$svg$Svg$Attributes$x(
+									$elm$core$String$fromFloat(noteCenterX - 0.1)),
+									$elm$svg$Svg$Attributes$y(
+									$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 0.45))
+								]),
+							_List_Nil)
+						]) : _List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$image,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver_up.svg'),
+									$elm$svg$Svg$Attributes$width('3'),
+									$elm$svg$Svg$Attributes$height('9'),
+									$elm$svg$Svg$Attributes$x(
+									$elm$core$String$fromFloat(noteCenterX - 1.0)),
+									$elm$svg$Svg$Attributes$y(
+									$elm$core$String$fromFloat((stalkY + ($author$project$Stave$staveShiftY * staveOffset)) - 7.0))
+								]),
+							_List_Nil)
+						]);
+				} else {
+					return _List_Nil;
+				}
+			}
+		}();
+		var topBeam = function () {
+			var xAdjuster = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1 : (-1);
+			if (noteSubBeat.subdivision === '4-16') {
+				if (_Utils_eq(noteSubBeat.subBeat, noteSubBeat.nextSubBeat)) {
+					return _List_Nil;
+				} else {
+					if (noteSubBeat.isRest) {
+						return _List_Nil;
+					} else {
+						var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.05) : (noteCenterX - 1.1);
+						var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (nextNoteCenterX + 1.35) : (nextNoteCenterX - 0.9);
+						return _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.6'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+									]),
+								_List_Nil)
+							]);
+					}
+				}
+			} else {
+				if (noteSubBeat.subBeat === 5) {
+					return _Utils_ap(
+						function () {
+							if (prevSubBeatIsRest) {
+								return _List_Nil;
+							} else {
+								if (noteSubBeat.isRest && nextSubBeatIsRest) {
+									return _List_Nil;
+								} else {
+									var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.3) : (noteCenterX - 0.85);
+									var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (prevNoteCenterX + 1.05) : (prevNoteCenterX - 1.15);
+									return _List_fromArray(
+										[
+											A2(
+											$elm$svg$Svg$path,
+											_List_fromArray(
+												[
+													$elm$svg$Svg$Attributes$strokeWidth('0.6'),
+													$elm$svg$Svg$Attributes$stroke('black'),
+													$elm$svg$Svg$Attributes$d(
+													'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+												]),
+											_List_Nil)
+										]);
+								}
+							}
+						}(),
+						function () {
+							if (nextSubBeatIsRest) {
+								return _List_Nil;
+							} else {
+								if (noteSubBeat.isRest && prevSubBeatIsRest) {
+									return _List_Nil;
+								} else {
+									var beamStartX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (noteCenterX + 1.1) : (noteCenterX - 1.0);
+									var beamEndX = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? (nextNoteCenterX + 1.35) : (nextNoteCenterX - 0.85);
+									return _List_fromArray(
+										[
+											A2(
+											$elm$svg$Svg$path,
+											_List_fromArray(
+												[
+													$elm$svg$Svg$Attributes$strokeWidth('0.6'),
+													$elm$svg$Svg$Attributes$stroke('black'),
+													$elm$svg$Svg$Attributes$d(
+													'M ' + ($elm$core$String$fromFloat(beamStartX) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(beamEndX) + (' ' + $elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+												]),
+											_List_Nil)
+										]);
+								}
+							}
+						}());
+				} else {
+					return _List_Nil;
+				}
+			}
+		}();
+		var tripletBeam = function () {
+			if (noteSubBeat.subBeat === 5) {
+				if (noteSubBeat.isRest && nextSubBeatIsRest) {
+					return _List_Nil;
+				} else {
+					var yAdjuster = _Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1 : (-1);
+					return A2(
+						$elm$core$List$cons,
+						A2(
+							$elm$svg$Svg$text_,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$x(
+									$elm$core$String$fromFloat(noteCenterX)),
+									$elm$svg$Svg$Attributes$y(
+									$elm$core$String$fromFloat(
+										(stalkY - (_Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? 1.3 : (-2.5))) + ($author$project$Stave$staveShiftY * staveOffset))),
+									$elm$svg$Svg$Attributes$class('stave-bar-number')
+								]),
+							_List_fromArray(
+								[
+									$elm$svg$Svg$text('3')
+								])),
+						(prevSubBeatIsRest || (nextSubBeatIsRest || noteSubBeat.isRest)) ? _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(prevNoteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat((stalkY - (1.5 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(prevNoteCenterX - 1.5) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+									]),
+								_List_Nil),
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(prevNoteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+									]),
+								_List_Nil),
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(noteCenterX + 2.0) + (' ' + ($elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 2.0) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+									]),
+								_List_Nil),
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(nextNoteCenterX + 2.0) + (' ' + ($elm$core$String$fromFloat((stalkY - (1.5 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(nextNoteCenterX + 2.0) + (' ' + $elm$core$String$fromFloat((stalkY - (2 * yAdjuster)) + ($author$project$Stave$staveShiftY * staveOffset)))))))))
+									]),
+								_List_Nil)
+							]) : _List_Nil);
+				}
+			} else {
+				return _List_Nil;
+			}
+		}();
+		var instrument = A2($elm$core$Dict$get, noteSubBeat.instrumentName, $author$project$Common$instrumentDict);
+		var noteCenterY = function () {
+			if (instrument.$ === 'Just') {
+				var instr = instrument.a;
+				return instr.stavePosition + ($author$project$Stave$staveShiftY * staveOffset);
+			} else {
+				return 0;
+			}
+		}();
+		var noteShape = function () {
+			if (instrument.$ === 'Just') {
+				var instr = instrument.a;
+				return instr.noteShape;
+			} else {
+				return $author$project$CommonModel$Ovoid;
+			}
+		}();
+		var stalk = _Utils_eq(noteShape, $author$project$CommonModel$Rest) ? _List_Nil : (_Utils_eq(stalkDirection, $author$project$CommonModel$Up) ? ((_Utils_eq(noteShape, $author$project$CommonModel$Cross) || _Utils_eq(noteShape, $author$project$CommonModel$CrossLedger)) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+						$elm$svg$Svg$Attributes$stroke(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.2))))))))
+					]),
+				_List_Nil)
+			]) : _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+						$elm$svg$Svg$Attributes$stroke(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.2) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
+					]),
+				_List_Nil)
+			])) : ((_Utils_eq(noteShape, $author$project$CommonModel$Cross) || _Utils_eq(noteShape, $author$project$CommonModel$CrossLedger)) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+						$elm$svg$Svg$Attributes$stroke(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + $elm$core$String$fromFloat(noteCenterY - 1.2))))))))
+					]),
+				_List_Nil)
+			]) : _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+						$elm$svg$Svg$Attributes$stroke(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + ($elm$core$String$fromFloat(stalkY + ($author$project$Stave$staveShiftY * staveOffset)) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.0) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
+					]),
+				_List_Nil)
+			])));
+		var ghostNote = noteSubBeat.isGhostNote ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+						$elm$svg$Svg$Attributes$stroke('#565656'),
+						$elm$svg$Svg$Attributes$fill('#565656'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + ('C ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 2.0) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX - 1.5) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))))))))))
+					]),
+				_List_Nil),
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+						$elm$svg$Svg$Attributes$fill('#565656'),
+						$elm$svg$Svg$Attributes$stroke('#565656'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.7) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.5) + (' C ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + ($elm$core$String$fromFloat(noteCenterY - 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 2.2) + (' ' + ($elm$core$String$fromFloat(noteCenterY + 1.0) + (' ' + ($elm$core$String$fromFloat(noteCenterX + 1.7) + (' ' + $elm$core$String$fromFloat(noteCenterY + 1.5))))))))))))))))
+					]),
+				_List_Nil)
+			]) : _List_Nil;
+		var dot = noteSubBeat.isDotted ? (noteSubBeat.isRest ? ((!hasMixedDivisions) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$cx(
+						$elm$core$String$fromFloat(
+							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
+						$elm$svg$Svg$Attributes$cy(
+						$elm$core$String$fromFloat(noteCenterY)),
+						$elm$svg$Svg$Attributes$r('0.4'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black')
+					]),
+				_List_Nil)
+			]) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$cx(
+						$elm$core$String$fromFloat(
+							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
+						$elm$svg$Svg$Attributes$cy(
+						$elm$core$String$fromFloat(noteCenterY - 2)),
+						$elm$svg$Svg$Attributes$r('0.3'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black')
+					]),
+				_List_Nil)
+			]) : _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$cx(
+						$elm$core$String$fromFloat(
+							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
+						$elm$svg$Svg$Attributes$cy(
+						$elm$core$String$fromFloat(noteCenterY + 3)),
+						$elm$svg$Svg$Attributes$r('0.3'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black')
+					]),
+				_List_Nil)
+			]))) : _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$cx(
+						$elm$core$String$fromFloat(
+							noteCenterX + (noteSubBeat.isGhostNote ? 2.9 : 2.4))),
+						$elm$svg$Svg$Attributes$cy(
+						$elm$core$String$fromFloat(noteCenterY)),
+						$elm$svg$Svg$Attributes$r('0.4'),
+						$elm$svg$Svg$Attributes$fill(
+						noteSubBeat.isGhostNote ? '#565656' : 'black')
+					]),
+				_List_Nil)
+			])) : _List_Nil;
+		var crossNoteOffset = 1.0;
+		var accent = noteSubBeat.isAccented ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 2.7) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7))))))))
+					]),
+				_List_Nil),
+				A2(
+				$elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$d(
+						'M ' + ($elm$core$String$fromFloat(noteCenterX + 1.05) + (' ' + ($elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 1.7) + (' L ' + ($elm$core$String$fromFloat(noteCenterX - 1.05) + (' ' + $elm$core$String$fromFloat((noteSubBeat.stalkHeight + ($author$project$Stave$staveShiftY * staveOffset)) - 0.7))))))))
+					]),
+				_List_Nil)
+			]) : _List_Nil;
+		return _Utils_ap(
+			function () {
+				switch (noteShape.$) {
+					case 'Ovoid':
+						return _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$ellipse,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$cx(
+										$elm$core$String$fromFloat(noteCenterX)),
+										$elm$svg$Svg$Attributes$cy(
+										$elm$core$String$fromFloat(noteCenterY)),
+										$elm$svg$Svg$Attributes$rx('1.3'),
+										$elm$svg$Svg$Attributes$ry('0.95'),
+										$elm$svg$Svg$Attributes$transform(
+										'rotate(-20, ' + ($elm$core$String$fromFloat(noteCenterX) + (', ' + ($elm$core$String$fromFloat(noteCenterY) + ')')))),
+										$elm$svg$Svg$Attributes$fill(
+										noteSubBeat.isGhostNote ? '#565656' : 'black')
+									]),
+								_List_Nil)
+							]);
+					case 'Cross':
+						return _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY - crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY + crossNoteOffset))))))))
+									]),
+								_List_Nil),
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY + crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY - crossNoteOffset))))))))
+									]),
+								_List_Nil)
+							]);
+					case 'CrossLedger':
+						return _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY - crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY + crossNoteOffset))))))))
+									]),
+								_List_Nil),
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.4'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(noteCenterX - crossNoteOffset) + (' ' + ($elm$core$String$fromFloat(noteCenterY + crossNoteOffset) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + crossNoteOffset) + (' ' + $elm$core$String$fromFloat(noteCenterY - crossNoteOffset))))))))
+									]),
+								_List_Nil),
+								A2(
+								$elm$svg$Svg$path,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$strokeWidth('0.3'),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$d(
+										'M ' + ($elm$core$String$fromFloat(noteCenterX - 1.4) + (' ' + ($elm$core$String$fromFloat(noteCenterY) + (' L ' + ($elm$core$String$fromFloat(noteCenterX + 1.4) + (' ' + $elm$core$String$fromFloat(noteCenterY))))))))
+									]),
+								_List_Nil)
+							]);
+					case 'Triangle':
+						return _List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$circle,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$cx(
+										$elm$core$String$fromFloat(noteCenterX)),
+										$elm$svg$Svg$Attributes$cy(
+										$elm$core$String$fromFloat(noteCenterY)),
+										$elm$svg$Svg$Attributes$r('1.5')
+									]),
+								_List_Nil)
+							]);
+					default:
+						var _v1 = noteSubBeat.noteDuration;
+						switch (_v1.$) {
+							case 'Crotchet':
+								return (!hasMixedDivisions) ? _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
+												$elm$svg$Svg$Attributes$width('5'),
+												$elm$svg$Svg$Attributes$height('7'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 2)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 4))
+											]),
+										_List_Nil)
+									]) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
+												$elm$svg$Svg$Attributes$width('4'),
+												$elm$svg$Svg$Attributes$height('6'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 2)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 6))
+											]),
+										_List_Nil)
+									]) : _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/crotchet-rest.svg'),
+												$elm$svg$Svg$Attributes$width('4'),
+												$elm$svg$Svg$Attributes$height('6'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 2)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 1))
+											]),
+										_List_Nil)
+									]));
+							case 'Quaver':
+								return (!hasMixedDivisions) ? ((noteSubBeat.subdivision === '3-8') ? _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
+												$elm$svg$Svg$Attributes$width('3'),
+												$elm$svg$Svg$Attributes$height('5'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 1)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 4.0))
+											]),
+										_List_Nil)
+									]) : _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
+												$elm$svg$Svg$Attributes$width('4'),
+												$elm$svg$Svg$Attributes$height('6'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 3)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 3.5))
+											]),
+										_List_Nil)
+									])) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
+												$elm$svg$Svg$Attributes$width('3'),
+												$elm$svg$Svg$Attributes$height('5'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 1)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 5.2))
+											]),
+										_List_Nil)
+									]) : _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/quaver-rest.svg'),
+												$elm$svg$Svg$Attributes$width('3'),
+												$elm$svg$Svg$Attributes$height('5'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 1)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY + 1))
+											]),
+										_List_Nil)
+									]));
+							case 'SemiQuaver':
+								return (!hasMixedDivisions) ? _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/16th_rest.svg'),
+												$elm$svg$Svg$Attributes$width('4'),
+												$elm$svg$Svg$Attributes$height('6'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 2.5)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 2.5))
+											]),
+										_List_Nil)
+									]) : (_Utils_eq(noteSubBeat.stalkDirection, $author$project$CommonModel$Up) ? _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/16th_rest.svg'),
+												$elm$svg$Svg$Attributes$width('3'),
+												$elm$svg$Svg$Attributes$height('3.5'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 1.5)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY - 4.5))
+											]),
+										_List_Nil)
+									]) : _List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$image,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$xlinkHref('assets/images/16th_rest.svg'),
+												$elm$svg$Svg$Attributes$width('3'),
+												$elm$svg$Svg$Attributes$height('3.5'),
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromFloat(noteCenterX - 1.5)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(noteCenterY + 1.5))
+											]),
+										_List_Nil)
+									]));
+							default:
+								return _List_Nil;
+						}
+				}
+			}(),
+			_Utils_ap(
+				stalk,
+				_Utils_ap(
+					dot,
+					_Utils_ap(
+						tripletBeam,
+						_Utils_ap(
+							topBeam,
+							_Utils_ap(
+								semiQuaverBeam,
+								_Utils_ap(ghostNote, accent)))))));
+	});
+var $author$project$Stave$renderNoteSubBeats = F4(
+	function (barOffset, staveOffset, hasMixedDivisions, noteSubBeats) {
+		return A2(
+			$elm$core$List$concatMap,
+			function (nsb) {
+				return A7($author$project$Stave$renderNote, barOffset, staveOffset, nsb.beat, 4, nsb, noteSubBeats, hasMixedDivisions);
+			},
+			noteSubBeats);
+	});
+var $elm$core$List$sort = function (xs) {
+	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
+};
+var $author$project$Common$unique = function (list) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (a, uniques) {
+				return A2($elm$core$List$member, a, uniques) ? uniques : _Utils_ap(
+					uniques,
+					_List_fromArray(
+						[a]));
+			}),
+		_List_Nil,
+		list);
+};
+var $author$project$Stave$renderStaveBar = F2(
+	function (barNoteSubBeats, hasMixedDivisions) {
+		var beats = $author$project$Common$unique(
+			A2(
+				$elm$core$List$map,
+				function (nsb) {
+					return nsb.beat;
+				},
+				barNoteSubBeats.noteSubBeats));
+		return A2(
+			$elm$core$List$concatMap,
+			function (b) {
+				return A4(
+					$author$project$Stave$renderNoteSubBeats,
+					barNoteSubBeats.barOffset,
+					barNoteSubBeats.staveOffset,
+					hasMixedDivisions,
+					A2(
+						$elm$core$List$filter,
+						function (nsb) {
+							return _Utils_eq(nsb.beat, b);
+						},
+						barNoteSubBeats.noteSubBeats));
+			},
+			$elm$core$List$sort(beats));
+	});
 var $author$project$Stave$singleBarLines = F2(
 	function (staveOffset, barOffset) {
 		return (!barOffset) ? _List_fromArray(
@@ -10271,30 +10349,45 @@ var $author$project$Stave$renderStaveBars = function (bars) {
 			return x === '4-16';
 		},
 		divisions);
-	return A2(
-		$elm$core$List$concatMap,
+	var barNoteSubBeats = A2(
+		$elm$core$List$map,
 		function (b) {
 			var barNo = b.a;
 			var barOffset = A2($elm$core$Basics$modBy, 2, barNo - 1);
 			var staveOffset = ((barNo - 1) / 2) | 0;
 			var bar = b.b;
-			return _Utils_ap(
-				A3($author$project$Stave$stave, staveOffset, barNo, barOffset),
-				_Utils_ap(
-					(!barOffset) ? $author$project$Stave$percussionClef(staveOffset) : _List_Nil,
-					_Utils_ap(
-						A2($author$project$Stave$singleBarLines, staveOffset, barOffset),
-						_Utils_ap(
-							(barNo === 1) ? $author$project$Stave$staveTimeSignature(bar) : _List_Nil,
-							A5(
-								$author$project$Stave$renderStaveBar,
-								barOffset,
-								staveOffset,
-								A2($elm$core$List$range, 1, 4),
-								bar,
-								hasMixedDivisions)))));
+			return A5(
+				$author$project$Stave$BarNoteSubBeats,
+				barNo,
+				bar,
+				barOffset,
+				staveOffset,
+				A3(
+					$author$project$Stave$processStaveBar,
+					A2($elm$core$List$range, 1, 4),
+					bar,
+					hasMixedDivisions));
 		},
 		$elm$core$Dict$toList(bars));
+	return A2(
+		$elm$core$List$concatMap,
+		function (b) {
+			return _Utils_ap(
+				A3($author$project$Stave$stave, b.staveOffset, b.barNo, b.barOffset),
+				_Utils_ap(
+					(!b.barOffset) ? $author$project$Stave$percussionClef(b.staveOffset) : _List_Nil,
+					_Utils_ap(
+						A2($author$project$Stave$singleBarLines, b.staveOffset, b.barOffset),
+						_Utils_ap(
+							(b.barNo === 1) ? $author$project$Stave$staveTimeSignature(b.bar) : _List_Nil,
+							A2($author$project$Stave$renderStaveBar, b, hasMixedDivisions)))));
+		},
+		A2(
+			$elm$core$List$sortBy,
+			function ($) {
+				return $.barNo;
+			},
+			barNoteSubBeats));
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$html$Html$Attributes$width = function (n) {
@@ -10390,6 +10483,42 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Print Pattern')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$id('div-stickings')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('checkbox'),
+												$elm$html$Html$Attributes$id('cb-include-stickings'),
+												$author$project$CommonEvents$onCheckboxChanged($author$project$CommonModel$StickingsCheckBoxChanged),
+												$elm$html$Html$Attributes$checked(model.includeStickings)
+											]),
+										_List_Nil),
+										$elm$html$Html$text('Stickings'),
+										A2(
+										$elm$html$Html$select,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$disabled(!model.includeStickings)
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$option,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Single Stroke')
+													]))
+											]))
 									]))
 							])),
 						A2(
